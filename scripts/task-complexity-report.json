@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "generatedAt": "2025-05-22T07:55:48.263Z",
+    "tasksAnalyzed": 15,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": true
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Setup Expo React Native Project",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the Expo React Native project setup into logical phases: environment setup, project initialization, configuration, and structure implementation.",
+      "reasoning": "Setting up an Expo React Native project involves multiple configuration steps and environment setup. While Expo simplifies the process compared to bare React Native, it still requires careful configuration of project structure, navigation, and development tools. The complexity is moderate due to potential platform-specific issues and the need for proper TypeScript configuration."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Implement Authentication System",
+      "complexityScore": 7,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Divide the authentication system implementation into: context setup, UI development, API integration, secure storage, and authentication flow management.",
+      "reasoning": "Authentication systems require secure implementation of multiple interconnected components. This task involves token management, secure storage, form validation, and integration with company APIs. The first-time login password change adds additional complexity to the authentication flow."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Implement Department-based Authorization",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Separate the department-based authorization into: role/permission model design, UI conditional rendering, API request filtering, and administrator multi-department access implementation.",
+      "reasoning": "Authorization systems require careful implementation of access control logic across multiple app components. This task involves extending the authentication context, implementing department-based filtering, and creating conditional UI rendering based on permissions. The administrator multi-department access adds complexity."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Setup Server-Sent Events (SSE) Infrastructure",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Divide the SSE infrastructure implementation into: connection management, event handling, React integration, background processing, and optimization.",
+      "reasoning": "Implementing SSE in a mobile context is complex due to connection management challenges, background processing requirements, and battery optimization needs. The task requires creating robust reconnection logic, department-based filtering, and proper React integration through custom hooks."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Implement Real-time Dashboard",
+      "complexityScore": 9,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the real-time dashboard implementation into: layout design, chart components, SSE integration, filtering mechanisms, time range selection, and customization options.",
+      "reasoning": "Creating a real-time dashboard with multiple visualization types is highly complex. It requires integration with SSE, implementation of various chart types, responsive design, and department-based filtering. The dashboard must handle large datasets while maintaining performance across different screen sizes."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Implement Incident-Free Days Visualization",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Divide the incident-free days visualization into: counter component development, real-time update integration, and milestone/historical visualization implementation.",
+      "reasoning": "This task is moderately complex, requiring real-time updates via SSE and visual effects for milestones. The component is focused on a specific visualization with clear requirements, making it less complex than the full dashboard implementation."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implement FCM Push Notification System",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Separate the FCM implementation into: Firebase setup, permission handling, token management, notification handling (foreground/background), and user preferences.",
+      "reasoning": "Push notification implementation is complex due to platform-specific behaviors, permission handling, and the need to manage different application states. The task requires Firebase configuration, token management, and deep linking implementation, adding significant complexity."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Implement Notification Center",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the notification center into: UI development, real-time updates integration, status tracking/persistence, and filtering/search functionality.",
+      "reasoning": "The notification center requires managing complex state for read/unread status, implementing real-time updates, and creating filtering/search functionality. The need for offline persistence and handling large numbers of notifications adds to the complexity."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Implement AI-based Incident Analysis Visualization",
+      "complexityScore": 8,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the AI analysis visualization into: UI component design, API integration, interactive visualization implementation, and feedback/sharing functionality.",
+      "reasoning": "Visualizing AI-generated incident analysis requires creating complex interactive components to display root cause analysis, timelines, and related metrics. The task involves handling potentially complex data structures from the AI analysis and creating intuitive visualizations."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Log Viewer",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Separate the log viewer implementation into: UI design, API integration, filtering/search functionality, log formatting/highlighting, and access control.",
+      "reasoning": "The log viewer requires handling potentially large volumes of data with complex filtering and search capabilities. Real-time updates, syntax highlighting for different formats, and department-based access control add significant complexity to this component."
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Implement Responsive and Accessible UI",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the responsive and accessible UI implementation into: responsive layout components, accessibility enhancements, loading states/feedback, and internationalization support.",
+      "reasoning": "Creating a fully responsive and accessible UI requires addressing multiple concerns across the entire application. This includes device-specific layouts, screen reader support, proper focus management, and internationalization considerations."
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Implement User Profile and Settings",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Divide the user profile and settings implementation into: profile UI development, settings management, and persistence implementation.",
+      "reasoning": "The user profile and settings screens involve standard UI patterns and functionality. While it requires implementing various configuration options and persistence, the complexity is moderate compared to other tasks in the project."
+    },
+    {
+      "taskId": 13,
+      "taskTitle": "Implement Offline Mode and Data Caching",
+      "complexityScore": 9,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Separate the offline mode implementation into: caching strategy design, network detection, sync mechanism, offline UI indicators, and cache management.",
+      "reasoning": "Implementing robust offline functionality is highly complex, requiring sophisticated caching strategies, network detection, and synchronization mechanisms. The need to handle offline action queuing and manage cache size adds significant complexity."
+    },
+    {
+      "taskId": 14,
+      "taskTitle": "Implement Banner Notification System",
+      "complexityScore": 4,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down the banner notification system into: UI component development, content management, and display logic implementation.",
+      "reasoning": "The banner notification system is relatively straightforward compared to other tasks. It involves creating UI components, implementing display logic, and managing banner content, with moderate complexity for features like scheduling and targeting."
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Implement Performance Optimization and Testing",
+      "complexityScore": 9,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Divide performance optimization and testing into: monitoring implementation, render optimization, data handling improvements, asset optimization, automated testing, and CI/CD setup.",
+      "reasoning": "Performance optimization and comprehensive testing involve addressing multiple aspects of the application. This includes implementing monitoring, optimizing rendering and data handling, setting up automated testing, and creating CI/CD pipelines. The broad scope and technical depth make this highly complex."
+    }
+  ]
+}
