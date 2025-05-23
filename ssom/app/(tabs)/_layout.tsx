@@ -2,7 +2,7 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
 
-import ProtectedRoute from "../../modules/auth/components/ProtectedRoute";
+import ProtectedRoute from "@/modules/auth/components/ProtectedRoute";
 
 export default function TabLayout() {
   return (
@@ -42,14 +42,6 @@ export default function TabLayout() {
             title: "알림",
             tabBarIcon: ({ color, size }) => <Text style={{ color, fontSize: size }}>🚨</Text>,
             headerTitle: "시스템 알림",
-          }}
-        />
-        <Tabs.Screen
-          name="metrics"
-          options={{
-            title: "메트릭",
-            tabBarIcon: ({ color, size }) => <Text style={{ color, fontSize: size }}>📈</Text>,
-            headerTitle: "시스템 메트릭",
           }}
         />
         <Tabs.Screen

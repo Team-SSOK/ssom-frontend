@@ -1,5 +1,5 @@
 import { LoginRequest, LoginResponse, ChangePasswordRequest, User, AuthTokens, ApiError } from "../../../types/auth";
-import { AUTH_ENDPOINTS } from "../../../constants/auth";
+import { AUTH_ENDPOINTS } from "../constants/auth";
 
 // 기본 API URL (실제 환경에서는 환경 변수로 관리)
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api";

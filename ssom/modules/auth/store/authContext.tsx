@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from "react";
 import { AuthState, AuthAction, User, AuthTokens, LoginRequest, ChangePasswordRequest } from "../../../types/auth";
-import { STORAGE_KEYS, TOKEN_REFRESH_THRESHOLD } from "../../../constants/auth";
+import { STORAGE_KEYS, TOKEN_REFRESH_THRESHOLD } from "../constants/auth";
 import { StorageUtils } from "../../../utils/storage";
 import { AuthService } from "../api/authService";
 

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-native-gifted-charts": "^1.4.61",
+    "react-native-linear-gradient": "^2.8.3"
+  }
+}

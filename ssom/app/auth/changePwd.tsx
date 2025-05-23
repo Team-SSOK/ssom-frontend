@@ -13,11 +13,11 @@ import {
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { useAuth } from "../store/authContext";
-import Button from "../../../components/Button";
-import TextInput from "../../../components/TextInput";
-import { COMPANY_INFO, VALIDATION_RULES, AUTH_ERRORS } from "../../../constants/auth";
-import { ChangePasswordRequest } from "../../../types/auth";
+import { useAuth } from "@/modules/auth/store/authContext";
+import Button from "@/components/Button";
+import TextInput from "@/components/TextInput";
+import { COMPANY_INFO, VALIDATION_RULES, AUTH_ERRORS } from "@/modules/auth/constants/auth";
+import { ChangePasswordRequest } from "@/types/auth";
 
 interface FormData {
   currentPassword: string;
@@ -31,7 +31,7 @@ interface FormErrors {
   confirmPassword?: string;
 }
 
-const ChangePasswordScreen: React.FC = () => {
+const ChangePwdScreen: React.FC = () => {
   const router = useRouter();
   const { state, changePassword, logout } = useAuth();
 
@@ -349,4 +349,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChangePasswordScreen;
+export default ChangePwdScreen;
