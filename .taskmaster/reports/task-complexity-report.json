@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "generatedAt": "2025-06-03T13:33:04.750Z",
+    "tasksAnalyzed": 25,
+    "totalTasks": 25,
+    "analysisCount": 25,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": true
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Initialize Expo Project with TypeScript",
+      "complexityScore": 4,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the Expo project initialization into subtasks such as installing dependencies, configuring TypeScript, setting up project structure, initializing version control, configuring code quality tools, and platform-specific configuration.",
+      "reasoning": "This task involves several setup steps but each is relatively standard and well-documented. The complexity is moderate due to the number of tools and configurations, but there are no intricate algorithms or unique logic."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Implement Core Navigation with Expo Router",
+      "complexityScore": 6,
+      "recommendedSubtasks": 8,
+      "expansionPrompt": "Expand the navigation setup into subtasks such as directory structure, tab navigation, route creation, navigation guards, icon integration, type definitions, transitions/animations, and deep linking.",
+      "reasoning": "Setting up navigation with authentication guards, deep linking, and custom transitions adds complexity beyond basic routing. Multiple screens and route types require careful organization and testing."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Create Reusable UI Component Library",
+      "complexityScore": 7,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "List subtasks for each core component, accessibility, dark mode, documentation, responsive design, and TypeScript typing.",
+      "reasoning": "Building a comprehensive, accessible, and documented component library is a significant undertaking, especially with dark mode, responsiveness, and TypeScript support."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Implement JWT Authentication System",
+      "complexityScore": 8,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "Divide authentication into subtasks for context setup, service methods, secure storage, interceptors, forms, error handling, token refresh, protected routes, persistence, and password change.",
+      "reasoning": "JWT authentication involves secure storage, API integration, token refresh, error handling, and persistence, making it complex and security-critical."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Implement Biometric Authentication",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Break down biometric auth into service creation, UI integration, secure storage, settings, fallback handling, error handling, device compatibility, and auto-prompt logic.",
+      "reasoning": "Biometric authentication requires device capability checks, secure credential storage, fallback logic, and robust error handling, increasing complexity."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Implement State Management with Zustand",
+      "complexityScore": 6,
+      "recommendedSubtasks": 8,
+      "expansionPrompt": "Expand into subtasks for store creation, persistence, typing, selectors, hooks, hydration, reset logic, and devtools integration.",
+      "reasoning": "Setting up multiple global stores with persistence, hydration, and devtools adds moderate complexity, especially with TypeScript typing."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implement API Client with Axios",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "List subtasks for Axios setup, interceptors, error handling, service modules, retry logic, cancellation, offline queuing, and security enhancements.",
+      "reasoning": "A robust API client with interceptors, error handling, retry, cancellation, and security features is complex and foundational for the app."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Implement Issue Dashboard Screen",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Break down dashboard implementation into subtasks for each section, data fetching, charts, filters, refresh logic, error handling, navigation, orientation optimization, and caching.",
+      "reasoning": "The dashboard aggregates multiple data sources, visualizations, and real-time updates, requiring careful UI and data management."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Implement Issue List Screen",
+      "complexityScore": 8,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "Expand into subtasks for list rendering, search, filtering, sorting, pagination, state handling, swipe actions, batch operations, offline support, and UI feedback.",
+      "reasoning": "Advanced filtering, virtualization, batch actions, and offline support make this a complex and feature-rich screen."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Issue Details Screen",
+      "complexityScore": 9,
+      "recommendedSubtasks": 11,
+      "expansionPrompt": "List subtasks for each section (header, status, description, assignee, logs, comments, AI summary), editing, status updates, offline support, and navigation.",
+      "reasoning": "Combining detailed data display, editing, comments, AI integration, and offline support results in high complexity."
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Implement Issue Creation Screen",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Break down into subtasks for form fields, validation, assignee/log selection, creation modes, draft saving, submission, error handling, offline queue, and navigation.",
+      "reasoning": "Multiple creation modes, validation, draft saving, and offline queueing add to the complexity of this form-heavy screen."
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Implement Issue Merging Functionality",
+      "complexityScore": 8,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Expand into subtasks for UI, source/target selection, merge preview, conflict resolution, comment/log consolidation, confirmation, feedback, validation, and API integration.",
+      "reasoning": "Merging issues with conflict resolution, consolidation, and history tracking is a complex, multi-step process."
+    },
+    {
+      "taskId": 13,
+      "taskTitle": "Implement Alert Management Screen",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "List subtasks for alert list, filtering, details, acknowledgment, muting, real-time updates, offline support, quick actions, and settings.",
+      "reasoning": "Real-time updates, filtering, acknowledgment, and offline support make this screen moderately complex."
+    },
+    {
+      "taskId": 14,
+      "taskTitle": "Implement Log List Screen",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Break down into subtasks for list rendering, filtering, search, grouping, pagination, state handling, quick filters, offline support, and export.",
+      "reasoning": "Advanced filtering, virtualization, grouping, and offline/export features add to the complexity."
+    },
+    {
+      "taskId": 15,
+      "taskTitle": "Implement Log Details Screen",
+      "complexityScore": 8,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "Expand into subtasks for each section (header, source, message, metadata, related issues, context logs, stack trace), actions (create issue, copy, share, annotate), AI analysis, and offline support.",
+      "reasoning": "Comprehensive data display, navigation, AI, and offline features make this a complex detail screen."
+    },
+    {
+      "taskId": 16,
+      "taskTitle": "Implement AI Summarization Feature",
+      "complexityScore": 7,
+      "recommendedSubtasks": 8,
+      "expansionPrompt": "List subtasks for service methods, UI components, summary requests, caching, error handling, offline support, feedback, and sharing.",
+      "reasoning": "Integrating AI with UI, caching, feedback, and offline support is moderately complex but focused."
+    },
+    {
+      "taskId": 17,
+      "taskTitle": "Implement Push Notification System",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Break down into subtasks for notification service, permission flow, backend registration, handlers, categories/channels, preferences, deep linking, history, and badges.",
+      "reasoning": "Push notifications require cross-platform handling, deep linking, preferences, and robust testing."
+    },
+    {
+      "taskId": 18,
+      "taskTitle": "Implement Server-Sent Events (SSE) Integration",
+      "complexityScore": 8,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Expand into subtasks for SSE service, event handlers, UI indicators, reconnection logic, app state management, buffering, deduplication, and testing.",
+      "reasoning": "Real-time event handling, reconnection, buffering, and deduplication make SSE integration complex and error-prone."
+    },
+    {
+      "taskId": 19,
+      "taskTitle": "Implement Offline Mode Capabilities",
+      "complexityScore": 9,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "List subtasks for database setup, caching, sync service, network monitoring, UI indicators, action queue, conflict resolution, background sync, and performance testing.",
+      "reasoning": "Offline mode with local caching, sync, conflict resolution, and background operations is highly complex and critical for reliability."
+    },
+    {
+      "taskId": 20,
+      "taskTitle": "Implement User Settings Screen",
+      "complexityScore": 6,
+      "recommendedSubtasks": 8,
+      "expansionPrompt": "Break down into subtasks for each settings section, persistence, theme switching, language selection, password change, export/import, and cache clearing.",
+      "reasoning": "Settings screens are moderately complex due to multiple sections, persistence, and integration with other features."
+    },
+    {
+      "taskId": 21,
+      "taskTitle": "Implement Dark Mode Support",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "List subtasks for theme provider, palettes, switching logic, UI updates, icon theming, status colors, animations, persistence, and overrides.",
+      "reasoning": "Comprehensive dark mode requires updating all UI, handling transitions, and ensuring persistence and accessibility."
+    },
+    {
+      "taskId": 22,
+      "taskTitle": "Implement Accessibility Features",
+      "complexityScore": 8,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "Expand into subtasks for semantic markup, focus management, heading hierarchy, text scaling, high contrast mode, alt text, keyboard navigation, color contrast, testing utilities, and announcements.",
+      "reasoning": "Achieving WCAG 2.1 compliance across a mobile app is complex, requiring attention to detail and thorough testing."
+    },
+    {
+      "taskId": 23,
+      "taskTitle": "Implement Automated Testing Suite",
+      "complexityScore": 8,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "Break down into subtasks for unit test setup, component tests, integration tests, E2E setup, CI/CD integration, coverage, mocks, documentation, and guidelines.",
+      "reasoning": "A comprehensive automated testing suite covering unit, integration, E2E, and CI/CD is complex and foundational for quality."
+    },
+    {
+      "taskId": 24,
+      "taskTitle": "Implement Performance Optimization",
+      "complexityScore": 8,
+      "recommendedSubtasks": 10,
+      "expansionPrompt": "List subtasks for monitoring setup, rendering optimization, startup improvements, API performance, animation tuning, memory optimization, and performance testing.",
+      "reasoning": "Performance optimization spans multiple layers (UI, API, memory, startup), requiring deep analysis and targeted improvements."
+    },
+    {
+      "taskId": 25,
+      "taskTitle": "Implement App Store Deployment Configuration",
+      "complexityScore": 7,
+      "recommendedSubtasks": 9,
+      "expansionPrompt": "Break down into subtasks for EAS build setup, iOS deployment, Android deployment, versioning, release notes, beta testing, crash reporting, analytics, and documentation.",
+      "reasoning": "Deployment involves multiple platforms, build systems, signing, versioning, and compliance, making it moderately complex."
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+<context>
+# Overview  
+SSOM(System Service Operations Monitoring) is a comprehensive system operations monitoring mobile application designed to provide real-time monitoring, issue tracking, and log management capabilities. The application serves system administrators and operations teams who need to monitor system health, track and resolve issues, and analyze system logs efficiently from their mobile devices.
+
+The platform solves critical problems in system operations:
+- Centralized monitoring of system issues and alerts via mobile interface
+- Streamlined incident management and resolution workflows with GitHub integration
+- Intelligent log analysis with AI-powered summarization
+- Real-time visibility into system logs and issue tracking
+
+# Core Features  
+## 1. Authentication & User Management
+- **Secure Login System (LOG001)**: Dual authentication methods - traditional username/password and biometric fingerprint authentication
+- **Password Management (LOG002)**: Self-service password reset and mandatory password changes
+- **Why it's important**: Ensures secure access to sensitive monitoring data with convenient mobile authentication options
+- **How it works**: JWT-based authentication with role-based access control, supporting both traditional and biometric login methods
+
+## 2. Issue Management Dashboard
+- **Issue Dashboard (HOM001)**: Central overview of all system issues with visual statistics
+- **Issue List Management (HOM002)**: Comprehensive issue tracking with filtering and search
+- **Issue Details & Collaboration (HOM005)**: Detailed issue view with comment system and AI summarization
+- **Issue Creation (MON004)**: Streamlined issue creation from logs or manual entry
+- **Issue Merging (MON005)**: Ability to consolidate related issues
+- **GitHub Integration**: Issues automatically sync with GitHub (handled by backend services)
+- **Why it's important**: Provides structured incident management with seamless GitHub workflow integration
+- **How it works**: Status-based workflow with dependency tracking and automated GitHub synchronization via backend
+
+## 3. Alert & Notification System
+- **Alert Management (HOM003)**: Real-time alert monitoring with severity classification
+- **Why it's important**: Enables proactive issue detection and response via mobile notifications
+- **How it works**: Configurable alert rules with push notification support
+
+## 4. Log Monitoring & Analysis
+- **Log List & Search (MON001)**: Powerful log filtering and search capabilities
+- **Log Details (MON002)**: Comprehensive log analysis with issue correlation
+- **Why it's important**: Enables root cause analysis and system troubleshooting on mobile devices
+- **How it works**: Centralized log aggregation with intelligent categorization and mobile-optimized viewing
+
+## 5. AI-Powered Analytics
+- **LLM Summarization (MON003)**: AI-powered log and issue summarization
+- **Why it's important**: Reduces analysis time and improves decision-making on mobile devices
+- **How it works**: Integration with large language models for intelligent content analysis
+
+# User Experience  
+## User Personas
+- **System Administrators**: Primary users who monitor system health and resolve issues on-the-go
+- **Operations Engineers**: Team members who investigate incidents and maintain system stability via mobile access
+- **On-call Engineers**: Users who need immediate mobile access to system issues and logs during incidents
+
+## Key User Flows
+1. **Daily Monitoring Flow**: Biometric/Login → Dashboard Review → Alert Triage → Issue Investigation
+2. **Incident Response Flow**: Push Notification → Log Analysis → Issue Creation → GitHub Sync → Team Collaboration
+3. **Mobile Response Flow**: Quick biometric access → Critical alert review → Immediate action via mobile interface
+
+## UI/UX Considerations
+- **Mobile-First Design**: Optimized primarily for mobile devices with touch-friendly interfaces
+- **Dark Mode Support**: Reduces eye strain during extended monitoring sessions and night shifts
+- **Real-time Push Notifications**: Critical alert notifications for immediate incident response
+- **Accessibility**: WCAG 2.1 compliant for inclusive mobile access
+- **Offline Capability**: Basic functionality available without network connectivity
+</context>
+<PRD>
+# Technical Architecture  
+## System Components
+- **Frontend**: React Native mobile app with TypeScript using Expo app router
+- **Authentication**: JWT-based with biometric authentication support
+- **Real-time Communication**: Server-Sent Events (SSE) for live updates
+- **External Integrations**: Backend handles GitHub API synchronization
+- **AI Integration**: LLM API integration for summarization features (via backend)
+- **Data Storage**: Local SQLite for offline capabilities and API integration for server data
+
+## Data Models
+### Core Entities
+- **Users**: Authentication, roles, preferences, biometric enrollment status
+- **Issues**: Title, description, status, priority, assignee, timestamps, comments, GitHub issue ID
+- **Logs**: Timestamp, level, message, source, metadata
+- **Alerts**: Severity, status, trigger conditions, push notification settings
+- **Comments**: Content, author, timestamps, associated entity
+
+### Relationships
+- Users can create and be assigned to Issues
+- Logs can be linked to Issues for correlation
+- Issues can have multiple Comments
+- Issues sync with GitHub via backend services
+- Alerts can automatically generate Issues
+
+## APIs and Integrations
+### Authentication APIs (External Backend)
+- POST /api/users/login - User authentication
+- GET /api/users/info - User profile information
+- PUT /api/users/password - Password management
+
+### Issue Management APIs (External Backend)
+- GET /api/issue - List issues with filtering
+- POST /api/issue - Create new issue
+- GET /api/issue/data - Get specific issue details
+- PUT /api/issue - Update issue information
+- POST /api/issue/llm - Generate AI summary
+
+### Log Management APIs (External Backend)
+- GET /api/logging - List logs with filtering
+- GET /api/logging/{logId} - Get specific log details
+- GET /api/logging/issues - Get issues related to logs
+- POST /api/logging/summary - Generate log summary
+
+### Alert Management APIs (External Backend)
+- GET /api/alert - List alerts
+- PUT /api/alert/modify - Update alert status
+
+### Real-time Communication
+- SSE endpoints for live data updates
+- Push notification integration via backend
+
+## Mobile-Specific Requirements
+- **Expo SDK**: Latest stable version with app router
+- **Biometric Authentication**: expo-local-authentication for fingerprint/face recognition
+- **Push Notifications**: expo-notifications for real-time alerts
+- **Real-time Updates**: SSE client for live data streaming
+- **Offline Storage**: expo-sqlite for local data caching
+- **Navigation**: Expo Router for type-safe navigation
+- **State Management**: Zustand for lightweight state management
+
+# Development Roadmap  
+## Phase 1: MVP Foundation (Core Authentication & Basic Monitoring)
+- Mobile app setup with Expo and TypeScript
+- User authentication system with both password and biometric login
+- Basic issue dashboard with create/read operations
+- Simple log viewing capabilities
+- Basic alert notification system
+- Essential mobile UI components and navigation
+
+**MVP Success Criteria**: Users can log in via biometric/password, view issues, and see basic system alerts on mobile
+
+## Phase 2: Enhanced Issue Management & GitHub Integration
+- Complete CRUD operations for issues
+- GitHub-synced issue display (backend handles synchronization)
+- Comment system for team collaboration
+- Issue status workflow management
+- Advanced filtering and search capabilities
+- Push notification system for alerts
+- SSE integration for real-time updates
+
+## Phase 3: Advanced Log Analysis
+- Comprehensive log search and filtering optimized for mobile
+- Log correlation with issues
+- Mobile-optimized log viewing and navigation
+- Offline log caching capabilities
+
+## Phase 4: AI Integration & Advanced Features
+- LLM-powered summarization for issues and logs
+- Issue merging capabilities
+- Advanced mobile analytics and reporting
+- Automated issue detection from logs with GitHub sync
+
+## Phase 5: Performance & Polish
+- Performance optimization for mobile devices
+- Advanced biometric security features
+- Enhanced offline capabilities
+- Mobile accessibility improvements
+- App store optimization and deployment
+
+# Logical Dependency Chain
+## Foundation Dependencies (Must be built first)
+1. **Expo App Setup** - Mobile app foundation with TypeScript
+2. **Authentication System** - Both password and biometric authentication
+3. **Core Navigation** - Expo router setup and basic screen navigation
+4. **UI Component Library** - Mobile-optimized reusable components
+
+## Feature Build Order for Rapid User Value
+1. **Login System** → **Issue Dashboard** → **Basic Issue List**
+   - Gets users to a functional mobile monitoring interface quickly
+2. **GitHub-synced Issue Display** → **Issue Details** → **Issue Creation**  
+   - Enables complete issue management workflow with GitHub sync (backend handled)
+3. **Alert System** → **Push Notifications** → **Log Viewing** → **SSE Integration**
+   - Adds comprehensive mobile monitoring capabilities with real-time updates
+4. **AI Summarization** → **Advanced Mobile Features**
+   - Enhanced features that leverage mobile platform capabilities
+
+## Atomic Feature Scoping
+Each feature is designed to be:
+- **Mobile-optimized**: Touch-friendly and responsive on mobile devices
+- **Independently functional**: Can be used standalone
+- **Incrementally valuable**: Adds clear user benefit
+- **Foundation for enhancement**: Can be improved in future iterations
+- **GitHub-compatible**: Integrates seamlessly with GitHub workflows
+
+# Risks and Mitigations  
+## Technical Challenges
+**Risk**: Biometric authentication complexity across different mobile devices
+**Mitigation**: Use expo-local-authentication with comprehensive fallback to password authentication
+
+**Risk**: GitHub synchronization reliability affecting user experience
+**Mitigation**: Implement robust error handling and offline-first approach for GitHub-synced data
+
+**Risk**: Mobile performance with large log volumes
+**Mitigation**: Implement virtualized lists, pagination, and intelligent data loading
+
+## MVP Definition & Scope Management
+**Risk**: Feature creep preventing timely mobile MVP delivery
+**Mitigation**: Strict adherence to Phase 1 scope - authentication, basic dashboard, simple issue management
+
+**Risk**: Over-engineering mobile architecture
+**Mitigation**: Start with Expo managed workflow, upgrade to bare workflow only if needed
+
+## Resource Constraints  
+**Risk**: Limited development time for comprehensive mobile testing
+**Mitigation**: Implement automated testing with Expo testing tools, focus on critical path testing
+
+**Risk**: Complex mobile platform differences (iOS vs Android)
+**Mitigation**: Use Expo's cross-platform abstractions, test on both platforms from early stages
+
+# Appendix  
+## Research Findings
+- Mobile-first monitoring tools significantly improve incident response times
+- Biometric authentication adoption increases user engagement by 60%
+- GitHub integration is critical for development team workflows
+- AI-powered log analysis reduces mean time to resolution (MTTR)
+
+## Technical Specifications
+- **Mobile Framework**: Expo SDK 50+ with app router
+- **Language**: TypeScript with strict type checking
+- **Styling**: NativeWind (Tailwind CSS for React Native)
+- **State Management**: Zustand for lightweight state management
+- **API Client**: Axios with interceptors for authentication
+- **Real-time**: SSE client for live data updates
+- **Navigation**: Expo Router with file-based routing
+- **Testing**: Jest for unit tests, Detox for E2E mobile testing
+- **Build**: EAS Build for production deployments
+
+## Security Considerations
+- JWT tokens with secure storage in device keychain
+- Biometric authentication with device-level security
+- Certificate pinning for API communications
+- Input validation and sanitization on all user inputs
+- SSE connection security with proper authentication
+- GitHub data accessed only through secure backend APIs
+
+## Performance Targets
+- **App Launch Time**: < 3 seconds on mid-range devices
+- **API Response Rendering**: < 1 second for 95th percentile
+- **Biometric Authentication**: < 2 seconds
+- **Offline Mode**: Core features available without network
+- **Push Notification Delivery**: < 5 seconds from server trigger
+</PRD> 
