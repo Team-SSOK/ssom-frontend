@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { Entypo } from '@expo/vector-icons';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
+import { PaperProvider } from 'react-native-paper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -47,8 +48,10 @@ export default function Root() {
 
   return (
     <SessionProvider>
+      <PaperProvider>
         <SplashScreenController />
         <RootNavigator />
+      </PaperProvider>
     </SessionProvider>
   );
 }

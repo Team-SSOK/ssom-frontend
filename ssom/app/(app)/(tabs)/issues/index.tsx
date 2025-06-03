@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
-import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 // Mock data for demonstration
 const mockIssues = [
@@ -30,17 +29,9 @@ const mockIssues = [
     createdAt: '2024-06-03T08:15:00Z',
     description: 'Memory usage exceeded 80% threshold',
   },
-  {
-    id: '4',
-    title: 'SSL Certificate Expiring Soon',
-    status: 'open',
-    priority: 'warning',
-    createdAt: '2024-06-03T07:00:00Z',
-    description: 'SSL certificate expires in 7 days',
-  },
 ];
 
-export default function MainDashboard() {
+export default function IssuesListScreen() {
   const { isDark } = useTheme();
 
   const renderIssueItem = ({ item }: { item: typeof mockIssues[0] }) => (
@@ -49,7 +40,9 @@ export default function MainDashboard() {
         styles.issueCard,
         { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' },
       ]}
-      onPress={() => router.push(`/(app)/issues/${item.id}`)}
+      onPress={() => {
+        console.log('Issue pressed:', item.id);
+      }}
     >
       <View style={styles.issueHeader}>
         <Text style={[styles.issueTitle, { color: isDark ? '#fff' : '#000' }]}>
@@ -66,8 +59,6 @@ export default function MainDashboard() {
                   ? '#FF9500'
                   : item.priority === 'medium'
                   ? '#FFCC00'
-                  : item.priority === 'warning'
-                  ? '#FF9500'
                   : '#34C759',
             },
           ]}
@@ -107,39 +98,9 @@ export default function MainDashboard() {
     >
       <View style={styles.header}>
         <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>
-          SSOM Dashboard
-        </Text>
-        <Text style={[styles.subtitle, { color: isDark ? '#ccc' : '#666' }]}>
-          System Service Operations Monitoring
+          Issues
         </Text>
       </View>
-
-      <View style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
-          <Text style={[styles.statNumber, { color: '#FF3B30' }]}>2</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#ccc' : '#666' }]}>Critical</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
-          <Text style={[styles.statNumber, { color: '#FF9500' }]}>1</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#ccc' : '#666' }]}>High</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}>
-          <Text style={[styles.statNumber, { color: '#34C759' }]}>1</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#ccc' : '#666' }]}>Resolved</Text>
-        </View>
-      </View>
-
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: isDark ? '#fff' : '#000' }]}>
-          Recent Issues
-        </Text>
-        <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/issues')}>
-          <Text style={[styles.viewAllText, { color: '#007AFF' }]}>
-            View All
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       <FlatList
         data={mockIssues}
         renderItem={renderIssueItem}
@@ -164,46 +125,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    textTransform: 'uppercase',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  viewAllText: {
-    fontSize: 14,
-    fontWeight: '500',
   },
   listContainer: {
     padding: 16,
@@ -262,4 +183,4 @@ const styles = StyleSheet.create({
   createdAt: {
     fontSize: 12,
   },
-});
+}); 
