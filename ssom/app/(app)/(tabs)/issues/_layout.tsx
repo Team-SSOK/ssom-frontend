@@ -5,6 +5,7 @@ export default function IssuesLayout() {
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="[id]" />
             <Stack.Screen name="index" />
+            <Stack.Screen name="create" />
         </Stack>
 
     )
