@@ -32,60 +32,73 @@ const mockIssues = [
 ];
 
 export default function IssuesListScreen() {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical':
+        return colors.critical;
+      case 'high':
+        return colors.warning;
+      case 'medium':
+        return colors.tint2;
+      default:
+        return colors.success;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'open':
+        return colors.primary;
+      case 'in-progress':
+        return colors.warning;
+      case 'resolved':
+        return colors.success;
+      default:
+        return colors.textMuted;
+    }
+  };
 
   const renderIssueItem = ({ item }: { item: typeof mockIssues[0] }) => (
     <TouchableOpacity
       style={[
         styles.issueCard,
-        { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' },
+        { 
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+        },
       ]}
       onPress={() => {
         console.log('Issue pressed:', item.id);
       }}
     >
       <View style={styles.issueHeader}>
-        <Text style={[styles.issueTitle, { color: isDark ? '#fff' : '#000' }]}>
+        <Text style={[styles.issueTitle, { color: colors.text }]}>
           {item.title}
         </Text>
         <View
           style={[
             styles.priorityBadge,
-            {
-              backgroundColor:
-                item.priority === 'critical'
-                  ? '#FF3B30'
-                  : item.priority === 'high'
-                  ? '#FF9500'
-                  : item.priority === 'medium'
-                  ? '#FFCC00'
-                  : '#34C759',
-            },
+            { backgroundColor: getPriorityColor(item.priority) },
           ]}
         >
           <Text style={styles.priorityText}>{item.priority}</Text>
         </View>
       </View>
-      <Text style={[styles.issueDescription, { color: isDark ? '#ccc' : '#666' }]}>
+      <Text style={[styles.issueDescription, { color: colors.textSecondary }]}>
         {item.description}
       </Text>
       <View style={styles.issueFooter}>
         <View
           style={[
             styles.statusBadge,
-            {
-              backgroundColor:
-                item.status === 'open'
-                  ? '#007AFF'
-                  : item.status === 'in-progress'
-                  ? '#FF9500'
-                  : '#34C759',
-            },
+            { backgroundColor: getStatusColor(item.status) },
           ]}
         >
           <Text style={styles.statusText}>{item.status}</Text>
         </View>
-        <Text style={[styles.createdAt, { color: isDark ? '#888' : '#999' }]}>
+        <Text style={[styles.createdAt, { color: colors.textMuted }]}>
           {new Date(item.createdAt).toLocaleDateString()}
         </Text>
       </View>
@@ -94,10 +107,10 @@ export default function IssuesListScreen() {
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>
           Issues
         </Text>
       </View>
@@ -120,7 +133,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   title: {
     fontSize: 28,
@@ -134,7 +146,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#eee',
   },
   issueHeader: {
     flexDirection: 'row',

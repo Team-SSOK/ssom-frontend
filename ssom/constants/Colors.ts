@@ -1,40 +1,85 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * SSOM App Color System
+ * Based on the provided SSOM color palette with light and dark mode variations
  */
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-    border: '#e1e1e1',
-    card: '#f8f9fa',
-    primary: '#007AFF',
-    secondary: '#5856D6',
-    success: '#34C759',
-    warning: '#FF9500',
-    error: '#FF3B30',
+    // Neutral Colors
+    text: '#2A2C2E',           // Black
+    textSecondary: '#71747A',   // Grey
+    textMuted: '#959598',       // L. Grey
+    background: '#FFFFFF',      // White
+    backgroundSecondary: '#F5F7FA', // Silver
+    surface: '#E5E5E5',        // Next (Action)
+    border: '#D3D4DC',         // Disabled
+    white: '#FFFFFF',
+    
+    // Primary Colors
+    primary: '#1C2F5E',        // Primary
+    primaryHover: '#152A50',   // Hover
+    primaryDisabled: '#D3D4DC', // Disabled
+    
+    // Color Variations
+    shade1: '#1F324D',         // Shade 1
+    shade2: '#1F1F42',         // Shade 2  
+    shade3: '#082D53',         // Shade 3
+    tint1: '#3A5771',          // Tint 1
+    tint2: '#4A508A',          // Tint 2
+    tint3: '#607A62',          // Tint 3
+    
+    // Status Colors
+    critical: '#E5483E',       // Critical
+    warning: '#DB8520',        // Warning
+    resolved: '#5BA169',       // Resolved/Success
+    error: '#E5483E',          // Same as critical
+    success: '#5BA169',        // Same as resolved
+    
+    // Legacy support (for backward compatibility)
+    tint: '#1C2F5E',
+    icon: '#71747A',
+    tabIconDefault: '#959598',
+    tabIconSelected: '#1C2F5E',
+    card: '#F5F7FA',
+    secondary: '#4A508A',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-    border: '#2c2c2e',
-    card: '#1c1c1e',
-    primary: '#007AFF',
-    secondary: '#5856D6',
-    success: '#30D158',
-    warning: '#FF9F0A',
-    error: '#FF453A',
+    // Neutral Colors (Dark Mode)
+    text: '#FFFFFF',           // White text on dark background
+    textSecondary: '#B0B3B8',  // Lighter grey for secondary text
+    textMuted: '#8A8D93',      // Muted text
+    background: '#1A1A1A',     // Dark background
+    backgroundSecondary: '#2A2C2E', // Slightly lighter dark
+    surface: '#3A3A3A',        // Dark surface
+    border: '#404040',         // Dark border
+    white: '#FFFFFF',
+        
+    // Primary Colors (Adjusted for dark mode)
+    primary: '#4A6FA5',        // Lighter blue for better contrast
+    primaryHover: '#5A7FB5',   // Lighter hover state
+    primaryDisabled: '#606060', // Dark disabled state
+    
+    // Color Variations (Adjusted for dark mode)
+    shade1: '#3F4A5D',         // Lighter shade 1
+    shade2: '#3F3F62',         // Lighter shade 2
+    shade3: '#284D73',         // Lighter shade 3
+    tint1: '#5A7791',          // Lighter tint 1
+    tint2: '#6A70AA',          // Lighter tint 2
+    tint3: '#809A82',          // Lighter tint 3
+    
+    // Status Colors (Adjusted for dark mode)
+    critical: '#FF6B6B',       // Softer red for dark mode
+    warning: '#FFB347',        // Softer orange for dark mode
+    resolved: '#7BC97B',       // Softer green for dark mode
+    error: '#FF6B6B',          // Same as critical
+    success: '#7BC97B',        // Same as resolved
+    
+    // Legacy support (for backward compatibility)
+    tint: '#4A6FA5',
+    icon: '#B0B3B8',
+    tabIconDefault: '#8A8D93',
+    tabIconSelected: '#4A6FA5',
+    card: '#2A2C2E',
+    secondary: '#6A70AA',
   },
 }; 

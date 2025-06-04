@@ -6,27 +6,25 @@ import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 export default function TabLayout() {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   const router = useRouter();
   const [fabOpen, setFabOpen] = useState(false);
 
-  const onFabStateChange = ({ open }: { open: boolean }) => setFabOpen(open);
-
   const fabActions = [
     {
-      icon: 'home',
-      label: 'Dashboard',
+      icon: 'alpha-i',
       onPress: () => router.push('/(app)/(tabs)'),
+      style:  styles.fabActions ,
     },
     {
       icon: 'alert',
-      label: 'Alerts',
       onPress: () => router.push('/(app)/(tabs)/alerts'),
+      style: styles.fabActions,
     },
     {
-      icon: 'file-document-outline',
-      label: 'Logs',
+      icon: 'math-log',
       onPress: () => router.push('/(app)/(tabs)/logs'),
+      style: styles.fabActions,
     },
   ];
 
@@ -34,10 +32,6 @@ export default function TabLayout() {
     <>
       <Stack
         screenOptions={{
-          headerStyle: {
-            backgroundColor: isDark ? '#000' : '#fff',
-          },
-          headerTintColor: isDark ? '#fff' : '#000',
           headerShown: false,
         }}
       >
@@ -53,9 +47,10 @@ export default function TabLayout() {
           visible={true}
           icon={fabOpen ? 'close' : 'menu'}
           actions={fabActions}
-          onStateChange={onFabStateChange}
+          onStateChange={() => { setFabOpen(!fabOpen) }}
           style={styles.fab}
-          fabStyle={[styles.fabButton, { backgroundColor: '#007AFF' }]}
+          fabStyle={[styles.fabButton, { backgroundColor: colors.primary }]}
+          color='white'
           backdropColor='transparent'
         />
       </Portal>
@@ -68,12 +63,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     bottom: 16,
-    zIndex: 1000,
+  },
+  fabActions: {
+    padding: 3,
+    backgroundColor: 'white',
   },
   fabButton: {
-    elevation: 8,
+    elevation: 5,
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: 2,
     shadowOffset: { width: 0, height: 2 },
   },
 });

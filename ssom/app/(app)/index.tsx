@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PasswordChange() {
   const { session } = useSession();
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -91,10 +91,10 @@ export default function PasswordChange() {
   if (isFirstLogin === null) {
     return (
       <SafeAreaView 
-        style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: isDark ? '#fff' : '#000' }]}>
+          <Text style={[styles.loadingText, { color: colors.text }]}>
             Loading...
           </Text>
         </View>
@@ -104,33 +104,33 @@ export default function PasswordChange() {
 
   return (
     <SafeAreaView 
-      style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>
+          <Text style={[styles.title, { color: colors.text }]}>
             Welcome to SSOM
           </Text>
-          <Text style={[styles.subtitle, { color: isDark ? '#ccc' : '#666' }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             For security reasons, please change your initial password
           </Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>
+            <Text style={[styles.label, { color: colors.text }]}>
               Current Password
             </Text>
             <View style={[
               styles.passwordContainer,
-              { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }
+              { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }
             ]}>
               <TextInput
-                style={[styles.passwordInput, { color: isDark ? '#fff' : '#000' }]}
+                style={[styles.passwordInput, { color: colors.text }]}
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
                 placeholder="Enter current password"
-                placeholderTextColor={isDark ? '#888' : '#999'}
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry={!showCurrentPassword}
                 autoCapitalize="none"
               />
@@ -141,26 +141,26 @@ export default function PasswordChange() {
                 <Ionicons 
                   name={showCurrentPassword ? "eye-off" : "eye"} 
                   size={20} 
-                  color={isDark ? '#888' : '#999'} 
+                  color={colors.textMuted} 
                 />
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>
+            <Text style={[styles.label, { color: colors.text }]}>
               New Password
             </Text>
             <View style={[
               styles.passwordContainer,
-              { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }
+              { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }
             ]}>
               <TextInput
-                style={[styles.passwordInput, { color: isDark ? '#fff' : '#000' }]}
+                style={[styles.passwordInput, { color: colors.text }]}
                 value={newPassword}
                 onChangeText={setNewPassword}
                 placeholder="Enter new password (min 8 characters)"
-                placeholderTextColor={isDark ? '#888' : '#999'}
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry={!showNewPassword}
                 autoCapitalize="none"
               />
@@ -171,26 +171,26 @@ export default function PasswordChange() {
                 <Ionicons 
                   name={showNewPassword ? "eye-off" : "eye"} 
                   size={20} 
-                  color={isDark ? '#888' : '#999'} 
+                  color={colors.textMuted} 
                 />
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={[styles.label, { color: isDark ? '#fff' : '#000' }]}>
+            <Text style={[styles.label, { color: colors.text }]}>
               Confirm New Password
             </Text>
             <View style={[
               styles.passwordContainer,
-              { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }
+              { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }
             ]}>
               <TextInput
-                style={[styles.passwordInput, { color: isDark ? '#fff' : '#000' }]}
+                style={[styles.passwordInput, { color: colors.text }]}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 placeholder="Confirm new password"
-                placeholderTextColor={isDark ? '#888' : '#999'}
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry={!showConfirmPassword}
                 autoCapitalize="none"
               />
@@ -201,7 +201,7 @@ export default function PasswordChange() {
                 <Ionicons 
                   name={showConfirmPassword ? "eye-off" : "eye"} 
                   size={20} 
-                  color={isDark ? '#888' : '#999'} 
+                  color={colors.textMuted} 
                 />
               </TouchableOpacity>
             </View>
@@ -215,20 +215,20 @@ export default function PasswordChange() {
           />
         </View>
 
-        <View style={styles.requirements}>
-          <Text style={[styles.requirementsTitle, { color: isDark ? '#fff' : '#000' }]}>
+        <View style={[styles.requirements, { borderColor: colors.border }]}>
+          <Text style={[styles.requirementsTitle, { color: colors.text }]}>
             Password Requirements:
           </Text>
-          <Text style={[styles.requirementItem, { color: isDark ? '#ccc' : '#666' }]}>
+          <Text style={[styles.requirementItem, { color: colors.textSecondary }]}>
             • At least 8 characters long
           </Text>
-          <Text style={[styles.requirementItem, { color: isDark ? '#ccc' : '#666' }]}>
+          <Text style={[styles.requirementItem, { color: colors.textSecondary }]}>
             • Contains both uppercase and lowercase letters
           </Text>
-          <Text style={[styles.requirementItem, { color: isDark ? '#ccc' : '#666' }]}>
+          <Text style={[styles.requirementItem, { color: colors.textSecondary }]}>
             • Contains at least one number
           </Text>
-          <Text style={[styles.requirementItem, { color: isDark ? '#ccc' : '#666' }]}>
+          <Text style={[styles.requirementItem, { color: colors.textSecondary }]}>
             • Contains at least one special character
           </Text>
         </View>
@@ -284,6 +284,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     paddingHorizontal: 12,
+    borderWidth: 1,
   },
   passwordInput: {
     flex: 1,
@@ -300,7 +301,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
   },
   requirementsTitle: {
     fontSize: 16,
