@@ -6,30 +6,30 @@ import { useTheme } from '@/hooks/useTheme';
 const mockAlerts = [
   {
     id: '1',
-    title: 'High CPU Usage Alert',
-    severity: 'critical',
+    title: 'CPU 사용률 높음 경고',
+    severity: '긴급',
     timestamp: '2024-06-03T10:00:00Z',
     isRead: false,
     actionRequired: true,
-    description: 'CPU usage has exceeded 90% for more than 5 minutes',
+    description: 'CPU 사용률이 5분 이상 90%를 초과했습니다',
   },
   {
     id: '2',
-    title: 'Disk Space Warning',
-    severity: 'warning',
+    title: '디스크 공간 부족 경고',
+    severity: '경고',
     timestamp: '2024-06-03T09:30:00Z',
     isRead: true,
     actionRequired: false,
-    description: 'Disk space is running low on server-01',
+    description: 'server-01의 디스크 공간이 부족합니다',
   },
   {
     id: '3',
-    title: 'Service Health Check Failed',
-    severity: 'high',
+    title: '서비스 상태 확인 실패',
+    severity: '높음',
     timestamp: '2024-06-03T09:00:00Z',
     isRead: false,
     actionRequired: true,
-    description: 'Authentication service health check has failed',
+    description: '인증 서비스 상태 확인이 실패했습니다',
   },
 ];
 
@@ -39,10 +39,13 @@ export default function AlertsScreen() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
+      case '긴급':
         return colors.critical;
       case 'high':
+      case '높음':
         return colors.warning;
       case 'warning':
+      case '경고':
         return colors.warning;
       default:
         return colors.tint2;
@@ -67,7 +70,7 @@ export default function AlertsScreen() {
         <View style={styles.badges}>
           {!item.isRead && (
             <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
-              <Text style={styles.unreadText}>NEW</Text>
+              <Text style={styles.unreadText}>새로움</Text>
             </View>
           )}
           <View
@@ -86,7 +89,7 @@ export default function AlertsScreen() {
       <View style={styles.alertFooter}>
         {item.actionRequired && (
           <View style={[styles.actionBadge, { backgroundColor: colors.critical }]}>
-            <Text style={styles.actionText}>ACTION REQUIRED</Text>
+            <Text style={styles.actionText}>조치 필요</Text>
           </View>
         )}
         <Text style={[styles.timestamp, { color: colors.textMuted }]}>
@@ -102,7 +105,7 @@ export default function AlertsScreen() {
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>
-          Alerts
+          알림
         </Text>
       </View>
       <FlatList

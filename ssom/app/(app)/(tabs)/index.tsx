@@ -1,137 +1,58 @@
-import { View, Text, StyleSheet, FlatList, Pressable, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
+import DashboardHeader from '@/modules/issue/components/Dashboard/DashboardHeader';
+import IssueStatusSummary from '@/modules/issue/components/Dashboard/IssueStatusSummary';
+import IssueList from '@/modules/issue/components/Dashboard/IssueList';
 
 // Mock data for demonstration
 const mockIssues = [
   {
     id: '1',
-    title: 'API Response Time Degradation',
-    status: 'Critical',
+    title: 'API 응답 시간 저하',
+    status: '오류',
     createdAt: '2024-06-03T10:00:00Z',
-    description: 'API response times have increased significantly in the last hour',
+    description: '지난 1시간 동안 API 응답 시간이 현저히 증가했습니다',
   },
   {
     id: '2',
-    title: 'Database Connection Pool Exhausted',
-    status: 'Warning',
+    title: '데이터베이스 연결 풀 고갈',
+    status: '경고',
     createdAt: '2024-06-03T09:30:00Z',
-    description: 'All database connections are being used',
+    description: '모든 데이터베이스 연결이 사용 중입니다',
   },
   {
     id: '3',
-    title: 'Memory Usage Alert',
-    status: 'Critical',
+    title: '메모리 사용량 경고',
+    status: '오류',
     createdAt: '2024-06-03T08:15:00Z',
-    description: 'Memory usage exceeded 80% threshold',
+    description: '메모리 사용량이 80% 임계값을 초과했습니다',
   },
   {
     id: '4',
-    title: 'SSL Certificate Expiring Soon',
-    status: 'Resolved',
+    title: 'SSL 인증서 만료 임박',
+    status: '정보',
     createdAt: '2024-06-03T07:00:00Z',
-    description: 'SSL certificate expires in 7 days',
+    description: 'SSL 인증서가 7일 후 만료됩니다',
   },
 ];
 
 export default function MainDashboard() {
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Critical':
-        return colors.critical;
-      case 'Warning':
-        return colors.warning;
-      case 'Resolved':
-        return colors.success;
-      default:
-        return colors.textMuted;
-    }
+  const handleViewAllIssues = () => {
+    console.log('Navigate to all issues');
+    // router.push('/(app)/(tabs)/issues'); // Enable when needed
   };
-
-  const renderIssueItem = ({ item }: { item: typeof mockIssues[0] }) => (
-    <Pressable
-      style={[
-        styles.issueCard,
-        { 
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-        },
-      ]}
-      onPress={() => router.push(`/(app)/issues/${item.id}`)}
-    >
-      <View style={styles.issueHeader}>
-        <Text style={[styles.issueTitle, { color: colors.text }]}>
-          {item.title}
-        </Text>
-      </View>
-      <Text style={[styles.issueDescription, { color: colors.textSecondary }]}>
-        {item.description}
-      </Text>
-      <View style={styles.issueFooter}>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: getStatusColor(item.status) },
-          ]}
-        >
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-        <Text style={[styles.createdAt, { color: colors.textMuted }]}>
-          {new Date(item.createdAt).toLocaleDateString()}
-        </Text>
-      </View>
-    </Pressable>
-  );
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          SSOM
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          System Service Operations Monitoring
-        </Text>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statNumber, { color: colors.critical }]}>{mockIssues.filter(issue => issue.status === 'Critical').length}</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Critical</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statNumber, { color: colors.warning }]}>{mockIssues.filter(issue => issue.status === 'Warning').length}</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>High</Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statNumber, { color: colors.success }]}>{mockIssues.filter(issue => issue.status === 'Resolved').length}</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Resolved</Text>
-        </View>
-      </View>
-
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          최근 이슈
-        </Text>
-        <Pressable onPress={() => console.log('View All')}>
-          <Text style={[styles.viewAllText, { color: colors.primary }]}>
-            View All
-          </Text>
-        </Pressable>
-      </View>
-
-      <FlatList
-        data={mockIssues}
-        renderItem={renderIssueItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-      />
+      <DashboardHeader />
+      <IssueStatusSummary issues={mockIssues} />
+      <IssueList issues={mockIssues} onViewAll={handleViewAllIssues} />
     </SafeAreaView>
   );
 }
@@ -139,109 +60,5 @@ export default function MainDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    textTransform: 'uppercase',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  viewAllText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  listContainer: {
-    padding: 16,
-  },
-  issueCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-  },
-  issueHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  issueTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-    marginRight: 8,
-  },
-  issueDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  issueFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priorityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  priorityText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  statusText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'capitalize',
-  },
-  createdAt: {
-    fontSize: 12,
   },
 });

@@ -4,7 +4,7 @@ import {
   authApi,
   type SignInRequest,
   type SignUpRequest,
-} from '../api/authApi';
+} from '@/modules/auth/apis/authApi';
 import {
   saveTokens,
   clearTokens,

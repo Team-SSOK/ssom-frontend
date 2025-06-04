@@ -7,27 +7,27 @@ import { router } from 'expo-router';
 const mockIssues = [
   {
     id: '1',
-    title: 'API Response Time Degradation',
-    status: 'open',
-    priority: 'high',
+    title: 'API 응답 시간 저하',
+    status: '열림',
+    priority: '높음',
     createdAt: '2024-06-03T10:00:00Z',
-    description: 'API response times have increased significantly in the last hour',
+    description: '지난 1시간 동안 API 응답 시간이 현저히 증가했습니다',
   },
   {
     id: '2',
-    title: 'Database Connection Pool Exhausted',
-    status: 'in-progress',
-    priority: 'critical',
+    title: '데이터베이스 연결 풀 고갈',
+    status: '진행중',
+    priority: '긴급',
     createdAt: '2024-06-03T09:30:00Z',
-    description: 'All database connections are being used',
+    description: '모든 데이터베이스 연결이 사용 중입니다',
   },
   {
     id: '3',
-    title: 'Memory Usage Alert',
-    status: 'resolved',
-    priority: 'medium',
+    title: '메모리 사용량 경고',
+    status: '해결됨',
+    priority: '보통',
     createdAt: '2024-06-03T08:15:00Z',
-    description: 'Memory usage exceeded 80% threshold',
+    description: '메모리 사용량이 80% 임계값을 초과했습니다',
   },
 ];
 
@@ -37,10 +37,13 @@ export default function IssuesListScreen() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical':
+      case '긴급':
         return colors.critical;
       case 'high':
+      case '높음':
         return colors.warning;
       case 'medium':
+      case '보통':
         return colors.tint2;
       default:
         return colors.success;
@@ -50,10 +53,13 @@ export default function IssuesListScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
+      case '열림':
         return colors.primary;
       case 'in-progress':
+      case '진행중':
         return colors.warning;
       case 'resolved':
+      case '해결됨':
         return colors.success;
       default:
         return colors.textMuted;
@@ -111,7 +117,7 @@ export default function IssuesListScreen() {
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>
-          Issues
+          이슈 목록
         </Text>
       </View>
       <FlatList
