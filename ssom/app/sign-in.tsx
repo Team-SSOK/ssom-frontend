@@ -59,7 +59,7 @@ export default function SignIn() {
           email: form.email.trim(),
           password: form.password.trim(),
         });
-        router.replace('/(app)');
+        router.replace('/(app)/pw-change');
       }
     } catch (error) {
       console.error('인증 오류:', error);

@@ -11,12 +11,12 @@ export default function StatusBadge({ status, variant = 'status' }: StatusBadgeP
   const { colors } = useTheme();
 
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case '오류':
+    switch (status.toUpperCase()) {
+      case 'ERROR':
         return colors.critical;
-      case '경고':
+      case 'WARN':
         return colors.warning;
-      case '정보':
+      case 'INFO':
         return colors.primaryDisabled;
       default:
         return colors.textMuted;

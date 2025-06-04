@@ -13,9 +13,8 @@ interface IssueStatusSummaryProps {
 export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) {
   const { colors } = useTheme();
 
-  const criticalCount = issues.filter(issue => issue.status === '오류').length;
-  const warningCount = issues.filter(issue => issue.status === '경고').length;
-  const resolvedCount = issues.filter(issue => issue.status === '오류').length;
+  const criticalCount = issues.filter(issue => issue.status === 'ERROR').length;
+  const warningCount = issues.filter(issue => issue.status === 'WARN').length;
 
   return (
     <View style={styles.statsContainer}>
@@ -24,7 +23,7 @@ export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) 
           {criticalCount}
         </Text>
         <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-          Critical
+          ERROR
         </Text>
       </View>
       <View style={[styles.statCard, { backgroundColor: colors.card }]}>
@@ -32,15 +31,7 @@ export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) 
           {warningCount}
         </Text>
         <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-          Warning
-        </Text>
-      </View>
-      <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-        <Text style={[styles.statNumber, { color: colors.success }]}>
-          {resolvedCount}
-        </Text>
-        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-          Resolved
+          WARNING
         </Text>
       </View>
     </View>

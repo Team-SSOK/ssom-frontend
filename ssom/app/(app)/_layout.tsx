@@ -20,7 +20,7 @@ export default function AppLayout() {
   // 이 레이아웃은 루트 레이아웃이 아니므로 나중에 렌더링될 수 있습니다.
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="pw-change" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );

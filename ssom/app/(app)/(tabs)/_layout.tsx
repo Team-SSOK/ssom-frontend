@@ -26,6 +26,11 @@ export default function TabLayout() {
       onPress: () => router.push('/(app)/(tabs)/logs'),
       style: styles.fabActions,
     },
+    {
+      icon: 'account',
+      onPress: () => router.push('/(app)/(tabs)/profile'),
+      style: styles.fabActions,
+    },
   ];
 
   return (
@@ -39,6 +44,7 @@ export default function TabLayout() {
         <Stack.Screen name="issues" options={{ headerShown: false }} />
         <Stack.Screen name="logs" options={{ headerShown: false }} />
         <Stack.Screen name="alerts" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
       </Stack>
       
       <Portal>
