@@ -3,7 +3,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   authApi,
   type SignInRequest,
-  type SignUpRequest,
 } from '@/modules/auth/apis/authApi';
 import {
   saveTokens,
@@ -16,7 +15,7 @@ import {
 
 interface User {
   id: string;
-  email: string;
+  employeeId: string;
   name: string;
 }
 
@@ -27,7 +26,6 @@ interface AuthState {
   error: string | null;
   login: (credentials: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
-  signUp: (userData: SignUpRequest) => Promise<void>;
   initialize: () => Promise<void>;
   clearError: () => void;
   resetAuth: () => Promise<void>;
@@ -59,8 +57,14 @@ export const useAuthStore = create<AuthState>()(
             throw new Error('토큰 저장에 실패했습니다.');
           }
 
+          const authUser: User = {
+            id: user.id,
+            employeeId: user.employeeId,
+            name: user.name,
+          };
+
           set({
-            user: user as User,
+            user: authUser,
             isAuthenticated: true,
             error: null,
           });
@@ -94,30 +98,6 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             error: null,
           });
-        } finally {
-          set({ isLoading: false });
-        }
-      },
-
-      signUp: async (userData: SignUpRequest) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          const response = await authApi.signUp(userData);
-
-          if (!response.isSuccess) {
-            throw new Error(response.message || '회원가입에 실패했습니다.');
-          }
-
-          await get().login({
-            email: userData.email,
-            password: userData.password,
-          });
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : '회원가입에 실패했습니다.';
-          set({ error: errorMessage });
-          throw error;
         } finally {
           set({ isLoading: false });
         }

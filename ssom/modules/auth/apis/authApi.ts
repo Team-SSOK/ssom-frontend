@@ -4,7 +4,7 @@ const LOG_TAG = '[LOG][authApi]';
 
 // 요청 타입 정의
 export interface SignInRequest {
-  email: string;
+  employeeId: string;
   password: string;
 }
 
@@ -23,6 +23,7 @@ export interface AuthTokenResponse {
 export interface UserResponse {
   id: string;
   email: string;
+  employeeId: string;
   name: string;
 }
 
@@ -40,10 +41,11 @@ const IS_DEVELOPMENT = __DEV__;
 const MOCK_DELAY = 1000;
 
 // Mock 데이터 생성 유틸리티
-const createMockUser = (email: string, name?: string): UserResponse => ({
+const createMockUser = (employeeId: string, name?: string): UserResponse => ({
   id: `user_${Date.now()}`,
-  email,
-  name: name || email.split('@')[0] || 'Unknown User',
+  email: `${employeeId}@ssok.kr`,
+  employeeId: employeeId,
+  name: name || employeeId || 'Unknown User',
 });
 
 const createMockTokens = (): AuthTokenResponse => ({
@@ -57,13 +59,13 @@ export class AuthApi {
    * 로그인 API 호출
    */
   async signIn(data: SignInRequest): Promise<SignInResponse> {
-    console.log(`${LOG_TAG}[signIn] 요청:`, { email: data.email });
+    console.log(`${LOG_TAG}[signIn] 요청:`, { employeeId: data.employeeId });
 
     if (IS_DEVELOPMENT) {
       // Development 환경에서는 mock 응답 사용
       await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
 
-      const mockUser = createMockUser(data.email);
+      const mockUser = createMockUser(data.employeeId);
       const mockTokens = createMockTokens();
 
       console.log(`${LOG_TAG}[signIn] Mock 응답:`, mockUser);
@@ -134,7 +136,7 @@ export class AuthApi {
       switch (status) {
         case 401:
           return new Error(
-            '인증에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
+            '인증에 실패했습니다. 직원 ID와 비밀번호를 확인해주세요.',
           );
         case 403:
           return new Error('접근 권한이 없습니다.');
