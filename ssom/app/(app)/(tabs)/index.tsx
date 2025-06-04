@@ -1,40 +1,35 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
-import { Ionicons } from '@expo/vector-icons';
 
 // Mock data for demonstration
 const mockIssues = [
   {
     id: '1',
     title: 'API Response Time Degradation',
-    status: 'open',
-    priority: 'high',
+    status: 'Critical',
     createdAt: '2024-06-03T10:00:00Z',
     description: 'API response times have increased significantly in the last hour',
   },
   {
     id: '2',
     title: 'Database Connection Pool Exhausted',
-    status: 'in-progress',
-    priority: 'critical',
+    status: 'Warning',
     createdAt: '2024-06-03T09:30:00Z',
     description: 'All database connections are being used',
   },
   {
     id: '3',
     title: 'Memory Usage Alert',
-    status: 'resolved',
-    priority: 'medium',
+    status: 'Critical',
     createdAt: '2024-06-03T08:15:00Z',
     description: 'Memory usage exceeded 80% threshold',
   },
   {
     id: '4',
     title: 'SSL Certificate Expiring Soon',
-    status: 'open',
-    priority: 'warning',
+    status: 'Resolved',
     createdAt: '2024-06-03T07:00:00Z',
     description: 'SSL certificate expires in 7 days',
   },
@@ -43,28 +38,13 @@ const mockIssues = [
 export default function MainDashboard() {
   const { isDark, colors } = useTheme();
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical':
-        return colors.critical;
-      case 'high':
-        return colors.warning;
-      case 'medium':
-        return colors.tint2;
-      case 'warning':
-        return colors.warning;
-      default:
-        return colors.success;
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open':
-        return colors.primary;
-      case 'in-progress':
+      case 'Critical':
+        return colors.critical;
+      case 'Warning':
         return colors.warning;
-      case 'resolved':
+      case 'Resolved':
         return colors.success;
       default:
         return colors.textMuted;
@@ -72,7 +52,7 @@ export default function MainDashboard() {
   };
 
   const renderIssueItem = ({ item }: { item: typeof mockIssues[0] }) => (
-    <TouchableOpacity
+    <Pressable
       style={[
         styles.issueCard,
         { 
@@ -86,14 +66,6 @@ export default function MainDashboard() {
         <Text style={[styles.issueTitle, { color: colors.text }]}>
           {item.title}
         </Text>
-        <View
-          style={[
-            styles.priorityBadge,
-            { backgroundColor: getPriorityColor(item.priority) },
-          ]}
-        >
-          <Text style={styles.priorityText}>{item.priority}</Text>
-        </View>
       </View>
       <Text style={[styles.issueDescription, { color: colors.textSecondary }]}>
         {item.description}
@@ -111,7 +83,7 @@ export default function MainDashboard() {
           {new Date(item.createdAt).toLocaleDateString()}
         </Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
@@ -120,7 +92,7 @@ export default function MainDashboard() {
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>
-          SSOM Dashboard
+          SSOM
         </Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           System Service Operations Monitoring
@@ -129,28 +101,28 @@ export default function MainDashboard() {
 
       <View style={styles.statsContainer}>
         <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statNumber, { color: colors.critical }]}>2</Text>
+          <Text style={[styles.statNumber, { color: colors.critical }]}>{mockIssues.filter(issue => issue.status === 'Critical').length}</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Critical</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statNumber, { color: colors.warning }]}>1</Text>
+          <Text style={[styles.statNumber, { color: colors.warning }]}>{mockIssues.filter(issue => issue.status === 'Warning').length}</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>High</Text>
         </View>
         <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statNumber, { color: colors.success }]}>1</Text>
+          <Text style={[styles.statNumber, { color: colors.success }]}>{mockIssues.filter(issue => issue.status === 'Resolved').length}</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Resolved</Text>
         </View>
       </View>
 
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Recent Issues
+          최근 이슈
         </Text>
-        <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/issues')}>
+        <Pressable onPress={() => console.log('View All')}>
           <Text style={[styles.viewAllText, { color: colors.primary }]}>
             View All
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <FlatList
@@ -171,7 +143,6 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
   },
   title: {
     fontSize: 28,
