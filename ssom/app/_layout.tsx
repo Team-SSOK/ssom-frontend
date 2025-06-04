@@ -7,6 +7,16 @@ import * as Font from 'expo-font';
 import { Entypo } from '@expo/vector-icons';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { PaperProvider } from 'react-native-paper';
+import { theme } from '@/styles/theme';
+import {
+  IBMPlexSansKR_100Thin,
+  IBMPlexSansKR_200ExtraLight,
+  IBMPlexSansKR_300Light,
+  IBMPlexSansKR_400Regular,
+  IBMPlexSansKR_500Medium,
+  IBMPlexSansKR_600SemiBold,
+  IBMPlexSansKR_700Bold,
+} from '@expo-google-fonts/ibm-plex-sans-kr';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,13 +33,22 @@ export default function Root() {
     async function prepare() {
       try {
         // Pre-load fonts, make any API calls you need to do here
-        await Font.loadAsync(Entypo.font);
+        await Font.loadAsync({
+          ...Entypo.font,
+          // IBM Plex Sans KR 폰트 로드
+          'IBMPlexSansKR-Thin': IBMPlexSansKR_100Thin,
+          'IBMPlexSansKR-ExtraLight': IBMPlexSansKR_200ExtraLight,
+          'IBMPlexSansKR-Light': IBMPlexSansKR_300Light,
+          'IBMPlexSansKR-Regular': IBMPlexSansKR_400Regular,
+          'IBMPlexSansKR-Medium': IBMPlexSansKR_500Medium,
+          'IBMPlexSansKR-SemiBold': IBMPlexSansKR_600SemiBold,
+          'IBMPlexSansKR-Bold': IBMPlexSansKR_700Bold,
+        });
 
         // Initialize auth store
         await initialize();
 
         // Artificially delay for two seconds to simulate a slow loading
-        // experience. Remove this if you copy and paste the code!
         await new Promise((resolve) => setTimeout(resolve, 2000));
       } catch (e) {
         console.warn(e);
@@ -48,7 +67,7 @@ export default function Root() {
 
   return (
     <SessionProvider>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
         <SplashScreenController />
         <RootNavigator />
       </PaperProvider>

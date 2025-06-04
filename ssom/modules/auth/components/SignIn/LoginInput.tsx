@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { FontFamily } from '@/styles/fonts';
 
 interface LoginInputProps {
   value: string;
@@ -72,6 +73,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    fontFamily: FontFamily.regular,
+    fontWeight: '400',
     marginLeft: 12,
   },
   eyeButton: {

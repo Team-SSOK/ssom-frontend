@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import LoginInput from './LoginInput';
+import LoginInput from '@/modules/auth/components/SignIn/LoginInput';
 import LoginButton from './LoginButton';
 
 interface LoginFormProps {

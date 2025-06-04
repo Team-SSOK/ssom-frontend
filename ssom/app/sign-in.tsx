@@ -11,10 +11,10 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
 import { useAlert } from '@/hooks/useAlert';
-import AppLogo from '@/components/SignIn/AppLogo';
-import LoginForm from '@/components/SignIn/LoginForm';
-import LoginNotice from '@/components/SignIn/LoginNotice';
-import AppVersionInfo from '@/components/SignIn/AppVersionInfo';
+import AppLogo from '@/modules/auth/components/SignIn/AppLogo';
+import LoginForm from '@/modules/auth/components/SignIn/LoginForm';
+import LoginNotice from '@/modules/auth/components/SignIn/LoginNotice';
+import AppVersionInfo from '@/modules/auth/components/SignIn/AppVersionInfo';
 
 export default function SignIn() {
   const { login, isLoading, error, clearError } = useAuthStore();

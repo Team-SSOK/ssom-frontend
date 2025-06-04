@@ -8,6 +8,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import { FontFamily } from '@/styles/fonts';
 
 interface ButtonProps {
   title: string;
@@ -144,6 +145,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   text: {
+    fontFamily: FontFamily.semiBold,
     fontWeight: '600',
     textAlign: 'center',
   },

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { FontFamily } from '@/styles/fonts';
 
 export default function AppLogo() {
   const { colors } = useTheme();
@@ -54,12 +55,14 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 36,
-    fontWeight: '800',
+    fontFamily: FontFamily.bold,
+    fontWeight: '700',
     letterSpacing: 2,
     marginBottom: 8,
   },
   appSubtitle: {
     fontSize: 14,
+    fontFamily: FontFamily.medium,
     fontWeight: '500',
     textAlign: 'center',
     letterSpacing: 0.5,
@@ -78,6 +81,7 @@ const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 16,
     fontSize: 12,
+    fontFamily: FontFamily.medium,
     fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 1,

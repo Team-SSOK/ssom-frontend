@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
+import { FontFamily } from '@/styles/fonts';
 
 export default function LoginNotice() {
   const { colors } = useTheme();
@@ -27,6 +28,8 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
+    fontFamily: FontFamily.regular,
+    fontWeight: '400',
     marginLeft: 8,
     flex: 1,
     lineHeight: 20,

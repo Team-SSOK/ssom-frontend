@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { FontFamily } from '@/styles/fonts';
 
 export default function AppVersionInfo() {
   const { colors } = useTheme();
@@ -23,10 +24,13 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
+    fontFamily: FontFamily.semiBold,
     fontWeight: '600',
     marginBottom: 4,
   },
   versionText: {
     fontSize: 12,
+    fontFamily: FontFamily.regular,
+    fontWeight: '400',
   },
 }); 
