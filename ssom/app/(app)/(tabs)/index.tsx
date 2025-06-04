@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import DashboardHeader from '@/modules/issue/components/Dashboard/DashboardHeader';
-import IssueStatusSummary from '@/modules/issue/components/Dashboard/IssueStatusSummary';
-import IssueList from '@/modules/issue/components/Dashboard/IssueList';
+import DashboardHeader from '@/modules/issues/components/Dashboard/DashboardHeader';
+import IssueStatusSummary from '@/modules/issues/components/Dashboard/IssueStatusSummary';
+import IssueList from '@/modules/issues/components/Dashboard/IssueList';
 
 // Mock data for demonstration
 const mockIssues = [

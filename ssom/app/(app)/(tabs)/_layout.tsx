@@ -36,9 +36,9 @@ export default function TabLayout() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="issues/index" />
-        <Stack.Screen name="logs/index" />
-        <Stack.Screen name="alerts/index" />
+        <Stack.Screen name="issues" options={{ headerShown: false }} />
+        <Stack.Screen name="logs" options={{ headerShown: false }} />
+        <Stack.Screen name="alerts" options={{ headerShown: false }} />
       </Stack>
       
       <Portal>

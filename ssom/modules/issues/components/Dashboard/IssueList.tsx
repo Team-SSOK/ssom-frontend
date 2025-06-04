@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import IssueItem from '@/modules/issue/components/Dashboard/IssueItem';
+import IssueItem from '@/modules/issues/components/Dashboard/IssueItem';
 
 interface Issue {
   id: string;

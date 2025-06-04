@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
-import StatusBadge from '@/modules/issue/components/Common/StatusBadge';
+import StatusBadge from '@/modules/issues/components/Common/StatusBadge';
 
 interface Issue {
   id: string;
@@ -20,7 +20,7 @@ export default function IssueItem({ item }: IssueItemProps) {
   const { colors } = useTheme();
 
   const handlePress = () => {
-    router.push(`/(app)/issues/${item.id}`);
+    router.push(`/issues/${item.id}`);
   };
 
   return (
