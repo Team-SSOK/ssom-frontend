@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { FontFamily } from '@/styles/fonts';
 
 export default function AlertHeader() {
   const { colors } = useTheme();
@@ -59,7 +60,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: FontFamily.bold,
+    fontWeight: '700',
     flex: 1,
     textAlign: 'center',
   },
