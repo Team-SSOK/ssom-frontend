@@ -167,18 +167,6 @@ export default function SignIn() {
                 onPress={handleAuth}
                 disabled={!isFormValid || isLoading}
               />
-
-              <Pressable
-                style={styles.toggleButton}
-                onPress={toggleMode}
-                disabled={isLoading}
-              >
-                <Text style={[styles.toggleText, { color: '#007AFF' }]}>
-                  {isSignUp
-                    ? '이미 계정이 있으신가요? 로그인'
-                    : '계정이 없으신가요? 회원가입'}
-                </Text>
-              </Pressable>
             </View>
 
             <Text style={[styles.note, { color: isDark ? '#888' : '#999' }]}>
