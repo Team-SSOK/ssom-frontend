@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import LottieView from 'lottie-react-native';
+import { useRouter } from 'expo-router';
 
 export default function DashboardHeader() {
   const { colors } = useTheme();
@@ -10,9 +11,11 @@ export default function DashboardHeader() {
   const [hasNotifications, setHasNotifications] = useState(true);
   const [notificationCount, setNotificationCount] = useState(3);
 
+  const router = useRouter();
+
   const handleAlertPress = () => {
     animationRef.current?.play();
-    console.log("알림 아이콘이 터치되었습니다");
+    router.push('/(app)/(tabs)/alerts');
   };
 
   return (
