@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
-import StatusBadge from '@/modules/issues/components/Common/StatusBadge';
+import StatusBadge from '@/modules/issues/components/Dashboard/Common/StatusBadge';
 
 interface Issue {
   id: string;
