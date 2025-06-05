@@ -15,7 +15,7 @@ import { setupInterceptors } from './interceptors';
  */
 
 const BASE_URL = 'https://ssom.ssok.kr/api';
-const DEFAULT_TIMEOUT = 10000;
+const DEFAULT_TIMEOUT = 30000; // LLM 분석을 위해 30초로 증가
 
 /**
  * 메인 API 클라이언트 생성

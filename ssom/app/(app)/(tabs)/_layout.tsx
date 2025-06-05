@@ -23,7 +23,7 @@ export default function TabLayout() {
     },
     {
       icon: 'math-log',
-      onPress: () => router.push('/(app)/(tabs)/logs'),
+      onPress: () => router.push('/(app)/(tabs)/loggings'),
       style: styles.fabActions,
     },
     {

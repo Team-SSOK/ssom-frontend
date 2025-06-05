@@ -39,4 +39,25 @@ export interface ServicesResponse {
 
 export interface LogsResponse {
   logs: LogEntry[];
+}
+
+// LLM 분석 결과 타입
+export interface LogAnalysisResult {
+  summary: string;
+  location: {
+    file: string;
+    function: string;
+  };
+  solution: string;
+  solution_detail: string;
+}
+
+export interface LogAnalysisResponse {
+  summary: string;
+  location: {
+    file: string;
+    function: string;
+  };
+  solution: string;
+  solution_detail: string;
 } 

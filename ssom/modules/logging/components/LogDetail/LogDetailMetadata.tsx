@@ -1,15 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { Ionicons } from '@expo/vector-icons';
 
 interface LogDetailMetadataProps {
   logId: string;
   logger: string;
   thread: string;
   app: string;
+  showAnalysisButton?: boolean;
+  onAnalysisRequest?: () => void;
+  isAnalyzing?: boolean;
 }
 
-export default function LogDetailMetadata({ logId, logger, thread, app }: LogDetailMetadataProps) {
+export default function LogDetailMetadata({ 
+  logId, 
+  logger, 
+  thread, 
+  app, 
+  showAnalysisButton = false,
+  onAnalysisRequest,
+  isAnalyzing = false 
+}: LogDetailMetadataProps) {
   const { colors } = useTheme();
 
   return (
@@ -51,6 +63,29 @@ export default function LogDetailMetadata({ logId, logger, thread, app }: LogDet
           </Text>
         </View>
       </View>
+
+      {showAnalysisButton && (
+        <Pressable
+          style={[
+            styles.analysisButton,
+            { 
+              backgroundColor: colors.primary,
+              opacity: isAnalyzing ? 0.7 : 1 
+            }
+          ]}
+          onPress={onAnalysisRequest}
+          disabled={isAnalyzing}
+        >
+          {isAnalyzing ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Ionicons name="analytics" size={20} color="white" />
+          )}
+          <Text style={[styles.analysisButtonText, { color: 'white' }]}>
+            {isAnalyzing ? 'AI 분석 중...' : 'AI 분석 요청'}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -82,5 +117,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
     textAlign: 'right',
+  },
+  analysisButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    gap: 8,
+  },
+  analysisButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 }); 

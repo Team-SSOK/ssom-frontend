@@ -5,7 +5,8 @@ import {
   LogFilters, 
   ApiResponse, 
   ServicesResponse, 
-  LogsResponse 
+  LogsResponse,
+  LogAnalysisResult 
 } from '../types';
 
 /**
@@ -78,6 +79,38 @@ class LogApiService {
   // 경고 로그만 조회하는 헬퍼 메서드
   async getWarningLogs(): Promise<LogEntry[]> {
     return this.getLogs({ level: 'WARN' });
+  }
+
+  /**
+   * 기존 LLM 분석 결과 조회 (API 스펙 4번)
+   * GET /api/logging/{logId}
+   */
+  async getExistingAnalysis(logId: string): Promise<LogAnalysisResult | null> {
+    try {
+      const response = await apiInstance.get<ApiResponse<LogAnalysisResult>>(
+        `/logging/${logId}`
+      );
+      return response.data.result;
+    } catch (error: any) {
+      // 400 에러(기존 분석 없음)는 null 반환
+      if (error.response?.status === 400 || error.response?.data?.code === 8003) {
+        return null;
+      }
+      // 다른 에러는 re-throw
+      throw error;
+    }
+  }
+
+  /**
+   * 새로운 LLM 분석 요청 (API 스펙 5번)
+   * POST /api/logging
+   */
+  async createAnalysis(logData: LogEntry): Promise<LogAnalysisResult> {
+    const response = await apiInstance.post<ApiResponse<LogAnalysisResult>>(
+      '/logging',
+      logData
+    );
+    return response.data.result;
   }
 }
 

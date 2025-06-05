@@ -47,7 +47,7 @@ export default function LogItem({
       onSelect(item.logId);
     } else {
       router.push({
-        pathname: "/logs/[id]" as any,
+        pathname: "/loggings/[id]" as any,
         params: {
           id: item.logId,
           logId: item.logId,
