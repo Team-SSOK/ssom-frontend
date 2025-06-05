@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
-import { SessionProvider, useSession } from '@/ctx';
 import { SplashScreenController } from '@/splash';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
@@ -68,26 +67,24 @@ export default function Root() {
   }
 
   return (
-    <SessionProvider>
-      <PaperProvider theme={theme}>
-        <SplashScreenController />
-        <RootNavigator />
-        <Toast config={toastConfig} />
-      </PaperProvider>
-    </SessionProvider>
+    <PaperProvider theme={theme}>
+      <SplashScreenController />
+      <RootNavigator />
+      <Toast config={toastConfig} />
+    </PaperProvider>
   );
 }
 
 function RootNavigator() {
-  const { session } = useSession();
+  const { user, isAuthenticated } = useAuthStore();
 
   return (
     <Stack>
-      <Stack.Protected guard={!!session}>
+      <Stack.Protected guard={isAuthenticated && !!user}>
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
       </Stack.Protected>
 
-      <Stack.Protected guard={!session}>
+      <Stack.Protected guard={!isAuthenticated || !user}>
         <Stack.Screen
           name="sign-in"
           options={{

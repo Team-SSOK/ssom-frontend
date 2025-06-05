@@ -1,15 +1,15 @@
 import { Text } from 'react-native';
 import { Redirect, Stack } from 'expo-router';
-import { useSession } from '@/ctx/useSession';
+import { useAuthStore } from '@/modules/auth/stores/authStore';
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
+  const { user, isAuthenticated, isLoading } = useAuthStore();
 
   if (isLoading) {
     return <Text>Loading...</Text>;
   }
 
-  if (!session) {
+  if (!isAuthenticated || !user) {
     return <Redirect href="/sign-in" />;
   }
 

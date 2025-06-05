@@ -1,8 +1,8 @@
 import * as SplashScreen from 'expo-splash-screen';
-import { useSession } from '@/ctx/useSession';
+import { useAuthStore } from '@/modules/auth/stores/authStore';
 
 export function SplashScreenController() {
-  const { isLoading } = useSession();
+  const { isLoading } = useAuthStore();
 
   if (!isLoading) {
     SplashScreen.hideAsync();
