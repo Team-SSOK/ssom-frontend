@@ -1,5 +1,19 @@
 import type { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
+/**
+ * API 로깅 전용 파일
+ * 
+ * 책임:
+ * - API 요청/응답 로그 출력 (개발 환경에서만)
+ * - 토큰 갱신 관련 로그
+ * - 인증 관련 특별 상황 로그
+ * 
+ * 역할 제한:
+ * - 에러 처리 없음 (순수 로깅만)
+ * - 비즈니스 로직 없음
+ * - 프로덕션 환경에서는 동작 안함
+ */
+
 const LOG_TAG = '[apiInstance]';
 
 interface RequestLogData {

@@ -15,7 +15,7 @@ import PwChangeRequirements from '@/modules/auth/components/PwChange/PwChangeReq
 export default function PasswordChange() {
   const { colors } = useTheme();
   const toast = useToast();
-  const { changePassword, isLoading, error, clearError } = useAuthStore();
+  const { changePassword, isLoading } = useAuthStore();
   const [isFirstLogin, setIsFirstLogin] = useState<boolean>(true);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const formRef = useRef<PwChangeFormRef>(null);
@@ -46,15 +46,6 @@ export default function PasswordChange() {
     return () => clearInterval(interval);
   }, []);
 
-  // 에러가 변경되면 Toast로 표시
-  useEffect(() => {
-    if (error) {
-      toast.error('비밀번호 변경 오류', error);
-      clearError();
-    }
-  }, [error, clearError, toast]);
-
-
   const handlePasswordChange = async (data: PasswordChangeRequest) => {
     try {
       await changePassword(data);
@@ -68,7 +59,9 @@ export default function PasswordChange() {
         onHide: () => router.replace('/(app)/(tabs)')
       });
     } catch (error) {
-      toast.error('비밀번호 변경 오류', error as string);
+      console.warn('비밀번호 변경 실패:', error);
+      const errorMessage = error instanceof Error ? error.message : '비밀번호 변경에 실패했습니다.';
+      toast.error('비밀번호 변경 오류', errorMessage);
     }
   };
 

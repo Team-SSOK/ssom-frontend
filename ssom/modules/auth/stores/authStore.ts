@@ -26,12 +26,10 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
   login: (credentials: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
   changePassword: (data: PasswordChangeRequest) => Promise<void>;
   initialize: () => Promise<void>;
-  clearError: () => void;
   resetAuth: () => Promise<void>;
 }
 
@@ -47,10 +45,9 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: false,
-      error: null,
 
       login: async (credentials: SignInRequest) => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true });
 
         try {
           const response = await authApi.signIn(credentials);
@@ -72,24 +69,27 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: authUser,
             isAuthenticated: true,
-            error: null,
           });
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : '로그인에 실패했습니다.';
+          // API 에러 또는 토큰 저장 실패 시 상태 초기화
           set({
             user: null,
             isAuthenticated: false,
-            error: errorMessage,
           });
-          throw error;
+          
+          // 에러 메시지 가공 후 다시 throw
+          if (error instanceof Error) {
+            throw error;
+          } else {
+            throw new Error('로그인에 실패했습니다.');
+          }
         } finally {
           set({ isLoading: false });
         }
       },
 
       logout: async () => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true });
 
         try {
           // 서버에 로그아웃 요청
@@ -102,23 +102,23 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: null,
             isAuthenticated: false,
-            error: null,
             isLoading: false,
           });
         }
       },
 
       changePassword: async (data: PasswordChangeRequest) => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true });
 
         try {
           await authApi.changePassword(data);
-          set({ error: null });
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : '비밀번호 변경에 실패했습니다.';
-          set({ error: errorMessage });
-          throw error;
+          // 에러 메시지 가공 후 다시 throw
+          if (error instanceof Error) {
+            throw error;
+          } else {
+            throw new Error('비밀번호 변경에 실패했습니다.');
+          }
         } finally {
           set({ isLoading: false });
         }
@@ -137,7 +137,6 @@ export const useAuthStore = create<AuthState>()(
             if (isValidToken) {
               set({
                 isAuthenticated: true,
-                error: null,
               });
             } else {
               // 유효하지 않은 토큰 형식이면 리셋
@@ -155,16 +154,11 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      clearError: () => {
-        set({ error: null });
-      },
-
       resetAuth: async () => {
         await clearTokens();
         set({
           user: null,
           isAuthenticated: false,
-          error: null,
         });
       },
     }),

@@ -3,6 +3,20 @@ import { getTokens, saveTokens } from '@/services/tokenService';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { logTokenRefresh } from './logger';
 
+/**
+ * 토큰 갱신 처리 전용 파일
+ * 
+ * 책임:
+ * - 토큰 갱신 API 호출 (별도 클라이언트 사용)
+ * - 토큰 갱신 중 대기열 관리
+ * - 토큰 갱신 실패 시 인증 상태 리셋
+ * 
+ * 특징:
+ * - 인터셉터가 없는 별도 클라이언트 사용 (무한 루프 방지)
+ * - 토큰 갱신 상태 전역 관리
+ * - 대기 중인 요청들의 동시 처리
+ */
+
 const BASE_URL = 'https://ssom.ssok.kr/api';
 
 // 토큰 갱신용 별도 클라이언트 (인터셉터 없음)

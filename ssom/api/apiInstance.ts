@@ -1,6 +1,18 @@
 import axios from 'axios';
 import { setupInterceptors } from './interceptors';
 
+/**
+ * API 인스턴스 설정 파일
+ * 
+ * 책임:
+ * - Axios 인스턴스 생성 및 기본 설정
+ * - Base URL, 타임아웃, 기본 헤더 설정
+ * - 인터셉터 연결
+ * 
+ * 역할 제한:
+ * - 에러 처리 없음 (interceptors에서 담당)
+ * - 비즈니스 로직 없음 (API 클래스에서 담당)
+ */
 
 const BASE_URL = 'https://ssom.ssok.kr/api';
 const DEFAULT_TIMEOUT = 10000;

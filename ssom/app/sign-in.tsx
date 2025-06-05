@@ -9,7 +9,6 @@ import {
   Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect } from 'react';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
@@ -20,16 +19,9 @@ import LoginNotice from '@/modules/auth/components/SignIn/LoginNotice';
 import AppVersionInfo from '@/modules/auth/components/SignIn/AppVersionInfo';
 
 export default function SignIn() {
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const { colors } = useTheme();
   const toast = useToast();
-
-  useEffect(() => {
-    if (error) {
-      toast.error('로그인 오류', error);
-      clearError();
-    }
-  }, [error, clearError, toast]);
 
   const checkFirstLogin = async (): Promise<boolean> => {
     try {
@@ -68,6 +60,8 @@ export default function SignIn() {
       }
     } catch (error) {
       console.warn('로그인 실패:', error);
+      const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
+      toast.error('로그인 오류', errorMessage);
     }
   };
 
