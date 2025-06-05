@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
-import { SplashScreenController } from '@/splash';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { Entypo } from '@expo/vector-icons';
@@ -28,7 +27,7 @@ SplashScreen.setOptions({
 
 export default function Root() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const initialize = useAuthStore((state) => state.initialize);
+  const { initialize, isLoading } = useAuthStore();
 
   useEffect(() => {
     async function prepare() {
@@ -62,13 +61,19 @@ export default function Root() {
     prepare();
   }, [initialize]);
 
+  // Hide splash screen when auth loading is complete
+  useEffect(() => {
+    if (!isLoading && appIsReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading, appIsReady]);
+
   if (!appIsReady) {
     return null;
   }
 
   return (
     <PaperProvider theme={theme}>
-      <SplashScreenController />
       <RootNavigator />
       <Toast config={toastConfig} />
     </PaperProvider>
