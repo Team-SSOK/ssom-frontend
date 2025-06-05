@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getTokens, saveTokens } from '@/services/tokenService';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 
-const BASE_URL = 'http://api.expo.kr/';
+const BASE_URL = 'http://ssom.ssok.kr/';
 const LOG_TAG = '[apiInstance]';
 
 // 토큰 갱신용 별도 클라이언트 (인터셉터 없음)

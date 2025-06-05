@@ -117,7 +117,7 @@ export const useAuthStore = create<AuthState>()(
             await get().resetAuth();
           }
         } catch (error) {
-          console.error('Auth 초기화 오류:', error);
+          // Auth 초기화 실패 시 자동으로 리셋
           await get().resetAuth();
         }
       },

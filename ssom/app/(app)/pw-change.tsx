@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useSession } from '@/ctx/useSession';
 import { useTheme } from '@/hooks/useTheme';
+import { useToast } from '@/hooks/useToast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PwChangeHeader from '@/modules/auth/components/PwChange/PwChangeHeader';
 import PwChangeForm, { PwChangeFormRef, PasswordChangeRequest } from '@/modules/auth/components/PwChange/PwChangeForm';
@@ -13,6 +14,7 @@ import PwChangeRequirements from '@/modules/auth/components/PwChange/PwChangeReq
 export default function PasswordChange() {
   const { session } = useSession();
   const { colors } = useTheme();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [isFirstLogin, setIsFirstLogin] = useState<boolean>(true);
   const formRef = useRef<PwChangeFormRef>(null);
@@ -24,13 +26,13 @@ export default function PasswordChange() {
         const hasChangedPassword = await AsyncStorage.getItem('hasChangedPassword');
         setIsFirstLogin(!hasChangedPassword);
       } catch (error) {
-        console.error('첫 로그인 상태 확인 오류:', error);
+        toast.error('오류', '첫 로그인 상태 확인 중 오류가 발생했습니다.');
         setIsFirstLogin(true); // 오류 시 첫 로그인으로 처리
       }
     };
 
     checkFirstLogin();
-  }, []);
+  }, [toast]);
 
   const handlePasswordChange = async (data: PasswordChangeRequest) => {
     setLoading(true);
@@ -50,18 +52,14 @@ export default function PasswordChange() {
       // Mark that password has been changed
       await AsyncStorage.setItem('hasChangedPassword', 'true');
       
-      Alert.alert(
-        '성공', 
-        '비밀번호가 성공적으로 변경되었습니다! 메인 화면으로 이동합니다.',
-        [
-          {
-            text: '확인',
-            onPress: () => router.replace('/(app)/(tabs)')
-          }
-        ]
-      );
+      toast.showSuccess({
+        title: '비밀번호 변경 완료',
+        message: '비밀번호가 성공적으로 변경되었습니다! 메인 화면으로 이동합니다.',
+        duration: 1000,
+        onHide: () => router.replace('/(app)/(tabs)')
+      });
     } catch (error) {
-      Alert.alert('오류', '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+      toast.error('변경 실패', '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }

@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
-import { useAlert } from '@/hooks/useAlert';
+import { useToast } from '@/hooks/useToast';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLogo from '@/modules/auth/components/SignIn/AppLogo';
 import LoginForm from '@/modules/auth/components/SignIn/LoginForm';
@@ -22,28 +22,29 @@ import AppVersionInfo from '@/modules/auth/components/SignIn/AppVersionInfo';
 export default function SignIn() {
   const { login, isLoading, error, clearError } = useAuthStore();
   const { colors } = useTheme();
-  const { showErrorAlert } = useAlert();
+  const toast = useToast();
 
-  // 에러가 변경되면 Alert로 표시
+  // 에러가 변경되면 Toast로 표시
   useEffect(() => {
     if (error) {
-      showErrorAlert(error, clearError);
+      toast.error('로그인 오류', error);
+      clearError();
     }
-  }, [error, clearError, showErrorAlert]);
+  }, [error, clearError, toast]);
 
   const checkFirstLogin = async (): Promise<boolean> => {
     try {
       const hasChangedPassword = await AsyncStorage.getItem('hasChangedPassword');
       return !hasChangedPassword; // 비밀번호를 변경한 적이 없으면 첫 로그인
     } catch (error) {
-      console.error('첫 로그인 상태 확인 오류:', error);
+      toast.error('오류', '첫 로그인 상태 확인 중 오류가 발생했습니다.');
       return true; // 오류 시 안전하게 첫 로그인으로 처리
     }
   };
 
   const handleLogin = async (employeeId: string, password: string) => {
     if (!employeeId.trim() || !password.trim()) {
-      showErrorAlert('직원 ID와 비밀번호를 입력해주세요.');
+      toast.error('입력 오류', '직원 ID와 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -62,15 +63,16 @@ export default function SignIn() {
       if (isFirstLogin) {
         // 첫 로그인이면 비밀번호 변경 페이지로 이동
         console.log('첫 로그인 감지 - pw-change로 리다이렉트');
+        toast.info('환영합니다!', '보안을 위해 비밀번호를 변경해주세요.');
         router.replace('/(app)/pw-change');
       } else {
         // 이미 비밀번호를 변경한 사용자는 메인 탭으로 이동
         console.log('기존 사용자 - 메인 탭으로 리다이렉트');
+        toast.success('로그인 성공', '환영합니다!');
         router.replace('/(app)/(tabs)');
       }
     } catch (error) {
-      console.error('로그인 오류:', error);
-      showErrorAlert('로그인 중 오류가 발생했습니다.');
+      toast.error('로그인 실패', '로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -78,9 +80,9 @@ export default function SignIn() {
   const resetFirstLoginStatus = async () => {
     try {
       await AsyncStorage.removeItem('hasChangedPassword');
-      console.log('첫 로그인 상태가 리셋되었습니다.');
+      toast.success('개발자 도구', '첫 로그인 상태가 리셋되었습니다.');
     } catch (error) {
-      console.error('첫 로그인 상태 리셋 오류:', error);
+      toast.error('개발자 도구', '첫 로그인 상태 리셋 중 오류가 발생했습니다.');
     }
   };
 

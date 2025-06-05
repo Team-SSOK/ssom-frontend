@@ -8,6 +8,8 @@ import { Entypo } from '@expo/vector-icons';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/styles/theme';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '@/styles/toastConfig';
 import {
   IBMPlexSansKR_100Thin,
   IBMPlexSansKR_200ExtraLight,
@@ -70,6 +72,7 @@ export default function Root() {
       <PaperProvider theme={theme}>
         <SplashScreenController />
         <RootNavigator />
+        <Toast config={toastConfig} />
       </PaperProvider>
     </SessionProvider>
   );
