@@ -24,7 +24,6 @@ export default function SignIn() {
   const { colors } = useTheme();
   const toast = useToast();
 
-  // 에러가 변경되면 Toast로 표시
   useEffect(() => {
     if (error) {
       toast.error('로그인 오류', error);
@@ -38,7 +37,7 @@ export default function SignIn() {
       return !hasChangedPassword; // 비밀번호를 변경한 적이 없으면 첫 로그인
     } catch (error) {
       toast.error('오류', '첫 로그인 상태 확인 중 오류가 발생했습니다.');
-      return true; // 오류 시 안전하게 첫 로그인으로 처리
+      return true;
     }
   };
 
@@ -49,30 +48,26 @@ export default function SignIn() {
     }
 
     try {
-      // 로그인 요청
       await login({
         employeeId: employeeId.trim(),
         password: password.trim(),
       });
 
-      // 로그인 성공 후 첫 로그인 여부 확인
       const isFirstLogin = await checkFirstLogin();
       
       console.log('로그인 완료 - 첫 로그인 여부:', isFirstLogin);
       
       if (isFirstLogin) {
-        // 첫 로그인이면 비밀번호 변경 페이지로 이동
         console.log('첫 로그인 감지 - pw-change로 리다이렉트');
         toast.info('환영합니다!', '보안을 위해 비밀번호를 변경해주세요.');
         router.replace('/(app)/pw-change');
       } else {
-        // 이미 비밀번호를 변경한 사용자는 메인 탭으로 이동
         console.log('기존 사용자 - 메인 탭으로 리다이렉트');
         toast.success('로그인 성공', '환영합니다!');
         router.replace('/(app)/(tabs)');
       }
     } catch (error) {
-      toast.error('로그인 실패', '로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.warn('로그인 실패:', error);
     }
   };
 
@@ -80,9 +75,13 @@ export default function SignIn() {
   const resetFirstLoginStatus = async () => {
     try {
       await AsyncStorage.removeItem('hasChangedPassword');
-      toast.success('개발자 도구', '첫 로그인 상태가 리셋되었습니다.');
+      
+      const { resetAuth } = useAuthStore.getState();
+      await resetAuth();
+      
+      toast.success('개발자 도구', '모든 인증 데이터가 리셋되었습니다. (토큰, 첫로그인 상태 포함)');
     } catch (error) {
-      toast.error('개발자 도구', '첫 로그인 상태 리셋 중 오류가 발생했습니다.');
+      toast.error('개발자 도구', '리셋 중 오류가 발생했습니다.');
     }
   };
 
@@ -108,7 +107,7 @@ export default function SignIn() {
                 onPress={resetFirstLoginStatus}
               >
                 <Text style={[styles.devButtonText, { color: colors.textMuted }]}>
-                  [DEV] 첫 로그인 상태 리셋
+                  [DEV] 모든 인증 데이터 리셋
                 </Text>
               </Pressable>
             )}

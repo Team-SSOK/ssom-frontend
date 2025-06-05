@@ -51,6 +51,16 @@ const PwChangeForm = forwardRef<PwChangeFormRef, PwChangeFormProps>(({ onSubmit,
 
   const [errors, setErrors] = useState<FormErrors>({});
 
+  // 비밀번호 요구사항 검증 함수
+  const validatePasswordRequirements = (password: string): boolean => {
+    if (password.length < 8) return false; // 최소 8자
+    if (!/[A-Z]/.test(password)) return false; // 영문 대문자
+    if (!/[a-z]/.test(password)) return false; // 영문 소문자
+    if (!/\d/.test(password)) return false; // 숫자
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false; // 특수문자
+    return true;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -60,8 +70,8 @@ const PwChangeForm = forwardRef<PwChangeFormRef, PwChangeFormProps>(({ onSubmit,
 
     if (!formData.newPassword.trim()) {
       newErrors.newPassword = '새 비밀번호를 입력해주세요';
-    } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = '비밀번호는 최소 8자 이상이어야 합니다';
+    } else if (!validatePasswordRequirements(formData.newPassword)) {
+      newErrors.newPassword = '비밀번호 요구사항을 충족하지 않습니다';
     }
 
     if (!formData.confirmPassword.trim()) {
@@ -90,7 +100,7 @@ const PwChangeForm = forwardRef<PwChangeFormRef, PwChangeFormProps>(({ onSubmit,
            formData.newPassword.trim().length > 0 && 
            formData.confirmPassword.trim().length > 0 &&
            formData.newPassword === formData.confirmPassword &&
-           formData.newPassword.length >= 8;
+           validatePasswordRequirements(formData.newPassword);
   };
 
   useImperativeHandle(ref, () => ({

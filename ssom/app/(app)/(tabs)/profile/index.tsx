@@ -15,13 +15,19 @@ import { useAuthStore } from '@/modules/auth/stores/authStore';
 
 export default function ProfileScreen() {
   const { colors } = useTheme();
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
 
-  // Mock user data - 실제로는 상태관리나 API에서 가져올 데이터
-  const userInfo = {
-    name: '김개발',
-    email: 'kim.dev@ssok.kr',
-    department: '플랫폼개발팀',
+  // 사용자 정보가 없으면 기본값 표시
+  const userInfo = user ? {
+    name: user.username,
+    department: user.department,
+    lastLoginAt: user.lastLoginAt,
+    biometricEnabled: user.biometricEnabled,
+  } : {
+    name: '사용자',
+    department: '부서 정보 없음',
+    lastLoginAt: '',
+    biometricEnabled: false,
   };
 
   const handleLogout = () => {
@@ -101,14 +107,22 @@ export default function ProfileScreen() {
             <Text style={[styles.userName, { color: colors.text }]}>
               {userInfo.name}
             </Text>
-            <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
-              {userInfo.email}
-            </Text>
-    
-            <Text style={[styles.detailValue, { color: colors.text }]}>
+            <Text style={[styles.userDepartment, { color: colors.textSecondary }]}>
               {userInfo.department}
             </Text>
+            
+            {userInfo.lastLoginAt && (
+              <Text style={[styles.lastLogin, { color: colors.textMuted }]}>
+                최근 로그인: {new Date(userInfo.lastLoginAt).toLocaleDateString('ko-KR')}
+              </Text>
+            )}
           </View>
+          
+          {userInfo.biometricEnabled && (
+            <View style={[styles.biometricBadge, { backgroundColor: colors.success }]}>
+              <Ionicons name="finger-print" size={16} color={colors.white} />
+            </View>
+          )}
         </View>
 
         {/* Menu Items */}
@@ -208,10 +222,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
-  userEmail: {
-    fontSize: 14,
-    marginBottom: 2,
-  },
   userDepartment: {
     fontSize: 12,
   },
@@ -284,5 +294,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     marginBottom: 40,
+  },
+  lastLogin: {
+    fontSize: 12,
+  },
+  biometricBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 16,
   },
 }); 

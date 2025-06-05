@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useSession } from '@/ctx/useSession';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
+import { useAuthStore } from '@/modules/auth/stores/authStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PwChangeHeader from '@/modules/auth/components/PwChange/PwChangeHeader';
 import PwChangeForm, { PwChangeFormRef, PasswordChangeRequest } from '@/modules/auth/components/PwChange/PwChangeForm';
@@ -12,15 +13,14 @@ import PwChangeButton from '@/modules/auth/components/PwChange/PwChangeButton';
 import PwChangeRequirements from '@/modules/auth/components/PwChange/PwChangeRequirements';
 
 export default function PasswordChange() {
-  const { session } = useSession();
   const { colors } = useTheme();
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
+  const { changePassword, isLoading, error, clearError } = useAuthStore();
   const [isFirstLogin, setIsFirstLogin] = useState<boolean>(true);
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const formRef = useRef<PwChangeFormRef>(null);
 
   useEffect(() => {
-    // Check if this is the user's first login
     const checkFirstLogin = async () => {
       try {
         const hasChangedPassword = await AsyncStorage.getItem('hasChangedPassword');
@@ -34,22 +34,31 @@ export default function PasswordChange() {
     checkFirstLogin();
   }, [toast]);
 
+  // 폼 유효성 상태를 주기적으로 체크
+  useEffect(() => {
+    const checkFormValidity = () => {
+      if (formRef.current) {
+        setIsFormValid(formRef.current.isValid());
+      }
+    };
+
+    const interval = setInterval(checkFormValidity, 100); // 100ms마다 체크
+    return () => clearInterval(interval);
+  }, []);
+
+  // 에러가 변경되면 Toast로 표시
+  useEffect(() => {
+    if (error) {
+      toast.error('비밀번호 변경 오류', error);
+      clearError();
+    }
+  }, [error, clearError, toast]);
+
+
   const handlePasswordChange = async (data: PasswordChangeRequest) => {
-    setLoading(true);
     try {
-      // Mock API call - replace with actual password change API
-      // await authApi.changePassword(data);
-      
-      console.log('비밀번호 변경 요청 데이터:', {
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword
-      });
+      await changePassword(data);
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mark that password has been changed
       await AsyncStorage.setItem('hasChangedPassword', 'true');
       
       toast.showSuccess({
@@ -59,9 +68,7 @@ export default function PasswordChange() {
         onHide: () => router.replace('/(app)/(tabs)')
       });
     } catch (error) {
-      toast.error('변경 실패', '비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setLoading(false);
+      toast.error('비밀번호 변경 오류', error as string);
     }
   };
 
@@ -87,13 +94,13 @@ export default function PasswordChange() {
             <PwChangeForm
               ref={formRef}
               onSubmit={handlePasswordChange}
-              loading={loading}
+              loading={isLoading}
             />
             
             <PwChangeButton
               onPress={handleSubmitPress}
-              disabled={loading}
-              isLoading={loading}
+              disabled={isLoading || !isFormValid}
+              isLoading={isLoading}
             />
             
             <PwChangeRequirements />
