@@ -12,9 +12,15 @@ interface IssueState {
   isIssueCreating: boolean;
   issueCreateError: string | null;
 
+  // 전체 이슈 목록 관련 상태
+  allIssues: IssueResult[];
+  isLoadingIssues: boolean;
+  issuesError: string | null;
+
   // 액션들
   createDraft: (data: IssueDraftRequest) => Promise<void>;
   createGithubIssue: (data: CreateGithubIssueRequest) => Promise<boolean>;
+  getAllIssues: () => Promise<void>;
   clearDraft: () => void;
   clearIssue: () => void;
   clearError: () => void;
@@ -28,6 +34,9 @@ export const useIssueStore = create<IssueState>((set, get) => ({
   createdIssue: null,
   isIssueCreating: false,
   issueCreateError: null,
+  allIssues: [],
+  isLoadingIssues: false,
+  issuesError: null,
 
   // 이슈 초안 생성
   createDraft: async (data: IssueDraftRequest) => {
@@ -69,6 +78,25 @@ export const useIssueStore = create<IssueState>((set, get) => ({
     }
   },
 
+  // 전체 이슈 목록 조회
+  getAllIssues: async () => {
+    set({ isLoadingIssues: true, issuesError: null });
+    
+    try {
+      const issues = await issueApi.getAllIssues();
+      set({ 
+        allIssues: issues,
+        isLoadingIssues: false 
+      });
+    } catch (error) {
+      console.error('Get all issues error:', error);
+      set({ 
+        isLoadingIssues: false,
+        issuesError: error instanceof Error ? error.message : '이슈 목록을 불러오는 중 오류가 발생했습니다.'
+      });
+    }
+  },
+
   // 초안 결과 클리어
   clearDraft: () => {
     set({ 
@@ -89,7 +117,8 @@ export const useIssueStore = create<IssueState>((set, get) => ({
   clearError: () => {
     set({ 
       draftError: null,
-      issueCreateError: null 
+      issueCreateError: null,
+      issuesError: null 
     });
   }
 }));
