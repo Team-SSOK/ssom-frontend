@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
@@ -9,7 +9,7 @@ import LogDetailBasicInfo from '@/modules/logging/components/LogDetail/LogDetail
 import LogDetailMetadata from '@/modules/logging/components/LogDetail/LogDetailMetadata';
 import LogAnalysisResultComponent from '@/modules/logging/components/LogDetail/LogAnalysisResult';
 import { useLogStore } from '@/modules/logging/stores/logStore';
-import { LogEntry, LogAnalysisResult } from '@/modules/logging/types';
+import { LogEntry } from '@/modules/logging/types';
 
 export default function LogDetailScreen() {
   const { colors } = useTheme();
