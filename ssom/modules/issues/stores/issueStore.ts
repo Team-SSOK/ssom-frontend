@@ -17,6 +17,11 @@ interface IssueState {
   isLoadingIssues: boolean;
   issuesError: string | null;
 
+  // 나의 이슈 목록 관련 상태
+  myIssues: IssueResult[];
+  isLoadingMyIssues: boolean;
+  myIssuesError: string | null;
+
   // 개별 이슈 상세 조회 관련 상태
   currentIssue: IssueResult | null;
   isLoadingCurrentIssue: boolean;
@@ -26,6 +31,7 @@ interface IssueState {
   createDraft: (data: IssueDraftRequest) => Promise<void>;
   createGithubIssue: (data: CreateGithubIssueRequest) => Promise<boolean>;
   getAllIssues: () => Promise<void>;
+  getMyIssues: () => Promise<void>;
   getIssueById: (issueId: number) => Promise<void>;
   clearDraft: () => void;
   clearIssue: () => void;
@@ -44,6 +50,9 @@ export const useIssueStore = create<IssueState>((set, get) => ({
   allIssues: [],
   isLoadingIssues: false,
   issuesError: null,
+  myIssues: [],
+  isLoadingMyIssues: false,
+  myIssuesError: null,
   currentIssue: null,
   isLoadingCurrentIssue: false,
   currentIssueError: null,
@@ -107,6 +116,25 @@ export const useIssueStore = create<IssueState>((set, get) => ({
     }
   },
 
+  // 나의 이슈 목록 조회
+  getMyIssues: async () => {
+    set({ isLoadingMyIssues: true, myIssuesError: null });
+    
+    try {
+      const issues = await issueApi.getMyIssues();
+      set({ 
+        myIssues: issues,
+        isLoadingMyIssues: false 
+      });
+    } catch (error) {
+      console.error('Get my issues error:', error);
+      set({ 
+        isLoadingMyIssues: false,
+        myIssuesError: error instanceof Error ? error.message : '나의 이슈 목록을 불러오는 중 오류가 발생했습니다.'
+      });
+    }
+  },
+
   // 개별 이슈 상세 조회
   getIssueById: async (issueId: number) => {
     set({ isLoadingCurrentIssue: true, currentIssueError: null });
@@ -156,6 +184,7 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       draftError: null,
       issueCreateError: null,
       issuesError: null,
+      myIssuesError: null,
       currentIssueError: null 
     });
   }
