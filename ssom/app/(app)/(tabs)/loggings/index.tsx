@@ -196,7 +196,6 @@ const styles = StyleSheet.create({
   },
   connectionSection: {
     paddingHorizontal: 16,
-    paddingBottom: 8,
   },
   filterSection: {
     alignItems: 'flex-start',
