@@ -17,7 +17,8 @@ import { logTokenRefresh } from './logger';
  * - 대기 중인 요청들의 동시 처리
  */
 
-const BASE_URL = 'https://ssom.ssok.kr/api';
+// const BASE_URL = 'https://ssom.ssok.kr/api';
+const BASE_URL = 'http://kudong.kr:55037/api';
 
 // 토큰 갱신용 별도 클라이언트 (인터셉터 없음)
 const refreshClient = axios.create({
