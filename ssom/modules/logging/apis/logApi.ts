@@ -88,7 +88,7 @@ class LogApiService {
   async getExistingAnalysis(logId: string): Promise<LogAnalysisResult | null> {
     try {
       const response = await apiInstance.get<ApiResponse<LogAnalysisResult>>(
-        `/logging/${logId}`
+        `/logging/analysis/${logId}`
       );
       return response.data.result;
     } catch (error: any) {
@@ -107,8 +107,19 @@ class LogApiService {
    */
   async createAnalysis(logData: LogEntry): Promise<LogAnalysisResult> {
     const response = await apiInstance.post<ApiResponse<LogAnalysisResult>>(
-      '/logging',
+      '/logging/analysis',
       logData
+    );
+    return response.data.result;
+  }
+
+  /**
+   * 로그 상세 조회 (API 스펙 6번)
+   * GET /api/logging/{logId}
+   */
+  async getLogById(logId: string): Promise<LogEntry> {
+    const response = await apiInstance.get<ApiResponse<LogEntry>>(
+      `/logging/${logId}`
     );
     return response.data.result;
   }

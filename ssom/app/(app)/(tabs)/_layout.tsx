@@ -12,17 +12,17 @@ export default function TabLayout() {
 
   const fabActions = [
     {
-      icon: 'alpha-i',
+      icon: 'bug-outline',
       onPress: () => router.push('/(app)/(tabs)'),
       style:  styles.fabActions ,
     },
     {
-      icon: 'alert',
+      icon: 'monitor-dashboard',
       onPress: () => router.push('/(app)/(tabs)/alerts'),
       style: styles.fabActions,
     },
     {
-      icon: 'math-log',
+      icon: 'console-line',
       onPress: () => router.push('/(app)/(tabs)/loggings'),
       style: styles.fabActions,
     },

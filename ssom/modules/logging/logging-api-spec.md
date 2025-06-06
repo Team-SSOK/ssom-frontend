@@ -206,3 +206,44 @@ api/logging/{logId}
     }
 }
 ```
+
+## 6. 로그 상세 조회 (`/api/logging/{logId}`)
+
+- **Method**: `GET`
+- **Endpoint**: `/api/logging/{logId}`
+- **설명**: 특정 로그 ID로 로그의 상세 정보를 조회합니다.
+- **사용 시기**: 이슈 상세 화면에서 특정 로그 항목을 탭했을 때 사용
+
+### 🔐 요청 헤더
+```
+Authorization: Bearer {accessToken}
+```
+
+### ✅ 성공 응답 예시
+
+```json
+{
+  "isSuccess": true,
+  "code": 2000,
+  "message": "요청에 성공하였습니다.",
+  "result": {
+    "logId": "Pj8fP5cBEKdnQBbe5ZYm",
+    "timestamp": "2025-06-05T08:04:41.747062879+00:00",
+    "level": "WARN",
+    "logger": "org.springframework.cloud.kubernetes.commons.config.ConfigUtils",
+    "thread": "pool-4-thread-1",
+    "message": "sourceName : ssok-user-service-kubernetes was requested, but not found in namespace : ssok",
+    "app": "ssok-user-service"
+  }
+}
+```
+
+### ❌ 실패 응답 예시
+
+```json
+{
+  "isSuccess": false,
+  "code": 8006,
+  "message": "로그 ID로 로그를 조회하는 데 실패했습니다."
+}
+```

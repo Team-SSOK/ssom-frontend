@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { router } from 'expo-router';
 
 interface IssueDetailTagsProps {
   logIds: string[];
@@ -9,6 +10,10 @@ interface IssueDetailTagsProps {
 export default function IssueDetailTags({ logIds }: IssueDetailTagsProps) {
   const { colors } = useTheme();
 
+  const handleLogClick = (logId: string) => {
+    router.push(`/(app)/(tabs)/loggings/${logId}?fromIssue=true`);
+  };
+
   return (
     <View style={styles.section}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -16,17 +21,18 @@ export default function IssueDetailTags({ logIds }: IssueDetailTagsProps) {
       </Text>
       <View style={styles.tagsContainer}>
         {logIds.map((logId, index) => (
-          <View
+          <Pressable
             key={index}
             style={[
               styles.tag,
               { backgroundColor: colors.border },
             ]}
+            onPress={() => handleLogClick(logId)}
           >
             <Text style={[styles.tagText, { color: colors.text }]}>
               Log #{logId}
             </Text>
-          </View>
+          </Pressable>
         ))}
       </View>
     </View>

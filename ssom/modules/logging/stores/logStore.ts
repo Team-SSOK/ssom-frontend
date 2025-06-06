@@ -9,6 +9,10 @@ interface LogState {
   isLoading: boolean;
   filters: LogFilters;
   
+  // 로그 상세 조회 관련 상태
+  currentLog: LogEntry | null;
+  isLoadingCurrentLog: boolean;
+  
   // LLM 분석 관련 상태
   analysisResult: LogAnalysisResult | null;
   isAnalyzing: boolean;
@@ -20,6 +24,10 @@ interface LogState {
   setFilters: (filters: LogFilters) => void;
   clearLogs: () => void;
   addLog: (log: LogEntry) => void; // SSE로 받은 로그 추가용
+  
+  // 로그 상세 조회 관련 액션
+  fetchLogById: (logId: string) => Promise<void>;
+  clearCurrentLog: () => void;
   
   // LLM 분석 관련 액션
   getExistingAnalysis: (logId: string) => Promise<void>;
@@ -33,6 +41,10 @@ export const useLogStore = create<LogState>((set, get) => ({
   services: [],
   isLoading: false,
   filters: {},
+  
+  // 로그 상세 조회 관련 초기 상태
+  currentLog: null,
+  isLoadingCurrentLog: false,
   
   // LLM 분석 관련 초기 상태
   analysisResult: null,
@@ -128,6 +140,28 @@ export const useLogStore = create<LogState>((set, get) => ({
       set({ isAnalyzing: false });
       throw error;
     }
+  },
+
+  // 로그 상세 조회
+  fetchLogById: async (logId: string) => {
+    set({ isLoadingCurrentLog: true });
+    
+    try {
+      const log = await logApi.getLogById(logId);
+      set({ 
+        currentLog: log, 
+        isLoadingCurrentLog: false 
+      });
+    } catch (error) {
+      console.log('로그 상세 조회 실패:', error);
+      set({ isLoadingCurrentLog: false });
+      throw error;
+    }
+  },
+
+  // 현재 로그 초기화
+  clearCurrentLog: () => {
+    set({ currentLog: null });
   },
 
   // 분석 결과 초기화

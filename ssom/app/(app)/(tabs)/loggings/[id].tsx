@@ -27,18 +27,26 @@ export default function LogDetailScreen() {
   
   const params = useLocalSearchParams<{
     id: string;
-    logId: string;
-    timestamp: string;
-    level: string;
-    logger: string;
-    thread: string;
-    message: string;
-    app: string;
+    logId?: string;
+    timestamp?: string;
+    level?: string;
+    logger?: string;
+    thread?: string;
+    message?: string;
+    app?: string;
+    fromIssue?: string;
   }>();
 
-  // params로 받은 실제 로그 데이터 사용
-  const logDetail: LogEntry = {
-    logId: params.logId || params.id || '',
+  // 이슈에서 접근했는지 여부 확인
+  const isFromIssue = params.fromIssue === 'true';
+  const logId = params.logId || params.id || '';
+
+  // 로그 상세 조회 관련 상태
+  const { currentLog, isLoadingCurrentLog, fetchLogById, clearCurrentLog } = useLogStore();
+
+  // 로그 데이터 결정: 이슈에서 온 경우 API 호출, 아니면 params 사용
+  const logDetail: LogEntry = isFromIssue && currentLog ? currentLog : {
+    logId,
     timestamp: params.timestamp || '',
     level: (params.level as 'ERROR' | 'WARN' | 'INFO' | 'DEBUG') || 'INFO',
     logger: params.logger || '',
@@ -47,23 +55,39 @@ export default function LogDetailScreen() {
     app: params.app || '',
   };
 
-  // 페이지 진입 시 기존 분석 결과 조회 (API 스펙 4번)
+  // 페이지 진입 시 로그 데이터 로드 (이슈에서 접근한 경우)
+  useEffect(() => {
+    if (isFromIssue && logId) {
+      fetchLogById(logId);
+    }
+  }, [isFromIssue, logId, fetchLogById]);
+
   useEffect(() => {
     const loadExistingAnalysis = async () => {
-      if (!logDetail.logId) return;
+      if (!logId) return;
       
       // 페이지 진입 시 분석 상태 초기화
       clearAnalysis();
       
       try {
-        await getExistingAnalysis(logDetail.logId);
+        await getExistingAnalysis(logId);
       } catch (error) {
         // 에러는 logStore에서 이미 처리됨
       }
     };
 
     loadExistingAnalysis();
-  }, [logDetail.logId, getExistingAnalysis, clearAnalysis]);
+  }, [logId, getExistingAnalysis, clearAnalysis]);
+
+  // 컴포넌트 unmount 시 cleanup
+  useEffect(() => {
+    return () => {
+      if (isFromIssue) {
+        clearCurrentLog();
+      }
+      clearAnalysis();
+    };
+  }, [isFromIssue, clearCurrentLog, clearAnalysis]);
 
   // 새로운 분석 요청 (API 스펙 5번)
   const handleAnalysisRequest = async () => {
@@ -74,6 +98,27 @@ export default function LogDetailScreen() {
       toast.error('분석 실패', 'AI 분석 요청에 실패했습니다.');
     }
   };
+
+  // 이슈에서 접근했을 때 로그 데이터 로딩 중인지 확인
+  const isLoading = isFromIssue && isLoadingCurrentLog;
+
+  // 로딩 중이거나 로그 데이터가 없는 경우
+  if (isLoading || (isFromIssue && !currentLog)) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <LogDetailHeader 
+          logData={{
+            logId: logId || '',
+            level: '',
+            message: isLoading ? '로그 정보를 불러오는 중...' : '로그를 찾을 수 없습니다.',
+            app: '',
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
