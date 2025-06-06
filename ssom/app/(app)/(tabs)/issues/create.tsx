@@ -37,8 +37,19 @@ interface CreateIssueForm {
 
 export default function IssueCreateScreen() {
   const { colors } = useTheme();
-  const { showError } = useToast();
-  const { createDraft, draftResult, isDraftCreating, draftError, clearDraft, clearError } = useIssueStore();
+  const { showError, showSuccess } = useToast();
+  const { 
+    createDraft, 
+    draftResult, 
+    isDraftCreating, 
+    draftError, 
+    createGithubIssue, 
+    isIssueCreating, 
+    issueCreateError, 
+    clearDraft, 
+    clearIssue, 
+    clearError 
+  } = useIssueStore();
   const params = useLocalSearchParams<{
     fromLog?: string;
     logId?: string;
@@ -63,7 +74,7 @@ export default function IssueCreateScreen() {
     references: '',
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // isSubmitting은 store의 isIssueCreating으로 대체
   const [errors, setErrors] = useState<Partial<CreateIssueForm>>({});
 
   // 로그에서 이슈 생성 시 AI 분석 수행
@@ -132,12 +143,21 @@ export default function IssueCreateScreen() {
     }
   }, [draftError, showError, clearError]);
 
+  // GitHub 이슈 생성 에러 처리
+  useEffect(() => {
+    if (issueCreateError) {
+      showError({ title: 'GitHub 이슈 생성 오류', message: issueCreateError });
+      clearError();
+    }
+  }, [issueCreateError, showError, clearError]);
+
   // 컴포넌트 unmount 시 cleanup
   useEffect(() => {
     return () => {
       clearDraft();
+      clearIssue();
     };
-  }, [clearDraft]);
+  }, [clearDraft, clearIssue]);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<CreateIssueForm> = {};
@@ -163,34 +183,53 @@ export default function IssueCreateScreen() {
       return;
     }
 
-    setIsSubmitting(true);
+    // 로그 ID 목록 준비
+    const logIds = params.multiSelect === 'true' && params.logIds
+      ? params.logIds.split(',')
+      : params.logId 
+      ? [params.logId]
+      : [];
 
-    try {
-      // TODO: API 호출로 이슈 생성
-      console.log('이슈 생성 데이터:', form);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Mock API call
+    // 담당자 목록 준비 (빈 문자열이 아닐 경우에만)
+    const assigneeUsernames = form.assignee.trim() 
+      ? form.assignee.split(',').map(name => name.trim()).filter(name => name)
+      : [];
 
-      // 성공 시 알림 및 이슈 리스트로 이동
-      Alert.alert(
-        '이슈 생성 완료',
-        '새로운 이슈가 성공적으로 생성되었습니다.',
-        [
-          {
-            text: '확인',
-            onPress: () => {
-              router.push('/(app)/(tabs)');
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert(
-        '오류',
-        '이슈 생성 중 오류가 발생했습니다. 다시 시도해주세요.',
-        [{ text: '확인' }]
-      );
-    } finally {
-      setIsSubmitting(false);
+    // 재현 단계 배열로 변환
+    const reproductionSteps = form.reproductionSteps.trim()
+      ? form.reproductionSteps.split('\n').map(step => step.trim()).filter(step => step)
+      : [];
+
+    // 위치 정보 파싱 (예: "JwtAuthenticationFilter.java - filter()")
+    const locationParts = form.location.includes(' - ') 
+      ? form.location.split(' - ')
+      : [form.location, ''];
+
+    const issueData = {
+      title: form.title,
+      description: form.description,
+      logIds,
+      assigneeUsernames,
+      cause: form.cause || undefined,
+      solution: form.solution || undefined,
+      reproductionSteps,
+      references: form.references || undefined,
+      locationFile: locationParts[0] || undefined,
+      locationFunction: locationParts[1] || undefined,
+    };
+
+    console.log('GitHub 이슈 생성 데이터:', issueData);
+
+    const success = await createGithubIssue(issueData);
+
+    if (success) {
+      showSuccess({
+        title: '이슈 생성 완료',
+        message: '새로운 GitHub 이슈가 성공적으로 생성되었습니다.'
+      });
+
+      // 성공 시 메인 탭으로 이동
+      router.push('/(app)/(tabs)');
     }
   };
 
@@ -339,8 +378,8 @@ export default function IssueCreateScreen() {
 
         <IssueSubmitButton
           onPress={handleSubmit}
-          disabled={isDraftCreating}
-          isLoading={isSubmitting}
+          disabled={isDraftCreating || isIssueCreating}
+          isLoading={isIssueCreating}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>

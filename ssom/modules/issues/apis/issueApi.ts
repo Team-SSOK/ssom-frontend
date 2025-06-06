@@ -6,6 +6,19 @@ export interface IssueDraftRequest {
   additionalContext?: string;
 }
 
+export interface CreateGithubIssueRequest {
+  title: string;
+  description: string;
+  logIds: string[];
+  assigneeUsernames?: string[];
+  cause?: string;
+  solution?: string;
+  reproductionSteps?: string[];
+  references?: string;
+  locationFile?: string;
+  locationFunction?: string;
+}
+
 // 응답 타입 정의
 export interface ApiResponse<T> {
   isSuccess: boolean;
@@ -43,6 +56,20 @@ export interface IssueDraftResult {
   message: IssueMessage;
 }
 
+export interface IssueResult {
+  issueId: number;
+  githubIssueNumber: number;
+  title: string;
+  description: string;
+  status: string;
+  createdByEmployeeId: string;
+  assigneeGithubIds: string[];
+  logIds: string[];
+  isGithubSynced: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /**
  * 이슈 관련 API 클래스
  * 
@@ -69,6 +96,55 @@ export class IssueApi {
       {
         timeout: 30000, // LLM 분석을 위해 30초으로 설정
       }
+    );
+
+    return response.data.result;
+  }
+
+  /**
+   * GitHub Issue 생성 API 호출
+   * POST /api/issues/github
+   */
+  async createGithubIssue(data: CreateGithubIssueRequest): Promise<IssueResult> {
+    const response = await apiInstance.post<ApiResponse<IssueResult>>(
+      '/issues/github',
+      data
+    );
+
+    return response.data.result;
+  }
+
+  /**
+   * 내가 담당자로 지정된 Issue 목록 조회 API 호출
+   * GET /api/issues/my
+   */
+  async getMyIssues(): Promise<IssueResult[]> {
+    const response = await apiInstance.get<ApiResponse<IssueResult[]>>(
+      '/issues/my'
+    );
+
+    return response.data.result;
+  }
+
+  /**
+   * 전체 Issue 목록 조회 API 호출
+   * GET /api/issues
+   */
+  async getAllIssues(): Promise<IssueResult[]> {
+    const response = await apiInstance.get<ApiResponse<IssueResult[]>>(
+      '/issues'
+    );
+
+    return response.data.result;
+  }
+
+  /**
+   * 특정 Issue 상세 정보 조회 API 호출
+   * GET /api/issues/{issueId}
+   */
+  async getIssueById(issueId: number): Promise<IssueResult> {
+    const response = await apiInstance.get<ApiResponse<IssueResult>>(
+      `/issues/${issueId}`
     );
 
     return response.data.result;
