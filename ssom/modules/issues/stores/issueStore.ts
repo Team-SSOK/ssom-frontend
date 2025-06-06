@@ -17,12 +17,19 @@ interface IssueState {
   isLoadingIssues: boolean;
   issuesError: string | null;
 
+  // 개별 이슈 상세 조회 관련 상태
+  currentIssue: IssueResult | null;
+  isLoadingCurrentIssue: boolean;
+  currentIssueError: string | null;
+
   // 액션들
   createDraft: (data: IssueDraftRequest) => Promise<void>;
   createGithubIssue: (data: CreateGithubIssueRequest) => Promise<boolean>;
   getAllIssues: () => Promise<void>;
+  getIssueById: (issueId: number) => Promise<void>;
   clearDraft: () => void;
   clearIssue: () => void;
+  clearCurrentIssue: () => void;
   clearError: () => void;
 }
 
@@ -37,6 +44,9 @@ export const useIssueStore = create<IssueState>((set, get) => ({
   allIssues: [],
   isLoadingIssues: false,
   issuesError: null,
+  currentIssue: null,
+  isLoadingCurrentIssue: false,
+  currentIssueError: null,
 
   // 이슈 초안 생성
   createDraft: async (data: IssueDraftRequest) => {
@@ -97,6 +107,25 @@ export const useIssueStore = create<IssueState>((set, get) => ({
     }
   },
 
+  // 개별 이슈 상세 조회
+  getIssueById: async (issueId: number) => {
+    set({ isLoadingCurrentIssue: true, currentIssueError: null });
+    
+    try {
+      const issue = await issueApi.getIssueById(issueId);
+      set({ 
+        currentIssue: issue,
+        isLoadingCurrentIssue: false 
+      });
+    } catch (error) {
+      console.error('Get issue by ID error:', error);
+      set({ 
+        isLoadingCurrentIssue: false,
+        currentIssueError: error instanceof Error ? error.message : '이슈 상세 정보를 불러오는 중 오류가 발생했습니다.'
+      });
+    }
+  },
+
   // 초안 결과 클리어
   clearDraft: () => {
     set({ 
@@ -113,12 +142,21 @@ export const useIssueStore = create<IssueState>((set, get) => ({
     });
   },
 
+  // 현재 이슈 클리어
+  clearCurrentIssue: () => {
+    set({ 
+      currentIssue: null, 
+      currentIssueError: null 
+    });
+  },
+
   // 에러 클리어
   clearError: () => {
     set({ 
       draftError: null,
       issueCreateError: null,
-      issuesError: null 
+      issuesError: null,
+      currentIssueError: null 
     });
   }
 }));

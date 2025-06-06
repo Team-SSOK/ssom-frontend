@@ -13,25 +13,25 @@ interface IssueStatusSummaryProps {
 export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) {
   const { colors } = useTheme();
 
-  const criticalCount = issues.filter(issue => issue.status === 'ERROR').length;
-  const warningCount = issues.filter(issue => issue.status === 'WARN').length;
+  const openCount = issues.filter(issue => issue.status === 'OPEN').length;
+  const closeCount = issues.filter(issue => issue.status === 'CLOSE').length;
 
   return (
     <View style={styles.statsContainer}>
       <View style={[styles.statCard, { backgroundColor: colors.card }]}>
         <Text style={[styles.statNumber, { color: colors.critical }]}>
-          {criticalCount}
+          {openCount}
         </Text>
         <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-          ERROR
+          OPEN
         </Text>
       </View>
       <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-        <Text style={[styles.statNumber, { color: colors.warning }]}>
-          {warningCount}
+        <Text style={[styles.statNumber, { color: colors.success || colors.primary }]}>
+          {closeCount}
         </Text>
         <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-          WARNING
+          CLOSE
         </Text>
       </View>
     </View>

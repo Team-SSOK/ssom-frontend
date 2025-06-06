@@ -12,12 +12,13 @@ export default function StatusBadge({ status, variant = 'status' }: StatusBadgeP
 
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
-      case 'ERROR':
+      case 'OPEN':
         return colors.critical;
-      case 'WARN':
+      case 'IN_PROGRESS':
         return colors.warning;
-      case 'INFO':
-        return colors.primaryDisabled;
+      case 'CLOSE':
+      case 'CLOSED':
+        return colors.success || colors.primary;
       default:
         return colors.textMuted;
     }
