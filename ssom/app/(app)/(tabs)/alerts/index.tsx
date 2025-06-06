@@ -1,76 +1,86 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
+import { useToast } from '@/hooks/useToast';
+import { useEffect } from 'react';
+import { useAlertStream } from '@/modules/alerts/hooks/useAlertStream';
+import { AlertEntry, Alert } from '@/modules/alerts/types';
 import AlertHeader from '@/modules/alerts/components/AlertHeader';
 import AlertList from '@/modules/alerts/components/AlertList';
 
-// Mock data based on backend API format from the image
-const mockAlerts = [
-  {
-    id: '1',
-    title: '[ERROR] ssok-gateway-service',
-    message: 'Authentication error: Authorization header is missing or invalid',
-    timestamp: '2024-06-03T10:45:23.123Z',
-    kind: 'AUTHENTICATION_ERROR',
-    isRead: false,
-    actionRequired: true,
-  },
-  {
-    id: '2',
-    title: '[WARNING] ssok-user-service',
-    message: 'User account locked: Maximum login attempts exceeded',
-    timestamp: '2024-06-03T10:30:15.456Z',
-    kind: 'ACCOUNT_SECURITY',
-    isRead: false,
-    actionRequired: true,
-  },
-  {
-    id: '3',
-    title: '[ERROR] ssok-database-service',
-    message: 'Database connection pool exhausted: All 50 connections in use',
-    timestamp: '2024-06-03T10:15:07.789Z',
-    kind: 'DATABASE_ERROR',
-    isRead: true,
-    actionRequired: false,
-  },
-  {
-    id: '4',
-    title: '[WARNING] ssok-api-service',
-    message: 'High system memory usage: Currently at 87% utilization',
-    timestamp: '2024-06-03T10:00:01.234Z',
-    kind: 'RESOURCE_WARNING',
-    isRead: false,
-    actionRequired: false,
-  },
-  {
-    id: '5',
-    title: '[ERROR] ssok-payment-service',
-    message: 'Payment processing failed: External payment gateway timeout',
-    timestamp: '2024-06-03T09:45:33.567Z',
-    kind: 'PAYMENT_ERROR',
-    isRead: true,
-    actionRequired: true,
-  },
-  {
-    id: '6',
-    title: '[INFO] ssok-bank',
-    message: 'Daily backup completed successfully',
-    timestamp: '2024-06-03T09:30:00.000Z',
-    kind: 'BACKUP_SUCCESS',
-    isRead: true,
-    actionRequired: false,
-  },
-];
-
 export default function AlertsScreen() {
   const { colors } = useTheme();
+  const toast = useToast();
+  
+  const { 
+    alerts, 
+    loadAlerts, 
+    markAsRead, 
+    isLoading, 
+    error 
+  } = useAlertStream();
+
+  // 화면 진입 시 알림 목록 로드
+  useEffect(() => {
+    loadAlerts();
+  }, [loadAlerts]);
+
+  // 에러 처리
+  useEffect(() => {
+    if (error) {
+      toast.error('알림 오류', error);
+    }
+  }, [error, toast]);
+
+  // API 데이터를 UI 컴포넌트에서 사용할 수 있는 형태로 변환
+  const transformedAlerts: Alert[] = alerts.map(alert => ({
+    id: alert.id,
+    title: alert.title,
+    message: alert.message,
+    timestamp: alert.timestamp,
+    kind: alert.kind,
+    isRead: alert.isRead,
+    actionRequired: !alert.isRead, // 읽지 않은 알림은 액션이 필요한 것으로 간주
+  }));
+
+  // 알림 클릭 시 읽음 처리
+  const handleAlertPress = async (alertId: string) => {
+    const alert = alerts.find(a => a.id === alertId);
+    if (alert && !alert.isRead) {
+      try {
+        await markAsRead(alert.alertId);
+      } catch (error) {
+        console.error('읽음 처리 실패:', error);
+      }
+    }
+  };
+
+  // 로딩 중일 때 표시할 컴포넌트
+  if (isLoading && alerts.length === 0) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <AlertHeader />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.text }]}>
+            알림을 불러오는 중...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <AlertHeader />
-      <AlertList alerts={mockAlerts} />
+      <AlertList 
+        alerts={transformedAlerts} 
+        onAlertPress={handleAlertPress}
+      />
     </SafeAreaView>
   );
 }
@@ -78,5 +88,16 @@ export default function AlertsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    textAlign: 'center',
   },
 }); 

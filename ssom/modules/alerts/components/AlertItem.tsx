@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 
 interface AlertData {
@@ -15,9 +14,10 @@ interface AlertData {
 
 interface AlertItemProps {
   item: AlertData;
+  onPress?: () => void;
 }
 
-export default function AlertItem({ item }: AlertItemProps) {
+export default function AlertItem({ item, onPress }: AlertItemProps) {
   const { colors } = useTheme();
 
   // Extract level from title format: "[ERROR] ssok-bank"
@@ -50,8 +50,7 @@ export default function AlertItem({ item }: AlertItemProps) {
   };
 
   const handlePress = () => {
-    // For now, just log the press until alert detail page is created
-    console.log('Alert pressed:', item.id);
+    onPress?.();
   };
 
   return (
@@ -61,7 +60,7 @@ export default function AlertItem({ item }: AlertItemProps) {
         { 
           backgroundColor: colors.card,
           borderColor: colors.border,
-          opacity: item.isRead ? 0.7 : 1,
+          opacity: item.isRead ? 0.4 : 1,
         },
       ]}
       onPress={handlePress}
@@ -114,7 +113,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    borderWidth: 1,
   },
   alertHeader: {
     flexDirection: 'row',

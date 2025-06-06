@@ -1,0 +1,116 @@
+import apiInstance from '@/api/apiInstance';
+import { 
+  AlertEntry, 
+  AlertStatusUpdateRequest, 
+  AlertDeleteRequest, 
+  FCMTokenRequest,
+  ApiResponse 
+} from '../types';
+
+/**
+ * 알림 관련 API 클래스
+ * 
+ * 책임:
+ * - 알림 관련 API 엔드포인트 호출
+ * - 응답 데이터 변환 (필요시)
+ * 
+ * 참고:
+ * - HTTP 에러, 네트워크 에러, 401 토큰 갱신은 interceptors에서 처리됨
+ * - 이 클래스는 interceptors를 신뢰하고 순수한 API 호출만 담당
+ */
+class AlertApiService {
+
+  /**
+   * 전체 알림 목록 조회 (API 스펙 2번)
+   * GET /api/alert
+   */
+  async getAlerts(): Promise<AlertEntry[]> {
+    const response = await apiInstance.get<ApiResponse<AlertEntry[]>>(
+      '/alert'
+    );
+
+    return response.data.result;
+  }
+
+  /**
+   * 알림 개별 상태 변경 (API 스펙 3번)
+   * PATCH /api/alert/modif
+   */
+  async updateAlertStatus(request: AlertStatusUpdateRequest): Promise<void> {
+    await apiInstance.patch<ApiResponse<null>>(
+      '/alert/modify',
+      request
+    );
+  }
+
+  /**
+   * 알림 개별 삭제 (API 스펙 4번)
+   * PATCH /api/alert/delete
+   */
+  async deleteAlert(request: AlertDeleteRequest): Promise<void> {
+    await apiInstance.patch<ApiResponse<null>>(
+      '/alert/delete',
+      request
+    );
+  }
+
+  /**
+   * FCM 토큰 등록 (API 스펙 5번)
+   * POST /api/fcm/register
+   */
+  async registerFCMToken(request: FCMTokenRequest): Promise<void> {
+    await apiInstance.post<ApiResponse<null>>(
+      '/fcm/register',
+      request
+    );
+  }
+
+  // 헬퍼 메서드들
+
+  /**
+   * 알림을 읽음 처리
+   */
+  async markAsRead(alertId: number): Promise<void> {
+    return this.updateAlertStatus({
+      alertStatusId: alertId,
+      isRead: true
+    });
+  }
+
+  /**
+   * 알림을 안읽음 처리
+   */
+  async markAsUnread(alertId: number): Promise<void> {
+    return this.updateAlertStatus({
+      alertStatusId: alertId,
+      isRead: false
+    });
+  }
+
+  /**
+   * 읽지 않은 알림만 조회
+   */
+  async getUnreadAlerts(): Promise<AlertEntry[]> {
+    const alerts = await this.getAlerts();
+    return alerts.filter(alert => !alert.isRead);
+  }
+
+  /**
+   * 읽은 알림만 조회
+   */
+  async getReadAlerts(): Promise<AlertEntry[]> {
+    const alerts = await this.getAlerts();
+    return alerts.filter(alert => alert.isRead);
+  }
+
+  /**
+   * 특정 종류의 알림만 조회
+   */
+  async getAlertsByKind(kind: string): Promise<AlertEntry[]> {
+    const alerts = await this.getAlerts();
+    return alerts.filter(alert => alert.kind === kind);
+  }
+}
+
+// 싱글톤 인스턴스
+export const alertApi = new AlertApiService();

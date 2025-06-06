@@ -14,20 +14,27 @@ interface AlertData {
 
 interface AlertListProps {
   alerts: AlertData[];
+  onAlertPress?: (alertId: string) => void;
 }
 
-export default function AlertList({ alerts }: AlertListProps) {
+export default function AlertList({ alerts, onAlertPress }: AlertListProps) {
   const renderAlertItem = ({ item }: { item: AlertData }) => (
-    <AlertItem item={item} />
+    <AlertItem 
+      item={item} 
+      onPress={() => onAlertPress?.(item.id)}
+    />
   );
 
   return (
     <FlatList
       data={alerts}
       renderItem={renderAlertItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item, index) => `${item.id}-${index}`}
       contentContainerStyle={styles.listContainer}
       showsVerticalScrollIndicator={false}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={10}
+      windowSize={10}
     />
   );
 }

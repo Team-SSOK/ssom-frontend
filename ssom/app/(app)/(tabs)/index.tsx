@@ -15,6 +15,8 @@ export default function MainDashboard() {
   const { colors } = useTheme();
   const { showError } = useToast();
   const [activeTab, setActiveTab] = useState<'my' | 'all'>('all');
+  
+  // 이슈 관련 상태
   const { 
     allIssues, 
     isLoadingIssues, 
