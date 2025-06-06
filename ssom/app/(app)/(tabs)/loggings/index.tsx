@@ -1,4 +1,3 @@
-
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
@@ -7,13 +6,12 @@ import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { useLogStore } from '@/modules/logging/stores/logStore';
 import { useLogStream } from '@/modules/logging/hooks/useLogStream';
+import { ConnectionStatus } from '@/modules/logging/components/Common/ConnectionStatus';
 import LogSearchBar from '@/modules/logging/components/LogDashboard/LogSearchBar';
 import LogFilterTabs from '@/modules/logging/components/LogDashboard/LogFilterTabs';
 import LogServiceDropdown from '@/modules/logging/components/LogDashboard/LogServiceDropdown';
 import LogSelectionToolbar from '@/modules/logging/components/LogDashboard/LogSelectionToolbar';
 import LogList from '@/modules/logging/components/LogDashboard/LogList';
-
-
 
 export default function LogsScreen() {
   const { colors } = useTheme();
@@ -27,8 +25,15 @@ export default function LogsScreen() {
   // logStore 사용
   const { logs, services, isLoading, fetchLogs, fetchServices, setFilters } = useLogStore();
   
-  // SSE 스트림 사용
-  const { logs: sseLogs, connect } = useLogStream();
+  // SSE 스트림 사용 - 개선된 기능들 포함
+  const { 
+    logs: sseLogs, 
+    connectionStatus, 
+    connectionMessage, 
+    connect, 
+    forceReconnect, 
+    reconnectAttempts 
+  } = useLogStream();
 
   // 화면 진입시 SSE 자동 연결
   useEffect(() => {
@@ -120,10 +125,17 @@ export default function LogsScreen() {
     });
   };
 
+  // 수동 재연결 핸들러
+  const handleRetryConnection = () => {
+    console.log('🔄 사용자 재연결 요청');
+    forceReconnect();
+  };
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
+
       <View style={styles.filterSection}>
         <LogSearchBar 
           searchText={searchText}
@@ -143,6 +155,15 @@ export default function LogsScreen() {
         </View>
       </View>
 
+      {/* SSE 연결 상태 표시 */}
+      <View style={styles.connectionSection}>
+        <ConnectionStatus
+          status={connectionStatus}
+          message={reconnectAttempts > 0 ? `${connectionMessage} (${reconnectAttempts}/10)` : connectionMessage}
+          onRetry={handleRetryConnection}
+          showRetryButton={true}
+        />
+      </View>
       {isMultiSelectMode && (
         <LogSelectionToolbar
           selectedCount={selectedLogIds.length}
@@ -172,6 +193,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 16
+  },
+  connectionSection: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
   filterSection: {
     alignItems: 'flex-start',

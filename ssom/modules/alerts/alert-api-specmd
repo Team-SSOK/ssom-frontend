@@ -1,0 +1,154 @@
+# 📢 Alert API 문서
+
+## 1. 알림 SSE 구독
+실시간 알림을 수신하기 위해 SSE(Server-Sent Events) 연결을 시작합니다.
+
+**Endpoint**
+```
+GET /api/alert/subscribe
+```
+
+**Headers**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| Authorization | string | ✅ | Bearer 토큰 |
+| Last-Event-ID | string | ❌ | 마지막 수신 이벤트 ID (옵션) |
+
+**Produces**  
+`text/event-stream`
+
+**예시 응답**
+```
+event: SSE_ALERT_INIT
+id: 20240604_abcdef123456
+data: connected
+```
+
+---
+
+## 2. 전체 알림 목록 조회
+```
+GET /api/alert
+```
+
+**Headers**
+Authorization 헤더 필요
+
+**Response**
+JSON 형식 알림 배열 반환
+
+---
+
+## 3. 알림 개별 상태 변경
+```
+PATCH /api/alert/modify
+```
+
+**Request Body**
+```json
+{
+  "alertStatusId": 1234,
+  "isRead": true
+}
+```
+
+---
+
+## 4. 알림 개별 삭제
+```
+PATCH /api/alert/delete
+```
+
+**Request Body**
+```json
+{
+  "alertStatusId": 1234
+}
+```
+
+---
+
+## 5. FCM 토큰 등록
+```
+POST /api/fcm/register
+```
+
+**Headers**
+X-User-Id 필요
+
+**Request Body**
+```json
+{
+  "fcmToken": "fcm_token_value"
+}
+```
+
+---
+
+## 6. 그라파나 알림 전송
+```
+POST /api/alert/grafana
+```
+
+**Request Body**
+```json
+{
+  "alerts": [
+    {
+      "app": "ssok-bluetooth-service",
+      "level": "warning",
+      "message": "...",
+      "timestamp": "2025-05-31T00:14:01.472Z",
+      "id": "686692198126160f"
+    }
+  ]
+}
+```
+
+---
+
+## 7. 오픈서치 대시보드 알림 전송
+```
+POST /api/alert/opensearch
+```
+
+**Request Body**
+```json
+{
+  "request": "{...JSON string...}"
+}
+```
+
+---
+
+## 8. 이슈 생성 알림 전송
+```
+POST /api/alert/issue
+```
+
+**Request Body**
+```json
+{
+  "timestamp": "2025-06-04T12:00:00Z",
+  "sharedEmployeeIds": ["user1", "user2", "user3"]
+}
+```
+
+---
+
+## 9. Jenkins 및 ArgoCD 알림 전송
+```
+POST /api/alert/send
+```
+
+**Request Body**
+```json
+{
+  "id": "someId",
+  "level": "INFO",
+  "app": "jenkins_ssok-bank",
+  "timestamp": "2025-06-04T12:00:00Z",
+  "message": "빌드가 성공적으로 완료되었습니다."
+}
+```
