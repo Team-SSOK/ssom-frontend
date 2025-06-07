@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { logApi } from '@/modules/logging/apis/logApi';
 import { LogEntry, ServiceInfo, LogFilters, LogAnalysisResult } from '@/modules/logging/types';
+import { LOG_CONFIG } from '@/api/constants';
 
 interface LogState {
   // 상태
@@ -94,8 +95,8 @@ export const useLogStore = create<LogState>((set, get) => ({
     const exists = logs.some(existingLog => existingLog.logId === log.logId);
     if (exists) return;
     
-    // 최신 로그를 맨 앞에 추가 (최대 100개로 제한)
-    const newLogs = [log, ...logs].slice(0, 100);
+    // 최신 로그를 맨 앞에 추가 (최대 개수 제한)
+    const newLogs = [log, ...logs].slice(0, LOG_CONFIG.MAX_LOGS_COUNT);
     set({ logs: newLogs });
   },
 

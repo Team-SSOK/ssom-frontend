@@ -30,7 +30,7 @@ interface AuthState {
   logout: () => Promise<void>;
   changePassword: (data: PasswordChangeRequest) => Promise<void>;
   initialize: () => Promise<void>;
-  resetAuth: () => Promise<void>;
+  clearAuth: () => Promise<void>;
 }
 
 const persistStorage = {
@@ -141,20 +141,20 @@ export const useAuthStore = create<AuthState>()(
             } else {
               // 유효하지 않은 토큰 형식이면 리셋
               console.warn('[AuthStore] 유효하지 않은 토큰 형식, 인증 상태 리셋');
-              await get().resetAuth();
+              await get().clearAuth();
             }
           } else {
             // 토큰이나 사용자 정보가 불완전하면 리셋
-            await get().resetAuth();
+            await get().clearAuth();
           }
         } catch (error) {
           // Auth 초기화 실패 시 자동으로 리셋
           console.warn('[AuthStore] 초기화 실패, 인증 상태 리셋:', error);
-          await get().resetAuth();
+          await get().clearAuth();
         }
       },
 
-      resetAuth: async () => {
+      clearAuth: async () => {
         await clearTokens();
         set({
           user: null,

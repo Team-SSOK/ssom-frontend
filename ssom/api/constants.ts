@@ -40,6 +40,12 @@ export const ALERT_CONFIG = {
   MAX_ALERTS_COUNT: 100,
 } as const;
 
+// 로그 관련 설정
+export const LOG_CONFIG = {
+  /** 최대 보관할 로그 개수 */
+  MAX_LOGS_COUNT: 100,
+} as const;
+
 // 로그 레벨 정의
 export const LOG_LEVELS = {
   ERROR: 'ERROR',

@@ -29,7 +29,7 @@ interface IssueState {
 
   // 액션들
   createDraft: (data: IssueDraftRequest) => Promise<void>;
-  createGithubIssue: (data: CreateGithubIssueRequest) => Promise<boolean>;
+  createGithubIssue: (data: CreateGithubIssueRequest) => Promise<void>;
   getAllIssues: () => Promise<void>;
   getMyIssues: () => Promise<void>;
   getIssueById: (issueId: number) => Promise<void>;
@@ -86,14 +86,13 @@ export const useIssueStore = create<IssueState>((set, get) => ({
         createdIssue: result,
         isIssueCreating: false 
       });
-      return true; // 성공
     } catch (error) {
       console.error('GitHub issue creation error:', error);
       set({ 
         isIssueCreating: false,
         issueCreateError: error instanceof Error ? error.message : 'GitHub 이슈 생성 중 오류가 발생했습니다.'
       });
-      return false; // 실패
+      throw error; // 일관된 에러 처리
     }
   },
 

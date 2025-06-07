@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { alertApi } from '../apis/alertApi';
 import { AlertEntry } from '../types';
 import { ALERT_CONFIG } from '@/api/constants';
+import { deduplicateById, sortByTimestamp, executeAsyncAction, standardizeErrorMessage } from '@/utils/storeHelpers';
 
 interface AlertState {
   alerts: AlertEntry[];
@@ -27,14 +28,11 @@ export const useAlertStore = create<AlertState>((set, get) => ({
   error: null,
 
   setAlerts: (alerts: AlertEntry[]) => {
-    // 중복 제거 및 최신순 정렬
-    const uniqueAlerts = alerts
-      .filter((alert, index, arr) => 
-        arr.findIndex(a => a.alertId === alert.alertId) === index
-      )
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    // Toss 원칙: 순수 함수를 사용한 예측 가능한 데이터 변환
+    const uniqueAlerts = deduplicateById(alerts, (alert) => alert.alertId);
+    const sortedAlerts = sortByTimestamp(uniqueAlerts);
     
-    set({ alerts: uniqueAlerts });
+    set({ alerts: sortedAlerts });
   },
 
   addAlert: (alert: AlertEntry) => {
