@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { alertApi } from '../apis/alertApi';
 import { AlertEntry } from '../types';
+import { ALERT_CONFIG } from '@/api/constants';
 
 interface AlertState {
   alerts: AlertEntry[];
@@ -48,10 +49,10 @@ export const useAlertStore = create<AlertState>((set, get) => ({
         return state;
       }
       
-      // 새 알림 추가 후 timestamp 기준으로 최신순 정렬 (최대 100개로 제한)
+      // 새 알림 추가 후 timestamp 기준으로 최신순 정렬 (최대 개수 제한)
       const newAlerts = [alert, ...state.alerts]
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 100);
+        .slice(0, ALERT_CONFIG.MAX_ALERTS_COUNT);
       
       return { alerts: newAlerts };
     });
@@ -82,7 +83,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
   markAsRead: async (alertId: number) => {
     try {
-      await alertApi.markAsRead(alertId);
+      await alertApi.markAlertAsRead(alertId);
       
       // 로컬 상태 업데이트
       get().updateAlert(alertId, { isRead: true });

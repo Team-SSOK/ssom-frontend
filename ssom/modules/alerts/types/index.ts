@@ -27,13 +27,7 @@ export interface FCMTokenRequest {
   fcmToken: string;
 }
 
-// API 응답 타입
-export interface ApiResponse<T> {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: T;
-}
+// API 응답 타입 (공통 타입으로 이동됨)
 
 export interface AlertsResponse {
   alerts: AlertEntry[];
@@ -45,7 +39,7 @@ export interface AlertEventListener {
 }
 
 export interface AlertConnectionEventListener {
-  (event: { type: 'connected' | 'disconnected' | 'connecting' | 'reconnecting' | 'error'; message?: string }): void;
+  (event: { type: 'connected' | 'disconnected' | 'connecting' | 'reconnecting' | 'error'; message: string }): void;
 }
 
 // UI에서 사용하는 알림 타입 (기존 mock과 호환)

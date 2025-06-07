@@ -23,15 +23,9 @@ export interface LogFilters {
 
 // SSE 이벤트 리스너 타입
 export type LogEventListener = (log: LogEntry) => void;
-export type ConnectionEventListener = (event: { type: string; message?: string }) => void;
+export type ConnectionEventListener = (event: { type: 'connected' | 'disconnected' | 'connecting' | 'reconnecting' | 'error'; message: string }) => void;
 
-// API 응답 타입
-export interface ApiResponse<T> {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: T;
-}
+// API 응답 타입 (공통 타입으로 이동됨)
 
 export interface ServicesResponse {
   services: ServiceInfo[];

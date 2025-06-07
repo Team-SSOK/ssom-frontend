@@ -82,7 +82,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
         </View>
       </View>
       
-      {showRetryButton && onRetry && status !== 'connecting' && (
+      {showRetryButton && onRetry && (
         <Pressable 
           style={[styles.retryButton, { borderColor: config.color }]}
           onPress={onRetry}
