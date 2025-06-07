@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
@@ -13,11 +12,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useToast } from '@/hooks/useToast';
+import { useAlertModal } from '@/components';
 
 export default function ProfileScreen() {
   const { colors } = useTheme();
   const { logout, user } = useAuthStore();
   const toast = useToast();
+  const { alert, AlertModal } = useAlertModal();
 
   // 사용자 정보가 없으면 기본값 표시
   const userInfo = user ? {
@@ -33,7 +34,7 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert(
+    alert(
       '로그아웃',
       '정말 로그아웃하시겠습니까?',
       [
@@ -73,7 +74,7 @@ export default function ProfileScreen() {
       icon: 'notifications-outline',
       title: '알림 설정',
       onPress: () => {
-        Alert.alert('알림', '준비 중인 기능입니다.');
+        alert('알림', '준비 중인 기능입니다.');
       },
       showArrow: true,
     },
@@ -81,7 +82,7 @@ export default function ProfileScreen() {
       icon: 'help-circle-outline',
       title: '도움말',
       onPress: () => {
-        Alert.alert('도움말', 'SSOM v1.0.0\n\n문의사항은 platform-team@ssok.kr로 연락해주세요.');
+        alert('도움말', 'SSOM v1.0.0\n\n문의사항은 platform-team@ssok.kr로 연락해주세요.');
       },
       showArrow: true,
     },
@@ -180,6 +181,9 @@ export default function ProfileScreen() {
           SSOM v1.0.0
         </Text>
       </ScrollView>
+      
+      {/* AlertModal 컴포넌트 */}
+      <AlertModal />
     </SafeAreaView>
   );
 }
