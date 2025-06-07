@@ -70,8 +70,8 @@ export default function SignIn() {
     try {
       await AsyncStorage.removeItem('hasChangedPassword');
       
-      const { resetAuth } = useAuthStore.getState();
-      await resetAuth();
+      const { clearAuth } = useAuthStore.getState();
+      await clearAuth();
       
       toast.success('개발자 도구', '모든 인증 데이터가 리셋되었습니다. (토큰, 첫로그인 상태 포함)');
     } catch (error) {

@@ -72,7 +72,7 @@ export const useLogStore = create<LogState>((set, get) => ({
       const services = await logApi.getServices();
       set({ services });
     } catch (error) {
-      console.log('서비스 목록 조회 실패:', error);
+      if(__DEV__) console.error('서비스 목록 조회 실패:', error);
       throw error;
     }
   },
@@ -116,7 +116,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         });
       }
     } catch (error) {
-      console.log('기존 분석 조회 실패:', error);
+      if(__DEV__) console.error('기존 분석 조회 실패:', error);
       set({ 
         analysisResult: null, 
         hasExistingAnalysis: false 
@@ -137,7 +137,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         isAnalyzing: false 
       });
     } catch (error) {
-      console.log('분석 요청 실패:', error);
+      if(__DEV__) console.error('분석 요청 실패:', error);
       set({ isAnalyzing: false });
       throw error;
     }
@@ -154,7 +154,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         isLoadingCurrentLog: false 
       });
     } catch (error) {
-      console.log('로그 상세 조회 실패:', error);
+      if(__DEV__) console.error('로그 상세 조회 실패:', error);
       set({ isLoadingCurrentLog: false });
       throw error;
     }

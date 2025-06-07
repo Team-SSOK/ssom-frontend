@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { issueApi, IssueDraftRequest, IssueDraftResult, CreateGithubIssueRequest, IssueResult } from '../apis/issueApi';
-import Toast from 'react-native-toast-message';
 
 interface IssueState {
   // 이슈 초안 생성 관련 상태
@@ -72,17 +71,11 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       const errorMessage = error instanceof Error ? error.message : '이슈 초안 생성 중 오류가 발생했습니다.';
       if (__DEV__) console.error('Issue draft creation error:', error);
       
-      Toast.show({
-        type: 'error',
-        text1: '이슈 초안 생성 실패',
-        text2: errorMessage,
-        visibilityTime: 4000,
-      });
-      
       set({ 
         isDraftCreating: false,
         draftError: errorMessage
       });
+      throw error;
     }
   },
 
@@ -100,18 +93,11 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       const errorMessage = error instanceof Error ? error.message : 'GitHub 이슈 생성 중 오류가 발생했습니다.';
       if (__DEV__) console.error('GitHub issue creation error:', error);
       
-      Toast.show({
-        type: 'error',
-        text1: 'GitHub 이슈 생성 실패',
-        text2: errorMessage,
-        visibilityTime: 4000,
-      });
-      
       set({ 
         isIssueCreating: false,
         issueCreateError: errorMessage
       });
-      throw error; // 일관된 에러 처리
+      throw error;
     }
   },
 
@@ -129,17 +115,11 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       const errorMessage = error instanceof Error ? error.message : '이슈 목록을 불러오는 중 오류가 발생했습니다.';
       if (__DEV__) console.error('Get all issues error:', error);
       
-      Toast.show({
-        type: 'error',
-        text1: '이슈 목록 조회 실패',
-        text2: errorMessage,
-        visibilityTime: 4000,
-      });
-      
       set({ 
         isLoadingIssues: false,
         issuesError: errorMessage
       });
+      throw error;
     }
   },
 
@@ -157,17 +137,11 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       const errorMessage = error instanceof Error ? error.message : '나의 이슈 목록을 불러오는 중 오류가 발생했습니다.';
       if (__DEV__) console.error('Get my issues error:', error);
       
-      Toast.show({
-        type: 'error',
-        text1: '나의 이슈 목록 조회 실패',
-        text2: errorMessage,
-        visibilityTime: 4000,
-      });
-      
       set({ 
         isLoadingMyIssues: false,
         myIssuesError: errorMessage
       });
+      throw error;
     }
   },
 
@@ -185,17 +159,11 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       const errorMessage = error instanceof Error ? error.message : '이슈 상세 정보를 불러오는 중 오류가 발생했습니다.';
       if (__DEV__) console.error('Get issue by ID error:', error);
       
-      Toast.show({
-        type: 'error',
-        text1: '이슈 상세 조회 실패',
-        text2: errorMessage,
-        visibilityTime: 4000,
-      });
-      
       set({ 
         isLoadingCurrentIssue: false,
         currentIssueError: errorMessage
       });
+      throw error;
     }
   },
 

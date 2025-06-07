@@ -14,7 +14,7 @@ import {
   removeItem,
 } from '@/services/tokenService';
 
-interface User {
+export interface User {
   username: string;
   department: string;
   expiresIn: number;
@@ -22,13 +22,24 @@ interface User {
   lastLoginAt: string;
 }
 
-interface AuthState {
+export interface UserProfile {
+  employeeId: string;
+  username: string;
+  phoneNumber: string;
+  department: string;
+  departmentCode: number;
+  githubId: string;
+}
+
+export interface AuthState {
   user: User | null;
+  profile: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
   changePassword: (data: PasswordChangeRequest) => Promise<void>;
+  getProfile: () => Promise<void>;
   initialize: () => Promise<void>;
   clearAuth: () => Promise<void>;
 }
@@ -43,6 +54,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      profile: null,
       isAuthenticated: false,
       isLoading: false,
 
@@ -79,6 +91,7 @@ export const useAuthStore = create<AuthState>()(
           
           // 에러 메시지 가공 후 다시 throw
           if (error instanceof Error) {
+            if(__DEV__) console.error('로그인 실패:', error);
             throw error;
           } else {
             throw new Error('로그인에 실패했습니다.');
@@ -95,8 +108,8 @@ export const useAuthStore = create<AuthState>()(
           // 서버에 로그아웃 요청
           await authApi.logout();
         } catch (error) {
-          // 로그아웃 API 실패해도 로컬 상태는 정리
-          console.warn('로그아웃 API 호출 실패, 로컬 상태만 정리합니다.');
+          if(__DEV__) console.error('로그아웃 API 호출 실패, 로컬 상태만 정리합니다.');
+          throw error;
         } finally {
           await clearTokens();
           set({
@@ -113,14 +126,21 @@ export const useAuthStore = create<AuthState>()(
         try {
           await authApi.changePassword(data);
         } catch (error) {
-          // 에러 메시지 가공 후 다시 throw
-          if (error instanceof Error) {
-            throw error;
-          } else {
-            throw new Error('비밀번호 변경에 실패했습니다.');
-          }
+          if(__DEV__) console.error('비밀번호 변경 실패:', error);
+          throw error;
         } finally {
           set({ isLoading: false });
+        }
+      },
+
+      getProfile: async () => {
+        try {
+          const profile = await authApi.getProfile();
+          set({ profile: profile });
+
+        } catch (error) {
+          if(__DEV__) console.error('프로필 조회 실패:', error);
+          throw error;
         }
       },
 

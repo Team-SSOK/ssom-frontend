@@ -2,8 +2,7 @@ import { create } from 'zustand';
 import { alertApi } from '../apis/alertApi';
 import { AlertEntry } from '../types';
 import { ALERT_CONFIG } from '@/api/constants';
-import { deduplicateById, sortByTimestamp, executeAsyncAction, standardizeErrorMessage } from '@/utils/storeHelpers';
-import Toast from 'react-native-toast-message';
+import { deduplicateById, sortByTimestamp } from '@/utils/storeHelpers';
 
 interface AlertState {
   alerts: AlertEntry[];
@@ -114,13 +113,6 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     } catch (error: any) {
       const errorMessage = error.message || '알림 목록을 불러오는데 실패했습니다.';
       if (__DEV__) console.error('알림 목록 로드 실패:', error);
-      
-      Toast.show({
-        type: 'error',
-        text1: '알림 목록 로드 실패',
-        text2: errorMessage,
-        visibilityTime: 4000,
-      });
       
       set({ error: errorMessage });
       throw error;
