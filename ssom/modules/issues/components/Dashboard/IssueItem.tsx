@@ -39,7 +39,7 @@ function IssueItem({ item }: IssueItemProps) {
           Issue #{item.id} : {item.title}
         </Text>
       </View>
-      <Text style={[styles.issueDescription, { color: colors.textSecondary }]}>
+      <Text ellipsizeMode='tail' numberOfLines={2} style={[styles.issueDescription, { color: colors.textSecondary }]}>
         {item.description}
       </Text>
       <View style={styles.issueFooter}>

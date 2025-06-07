@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Modal, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal, FlatList, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { ServiceInfo } from '@/modules/logging/types';
 import { FontFamily } from '@/styles/fonts';
@@ -130,13 +130,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
     height: 36,
   },
   dropdownText: {
-    fontSize: 14,
+    fontSize: Platform.OS === 'ios' ? 14 : 10,
     fontFamily: FontFamily.medium,
     fontWeight: '500',
     flex: 1,
@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
   modalContent: {
     marginHorizontal: 20,
     borderRadius: 12,
-    maxHeight: 300,
-    minWidth: 200,
+    maxHeight: 400,
+    minWidth: 300,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

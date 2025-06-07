@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
@@ -27,7 +26,7 @@ export default function PasswordChange() {
         setIsFirstLogin(!hasChangedPassword);
       } catch (error) {
         toast.error('오류', '첫 로그인 상태 확인 중 오류가 발생했습니다.');
-        setIsFirstLogin(true); // 오류 시 첫 로그인으로 처리
+        setIsFirstLogin(true); 
       }
     };
 

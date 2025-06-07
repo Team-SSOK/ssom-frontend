@@ -1,12 +1,14 @@
-import { Text } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { Redirect, Stack } from 'expo-router';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function AppLayout() {
+  const { colors } = useTheme();
   const { user, isAuthenticated, isLoading } = useAuthStore();
 
   if (isLoading) {
-    return <Text>Loading...</Text>;
+    return <ActivityIndicator size="large" color={colors.primary} />;
   }
 
   if (!isAuthenticated || !user) {
