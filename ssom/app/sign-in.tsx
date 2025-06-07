@@ -23,16 +23,6 @@ export default function SignIn() {
   const { colors } = useTheme();
   const toast = useToast();
 
-  const checkFirstLogin = async (): Promise<boolean> => {
-    try {
-      const hasChangedPassword = await AsyncStorage.getItem('hasChangedPassword');
-      return !hasChangedPassword; // 비밀번호를 변경한 적이 없으면 첫 로그인
-    } catch (error) {
-      toast.error('오류', '첫 로그인 상태 확인 중 오류가 발생했습니다.');
-      return true;
-    }
-  };
-
   const handleLogin = async (employeeId: string, password: string) => {
     if (!employeeId.trim() || !password.trim()) {
       toast.error('입력 오류', '직원 ID와 비밀번호를 입력해주세요.');
@@ -45,19 +35,10 @@ export default function SignIn() {
         password: password.trim(),
       });
 
-      const isFirstLogin = await checkFirstLogin();
+      console.log('로그인 완료 - (app) 레이아웃으로 이동');
+      toast.success('로그인 성공', '환영합니다!');
       
-      console.log('로그인 완료 - 첫 로그인 여부:', isFirstLogin);
-      
-      if (isFirstLogin) {
-        console.log('첫 로그인 감지 - pw-change로 리다이렉트');
-        toast.info('환영합니다!', '보안을 위해 비밀번호를 변경해주세요.');
-        router.replace('/(app)/pw-change');
-      } else {
-        console.log('기존 사용자 - 메인 탭으로 리다이렉트');
-        toast.success('로그인 성공', '환영합니다!');
-        router.replace('/(app)/(tabs)');
-      }
+      router.replace('/(app)/(tabs)');
     } catch (error) {
       console.warn('로그인 실패:', error);
       const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
