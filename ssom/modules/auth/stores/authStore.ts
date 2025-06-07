@@ -108,8 +108,9 @@ export const useAuthStore = create<AuthState>()(
           // 서버에 로그아웃 요청
           await authApi.logout();
         } catch (error) {
+          // 서버 API 실패 시에도 로컬 상태는 정리합니다
           if(__DEV__) console.error('로그아웃 API 호출 실패, 로컬 상태만 정리합니다.');
-          throw error;
+          // 서버 API 실패는 치명적이지 않으므로 에러를 throw하지 않습니다
         } finally {
           await clearTokens();
           set({

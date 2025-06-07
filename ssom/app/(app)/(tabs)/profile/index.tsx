@@ -12,7 +12,7 @@ import LogoutButton from '@/modules/auth/components/Profile/LogoutButton';
 
 export default function ProfileScreen() {
   const { colors } = useTheme();
-  const { AlertModal } = useAlertModal();
+  const { AlertModal, alert } = useAlertModal();
   const { user, profile, isLoading, getProfile } = useAuthStore();
 
   useEffect(() => {
@@ -36,16 +36,16 @@ export default function ProfileScreen() {
         </View>
 
         {/* User Info Card */}
-        <UserInfoCard userInfo={user} />
+        {user.username !== null && <UserInfoCard userInfo={user} />}
 
         {/* User Details Card */}
         <UserDetailsCard userInfo={profile} />
 
         {/* Menu Items */}
-        <MenuSection />
+        <MenuSection onAlert={alert} />
 
         {/* Logout Button */}
-        <LogoutButton />
+        <LogoutButton onAlert={alert} />
 
         {/* App Version */}
         <Text style={[styles.versionText, { color: colors.textMuted }]}>

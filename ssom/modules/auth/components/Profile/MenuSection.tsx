@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
-import { useAlertModal } from '@/components';
 
 interface MenuItem {
   icon: string;
@@ -12,9 +11,16 @@ interface MenuItem {
   showArrow: boolean;
 }
 
-export default function MenuSection() {
+interface MenuSectionProps {
+  onAlert: (title: string, message?: string, buttons?: Array<{
+    text: string;
+    style?: 'default' | 'cancel' | 'destructive';
+    onPress?: () => void;
+  }>) => void;
+}
+
+export default function MenuSection({ onAlert }: MenuSectionProps) {
   const { colors } = useTheme();
-  const { alert } = useAlertModal();
 
   const handleChangePassword = () => {
     router.replace('/(app)/pw-change');
@@ -31,7 +37,7 @@ export default function MenuSection() {
       icon: 'notifications-outline',
       title: '알림 설정',
       onPress: () => {
-        alert('알림', '준비 중인 기능입니다.');
+        onAlert('알림', '준비 중인 기능입니다.');
       },
       showArrow: true,
     },
@@ -39,7 +45,7 @@ export default function MenuSection() {
       icon: 'help-circle-outline',
       title: '도움말',
       onPress: () => {
-        alert('도움말', 'SSOM v1.0.0\n\n문의사항은 platform-team@ssok.kr로 연락해주세요.');
+        onAlert('도움말', 'SSOM v1.0.0\n\n문의사항은 platform-team@ssok.kr로 연락해주세요.');
       },
       showArrow: true,
     },

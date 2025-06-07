@@ -3,17 +3,22 @@ import { Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
-import { useToast } from '@/hooks/useToast';
-import { useAlertModal } from '@/components';
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+  onAlert: (title: string, message?: string, buttons?: Array<{
+    text: string;
+    style?: 'default' | 'cancel' | 'destructive';
+    onPress?: () => void;
+  }>) => void;
+}
+
+export default function LogoutButton({ onAlert }: LogoutButtonProps) {
   const { colors } = useTheme();
   const { logout } = useAuthStore();
-  const toast = useToast();
-  const { alert } = useAlertModal();
 
   const handleLogout = () => {
-    alert(
+    
+    onAlert(
       '로그아웃',
       '정말 로그아웃하시겠습니까?',
       [
@@ -25,13 +30,7 @@ export default function LogoutButton() {
           text: '로그아웃',
           style: 'destructive',
           onPress: async () => {
-            try {
-              await logout();
-              // 로그아웃 성공 시 자동으로 라우팅됩니다 (_layout.tsx의 Stack.Protected 설정에 의해)
-            } catch (error) {
-              if (__DEV__) console.error('로그아웃 오류:', error);
-              toast.error('로그아웃 실패', '로그아웃 중 오류가 발생했습니다.');
-            }
+            await logout();
           },
         },
       ]
@@ -40,7 +39,13 @@ export default function LogoutButton() {
 
   return (
     <Pressable
-      style={[styles.logoutButton, { backgroundColor: colors.critical }]}
+      style={({ pressed }) => [
+        styles.logoutButton, 
+        { 
+          backgroundColor: colors.critical,
+          opacity: pressed ? 0.8 : 1 
+        }
+      ]}
       onPress={handleLogout}
     >
       <Ionicons name="log-out-outline" size={20} color={colors.white} />

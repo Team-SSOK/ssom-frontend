@@ -116,7 +116,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         });
       }
     } catch (error) {
-      if(__DEV__) console.error('기존 분석 조회 실패:', error);
+      if(__DEV__) console.log('기존 분석 조회 실패:', error);
       set({ 
         analysisResult: null, 
         hasExistingAnalysis: false 
