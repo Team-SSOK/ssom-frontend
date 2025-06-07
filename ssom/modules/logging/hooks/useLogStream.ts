@@ -21,6 +21,36 @@ export function useLogStream(): UseLogStreamResult {
   const [reconnectAttempts, setReconnectAttempts] = useState<number>(0);
   const isConnecting = useRef(false);
 
+  // 컴포넌트 마운트 시 현재 SSE 연결 상태와 동기화
+  useEffect(() => {
+    const statusInfo = loggingSSEApi.getConnectionStatus();
+    setReconnectAttempts(statusInfo.attempts);
+    
+    if (statusInfo.connected && statusInfo.state === 'connected') {
+      setConnectionStatus('connected');
+      setConnectionMessage('연결됨');
+      console.log('🔄 기존 SSE 연결 상태와 동기화됨');
+    } else {
+      setConnectionStatus(statusInfo.state);
+      switch (statusInfo.state) {
+        case 'connecting':
+          setConnectionMessage('연결 중...');
+          break;
+        case 'reconnecting':
+          setConnectionMessage('재연결 중...');
+          break;
+        case 'error':
+          setConnectionMessage('연결 오류');
+          break;
+        case 'cooldown':
+          setConnectionMessage('서버 문제로 대기 중...');
+          break;
+        default:
+          setConnectionMessage('연결되지 않음');
+      }
+    }
+  }, []);
+
   // 새 로그 수신 처리
   const handleLogReceived: LogEventListener = useCallback((log: LogEntry) => {
     setLogs(prevLogs => {
@@ -71,7 +101,9 @@ export function useLogStream(): UseLogStreamResult {
 
   // SSE 연결 시작
   const connect = useCallback(() => {
-    if (isConnecting.current || connectionStatus === 'connected') {
+    // 실제 SSE 연결 상태 확인
+    const statusInfo = loggingSSEApi.getConnectionStatus();
+    if (isConnecting.current || statusInfo.connected) {
       console.log('이미 연결 중이거나 연결됨');
       return;
     }
@@ -92,7 +124,7 @@ export function useLogStream(): UseLogStreamResult {
       .finally(() => {
         isConnecting.current = false;
       });
-  }, [connectionStatus, handleLogReceived, handleConnectionEvent]);
+  }, [handleLogReceived, handleConnectionEvent]);
 
   // SSE 연결 해제
   const disconnect = useCallback(() => {

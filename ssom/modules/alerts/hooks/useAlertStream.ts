@@ -43,6 +43,36 @@ export function useAlertStream(): UseAlertStreamResult {
     connectionStatusRef.current = connectionStatus;
   }, [connectionStatus]);
 
+  // 컴포넌트 마운트 시 현재 SSE 연결 상태와 동기화
+  useEffect(() => {
+    const statusInfo = alertSSEApi.getConnectionStatus();
+    setReconnectAttempts(statusInfo.attempts);
+    
+    if (statusInfo.connected && statusInfo.state === 'connected') {
+      setConnectionStatus('connected');
+      setConnectionMessage('연결됨');
+      console.log('🔄 기존 Alert SSE 연결 상태와 동기화됨');
+    } else {
+      setConnectionStatus(statusInfo.state);
+      switch (statusInfo.state) {
+        case 'connecting':
+          setConnectionMessage('연결 중...');
+          break;
+        case 'reconnecting':
+          setConnectionMessage('재연결 중...');
+          break;
+        case 'error':
+          setConnectionMessage('연결 오류');
+          break;
+        case 'cooldown':
+          setConnectionMessage('서버 문제로 대기 중...');
+          break;
+        default:
+          setConnectionMessage('연결되지 않음');
+      }
+    }
+  }, []);
+
   // 새 알림 수신 처리 - 스토어의 addAlert 사용
   const handleAlertReceived: AlertEventListener = useCallback((alert: AlertEntry) => {
     addAlert(alert);
