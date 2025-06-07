@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { alertSSEApi } from '../apis/alertSSEApi';
 import { useAlertStore } from '../stores/alertStore';
 import { AlertEntry, AlertEventListener, AlertConnectionEventListener } from '../types';
+import Toast from 'react-native-toast-message';
 
 interface UseAlertStreamResult {
   alerts: AlertEntry[];
@@ -131,7 +132,15 @@ export function useAlertStream(): UseAlertStreamResult {
         console.log('Alert SSE 연결 시도 완료');
       })
       .catch((error) => {
-        console.error('Alert SSE 연결 실패:', error);
+        if (__DEV__) console.error('Alert SSE 연결 실패:', error);
+        
+        Toast.show({
+          type: 'error',
+          text1: '알림 연결 실패',
+          text2: '실시간 알림 연결에 실패했습니다.',
+          visibilityTime: 4000,
+        });
+        
         setConnectionStatus('error');
         setConnectionMessage('연결 실패');
       })

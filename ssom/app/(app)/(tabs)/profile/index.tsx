@@ -12,10 +12,12 @@ import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
+import { useToast } from '@/hooks/useToast';
 
 export default function ProfileScreen() {
   const { colors } = useTheme();
   const { logout, user } = useAuthStore();
+  const toast = useToast();
 
   // 사용자 정보가 없으면 기본값 표시
   const userInfo = user ? {
@@ -47,8 +49,8 @@ export default function ProfileScreen() {
               await logout();
               // 로그아웃 성공 시 자동으로 라우팅됩니다 (_layout.tsx의 Stack.Protected 설정에 의해)
             } catch (error) {
-              console.error('로그아웃 오류:', error);
-              Alert.alert('오류', '로그아웃 중 오류가 발생했습니다.');
+              if (__DEV__) console.error('로그아웃 오류:', error);
+              toast.error('로그아웃 실패', '로그아웃 중 오류가 발생했습니다.');
             }
           },
         },

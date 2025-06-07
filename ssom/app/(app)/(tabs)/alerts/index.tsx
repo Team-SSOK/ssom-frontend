@@ -49,9 +49,10 @@ export default function AlertsScreen() {
     if (alert && !alert.isRead) {
       try {
         await markAsRead(alert.alertId);
-      } catch (error) {
-        console.error('읽음 처리 실패:', error);
-      }
+              } catch (error) {
+          if (__DEV__) console.error('읽음 처리 실패:', error);
+          toast.error('읽음 처리 실패', '알림을 읽음으로 처리하는데 실패했습니다.');
+        }
     }
   };
 

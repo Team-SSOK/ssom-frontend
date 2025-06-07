@@ -5,7 +5,10 @@
  * - 반복되는 에러 처리 로직 통합
  * - 일관된 로딩 상태 관리
  * - 에러 메시지 표준화
+ * - 사용자 친화적 에러 알림
  */
+
+import Toast from 'react-native-toast-message';
 
 /**
  * 비동기 액션을 안전하게 실행하는 래퍼 함수
@@ -34,7 +37,17 @@ export async function executeAsyncAction<T>(
       ? error.message 
       : errorMessage || '작업 중 오류가 발생했습니다.';
     
-    console.error('Store action error:', error);
+    // Toss 원칙: 개발자용 로그와 사용자용 알림 분리
+    if (__DEV__) console.error('Store action error:', error);
+    
+    // 사용자에게 친화적인 에러 토스트 표시
+    Toast.show({
+      type: 'error',
+      text1: '오류 발생',
+      text2: message,
+      visibilityTime: 4000,
+    });
+    
     setError(message);
     throw error; // 일관된 에러 전파
   } finally {

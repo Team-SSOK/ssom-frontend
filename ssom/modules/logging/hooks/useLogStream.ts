@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loggingSSEApi } from '@/modules/logging/apis/logSSEApi';
 import { LogEntry, LogEventListener, ConnectionEventListener } from '@/modules/logging/types';
+import Toast from 'react-native-toast-message';
 
 interface UseLogStreamResult {
   logs: LogEntry[];
@@ -117,7 +118,15 @@ export function useLogStream(): UseLogStreamResult {
         console.log('SSE 연결 시도 완료');
       })
       .catch((error) => {
-        console.error('SSE 연결 실패:', error);
+        if (__DEV__) console.error('SSE 연결 실패:', error);
+        
+        Toast.show({
+          type: 'error',
+          text1: '로그 연결 실패',
+          text2: '실시간 로그 연결에 실패했습니다.',
+          visibilityTime: 4000,
+        });
+        
         setConnectionStatus('error');
         setConnectionMessage('연결 실패');
       })
