@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ActivityIndicator, Text } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
+import { useRefreshControl } from '@/hooks/useRefreshControl';
 import { useIssueStore } from '@/modules/issues/stores/issueStore';
 import DashboardHeader from '@/modules/issues/components/Dashboard/DashboardHeader';
 import IssueStatusSummary from '@/modules/issues/components/Dashboard/IssueStatusSummary';
 import IssueList from '@/modules/issues/components/Dashboard/IssueList';
 import IssueTabNavigation from '@/modules/issues/components/Dashboard/IssueTabNavigation';
 
-// Mock 데이터 제거 - 실제 API 데이터 사용
-
 export default function MainDashboard() {
   const { colors } = useTheme();
   const { showError } = useToast();
-  const [activeTab, setActiveTab] = useState<'my' | 'all'>('all');
+  const [activeTab, setActiveTab] = useState<'my' | 'all'>('my');
   
   // 이슈 관련 상태
   const { 
@@ -29,11 +28,10 @@ export default function MainDashboard() {
     clearError 
   } = useIssueStore();
 
-  // 컴포넌트 마운트 시 이슈 목록 로드
   useEffect(() => {
     getAllIssues();
     getMyIssues();
-  }, [getAllIssues, getMyIssues]);
+  }, []);
 
   // 에러 처리
   useEffect(() => {
@@ -44,7 +42,7 @@ export default function MainDashboard() {
       });
       clearError();
     }
-  }, [issuesError, myIssuesError, showError, clearError]);
+  }, [issuesError, myIssuesError]);
 
  
   // Tab 변경 핸들러
@@ -52,11 +50,21 @@ export default function MainDashboard() {
     setActiveTab(tab);
   };
 
+  const refreshHandler = useCallback(async () => {
+    await Promise.all([
+      getAllIssues(),
+      getMyIssues()
+    ]);
+  }, [getAllIssues, getMyIssues]);
+
+  const { refreshing, onRefresh } = useRefreshControl({ 
+    onRefresh: refreshHandler 
+  });
+
   // 현재 활성 탭에 따른 이슈 데이터 선택
   const currentIssues = activeTab === 'my' ? myIssues : allIssues;
   const isCurrentLoading = activeTab === 'my' ? isLoadingMyIssues : isLoadingIssues;
 
-  // API 데이터를 컴포넌트에서 사용할 수 있는 형태로 변환
   const transformedIssues = currentIssues.map(issue => ({
     id: issue.issueId.toString(),
     title: issue.title,
@@ -65,7 +73,6 @@ export default function MainDashboard() {
     description: issue.description,
   }));
 
-  // 전체 이슈 데이터 (StatusSummary용 - 항상 전체 이슈 기준)
   const allTransformedIssues = allIssues.map(issue => ({
     id: issue.issueId.toString(),
     title: issue.title,
@@ -74,21 +81,8 @@ export default function MainDashboard() {
     description: issue.description,
   }));
 
-  // 로딩 중일 때 표시할 컴포넌트
-  if (isCurrentLoading) {
-    return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background }]}
-      >
-        <DashboardHeader />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            이슈 목록을 불러오는 중...
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
+  if (isCurrentLoading && !refreshing) {
+    return <ActivityIndicator size="large" color={colors.primary} />
   }
 
   return (
@@ -102,7 +96,15 @@ export default function MainDashboard() {
         onTabChange={handleTabChange} 
       />
       <IssueList 
-        issues={transformedIssues} 
+        issues={transformedIssues}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            colors={[colors.primary]} 
+            tintColor={colors.primary} 
+          />
+        }
       />
     </SafeAreaView>
   );
@@ -111,16 +113,5 @@ export default function MainDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: 'center',
   },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
@@ -16,7 +16,7 @@ interface IssueItemProps {
   item: Issue;
 }
 
-export default function IssueItem({ item }: IssueItemProps) {
+function IssueItem({ item }: IssueItemProps) {
   const { colors } = useTheme();
 
   const handlePress = () => {
@@ -51,6 +51,9 @@ export default function IssueItem({ item }: IssueItemProps) {
     </Pressable>
   );
 }
+
+// React.memo로 메모이제이션하여 불필요한 리렌더링 방지
+export default memo(IssueItem);
 
 const styles = StyleSheet.create({
   issueCard: {
