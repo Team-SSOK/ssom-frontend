@@ -12,7 +12,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLogo from '@/modules/auth/components/SignIn/AppLogo';
 import LoginForm from '@/modules/auth/components/SignIn/LoginForm';
 import LoginNotice from '@/modules/auth/components/SignIn/LoginNotice';
@@ -41,20 +40,17 @@ export default function SignIn() {
       router.replace('/(app)/(tabs)');
     } catch (error) {
       console.warn('로그인 실패:', error);
-      const errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
-      toast.error('로그인 오류', errorMessage);
+      toast.error('로그인 오류', "로그인에 실패했습니다");
     }
   };
 
   // 개발용: 첫 로그인 상태 리셋
   const resetFirstLoginStatus = async () => {
     try {
-      await AsyncStorage.removeItem('hasChangedPassword');
-      
       const { clearAuth } = useAuthStore.getState();
       await clearAuth();
       
-      toast.success('개발자 도구', '모든 인증 데이터가 리셋되었습니다. (토큰, 첫로그인 상태 포함)');
+      toast.success('개발자 도구', '모든 인증 데이터가 리셋되었습니다.');
     } catch (error) {
       toast.error('개발자 도구', '리셋 중 오류가 발생했습니다.');
     }

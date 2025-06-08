@@ -82,15 +82,30 @@ export default function Root() {
 }
 
 function RootNavigator() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, isPasswordChanged } = useAuthStore();
+
+  console.log('isAuthenticated', isAuthenticated);
+  console.log('user', !!user);
+  console.log('isPasswordChanged', isPasswordChanged);
   
   // Alert SSE 연결 자동 관리
   useAlertSSEConnection({ isAuthenticated, user });
 
   return (
     <Stack>
-      <Stack.Protected guard={isAuthenticated && !!user}>
+      <Stack.Protected guard={isAuthenticated && !!user && isPasswordChanged !== false}>
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
+      </Stack.Protected>
+
+      <Stack.Protected guard={isAuthenticated && !!user && isPasswordChanged === false}>
+        <Stack.Screen 
+          name="pw-change" 
+          options={{ 
+            headerShown: false,
+            presentation: 'modal',
+            title: 'Password Change',
+          }} 
+        />
       </Stack.Protected>
 
       <Stack.Protected guard={!isAuthenticated || !user}>

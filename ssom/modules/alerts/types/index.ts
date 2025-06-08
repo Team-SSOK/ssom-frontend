@@ -4,6 +4,7 @@
 
 export interface AlertEntry {
   alertId: number;
+  alertStatusId: number;
   id: string;
   title: string;
   message: string;

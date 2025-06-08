@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   authApi,
   type SignInRequest,
@@ -36,6 +37,7 @@ export interface AuthState {
   profile: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isPasswordChanged: boolean;
   login: (credentials: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
   changePassword: (data: PasswordChangeRequest) => Promise<void>;
@@ -57,6 +59,7 @@ export const useAuthStore = create<AuthState>()(
       profile: null,
       isAuthenticated: false,
       isLoading: false,
+      isPasswordChanged: false,
 
       login: async (credentials: SignInRequest) => {
         set({ isLoading: true });
@@ -126,6 +129,9 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           await authApi.changePassword(data);
+          
+          // 비밀번호 변경 성공 시 상태 업데이트 (Zustand persist가 자동으로 저장)
+          set({ isPasswordChanged: true });
         } catch (error) {
           if(__DEV__) console.error('비밀번호 변경 실패:', error);
           throw error;
@@ -180,13 +186,14 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           isAuthenticated: false,
+          isPasswordChanged: false,
         });
       },
     }),
     {
       name: 'authStorage',
       storage: createJSONStorage(() => persistStorage),
-      partialize: ({ user }) => ({ user }),
+      partialize: ({ user, isPasswordChanged }) => ({ user, isPasswordChanged }),
       onRehydrateStorage: () => (state) => {
         if (__DEV__) console.log('[AuthStore] persist 복원 완료');
       },

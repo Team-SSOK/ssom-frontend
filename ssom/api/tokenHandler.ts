@@ -99,7 +99,7 @@ export const handleTokenRefresh = async (): Promise<string> => {
     processQueue(refreshError, undefined);
 
     // 인증 상태 초기화
-    useAuthStore.getState().resetAuth();
+    useAuthStore.getState().clearAuth();
 
     throw refreshError;
   } finally {

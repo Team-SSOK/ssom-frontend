@@ -12,10 +12,10 @@ interface AlertState {
   // Actions
   setAlerts: (alerts: AlertEntry[]) => void;
   addAlert: (alert: AlertEntry) => void;
-  updateAlert: (alertId: number, updates: Partial<AlertEntry>) => void;
-  removeAlert: (alertId: number) => void;
-  markAsRead: (alertId: number) => Promise<void>;
-  deleteAlert: (alertId: number) => Promise<void>;
+  updateAlert: (alertStatusId: number, updates: Partial<AlertEntry>) => void;
+  removeAlert: (alertStatusId: number) => void;
+  markAsRead: (alertStatusId: number) => Promise<void>;
+  deleteAlert: (alertStatusId: number) => Promise<void>;
   loadAlerts: () => Promise<void>;
   clearAlerts: () => void;
   setLoading: (loading: boolean) => void;
@@ -37,9 +37,11 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
   addAlert: (alert: AlertEntry) => {
     set(state => {
-      // 중복 방지: 같은 alertId 또는 id가 이미 있으면 추가하지 않음
+      // 중복 방지: 같은 alertId, alertStatusId 또는 id가 이미 있으면 추가하지 않음
       const exists = state.alerts.some(existingAlert => 
-        existingAlert.alertId === alert.alertId || existingAlert.id === alert.id
+        existingAlert.alertId === alert.alertId || 
+        existingAlert.alertStatusId === alert.alertStatusId ||
+        existingAlert.id === alert.id
       );
       
       if (exists) {
@@ -56,10 +58,10 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     });
   },
 
-  updateAlert: (alertId: number, updates: Partial<AlertEntry>) => {
+  updateAlert: (alertStatusId: number, updates: Partial<AlertEntry>) => {
     set(state => {
       const updatedAlerts = state.alerts.map(alert => 
-        alert.alertId === alertId 
+        alert.alertStatusId === alertStatusId 
           ? { ...alert, ...updates }
           : alert
       );
@@ -73,18 +75,18 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     });
   },
 
-  removeAlert: (alertId: number) => {
+  removeAlert: (alertStatusId: number) => {
     set(state => ({
-      alerts: state.alerts.filter(alert => alert.alertId !== alertId)
+      alerts: state.alerts.filter(alert => alert.alertStatusId !== alertStatusId)
     }));
   },
 
-  markAsRead: async (alertId: number) => {
+  markAsRead: async (alertStatusId: number) => {
     try {
-      await alertApi.markAlertAsRead(alertId);
+      await alertApi.markAlertAsRead(alertStatusId);
       
       // 로컬 상태 업데이트
-      get().updateAlert(alertId, { isRead: true });
+      get().updateAlert(alertStatusId, { isRead: true });
     } catch (error: any) {
       console.log('알림 읽음 처리 실패:', error);
       set({ error: '알림 읽음 처리에 실패했습니다.' });
@@ -92,12 +94,12 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     }
   },
 
-  deleteAlert: async (alertId: number) => {
+  deleteAlert: async (alertStatusId: number) => {
     try {
-      await alertApi.deleteAlert({ alertStatusId: alertId });
+      await alertApi.deleteAlert({ alertStatusId });
       
       // 로컬 상태에서 제거
-      get().removeAlert(alertId);
+      get().removeAlert(alertStatusId);
     } catch (error: any) {
       console.log('알림 삭제 실패:', error);
       set({ error: '알림 삭제에 실패했습니다.' });
@@ -109,6 +111,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const alertList = await alertApi.getAlerts();
+
       get().setAlerts(alertList);
     } catch (error: any) {
       const errorMessage = error.message || '알림 목록을 불러오는데 실패했습니다.';

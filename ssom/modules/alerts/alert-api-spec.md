@@ -69,6 +69,7 @@ application/json
   "result": [
     {
       "alertId": 1,
+      "alertStatusId": 1,
       "id": "686692198126160f",
       "title": "[ERROR] ssok-bank",
       "message": "Authentication error: Authorization header is missing or invalid",
@@ -80,6 +81,7 @@ application/json
     },
     {
       "alertId": 2,
+      "alertStatusId": 2,
       "id": "9fbb1234567890",
       "title": "[INFO] jenkins-ssok-bank",
       "message": "Build completed successfully",

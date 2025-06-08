@@ -4,11 +4,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { FontFamily } from '@/styles/fonts';
 
-interface PwChangeHeaderProps {
-  isFirstLogin?: boolean;
-}
 
-export default function PwChangeHeader({ isFirstLogin = true }: PwChangeHeaderProps) {
+export default function PwChangeHeader() {
   const { colors } = useTheme();
 
   return (
@@ -21,15 +18,9 @@ export default function PwChangeHeader({ isFirstLogin = true }: PwChangeHeaderPr
         SSOM 보안 설정
       </Text>
       
-      {isFirstLogin ? (
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          보안을 위해 초기 비밀번호를 변경해주세요
-        </Text>
-      ) : (
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          새로운 비밀번호로 변경해주세요
-        </Text>
-      )}
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        새로운 비밀번호로 변경해주세요
+      </Text>
       
       <View style={styles.divider}>
         <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />

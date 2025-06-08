@@ -12,8 +12,8 @@ interface UseAlertStreamResult {
   disconnect: () => void;
   forceReconnect: () => void;
   loadAlerts: () => Promise<void>;
-  markAsRead: (alertId: number) => Promise<void>;
-  deleteAlert: (alertId: number) => Promise<void>;
+  markAsRead: (alertStatusId: number) => Promise<void>;
+  deleteAlert: (alertStatusId: number) => Promise<void>;
   isConnected: boolean;
   reconnectAttempts: number;
   isLoading: boolean;

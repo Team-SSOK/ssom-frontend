@@ -45,14 +45,26 @@ export default function AlertsScreen() {
 
   // 알림 클릭 시 읽음 처리
   const handleAlertPress = async (alertId: string) => {
+
+    
     const alert = alerts.find(a => a.id === alertId);
+    console.log('🔍 Alert 클릭:', {
+      alertId,
+      alert: alert ? {
+        id: alert.id,
+        alertId: alert.alertId,
+        alertStatusId: alert.alertStatusId,
+        isRead: alert.isRead,
+        title: alert.title
+      } : 'Not found'
+    });
     if (alert && !alert.isRead) {
       try {
-        await markAsRead(alert.alertId);
-              } catch (error) {
-          if (__DEV__) console.error('읽음 처리 실패:', error);
-          toast.error('읽음 처리 실패', '알림을 읽음으로 처리하는데 실패했습니다.');
-        }
+        await markAsRead(alert.alertStatusId);
+      } catch (error) {
+        if (__DEV__) console.error('읽음 처리 실패:', error);
+        toast.error('읽음 처리 실패', '알림을 읽음으로 처리하는데 실패했습니다.');
+      }
     }
   };
 

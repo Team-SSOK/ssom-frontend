@@ -86,11 +86,11 @@ class AlertApi {
    * 
    * 부작용: 해당 알림의 isRead 상태가 true로 변경됨
    * 
-   * @param alertId 읽음 처리할 알림 ID
+   * @param alertStatusId 읽음 처리할 알림 상태 ID
    */
-  async markAlertAsRead(alertId: number): Promise<void> {
+  async markAlertAsRead(alertStatusId: number): Promise<void> {
     return this.updateAlertStatus({
-      alertStatusId: alertId,
+      alertStatusId: alertStatusId,
       isRead: true
     });
   }
@@ -100,11 +100,11 @@ class AlertApi {
    * 
    * 부작용: 해당 알림의 isRead 상태가 false로 변경됨
    * 
-   * @param alertId 안읽음 처리할 알림 ID
+   * @param alertStatusId 안읽음 처리할 알림 상태 ID
    */
-  async markAlertAsUnread(alertId: number): Promise<void> {
+  async markAlertAsUnread(alertStatusId: number): Promise<void> {
     return this.updateAlertStatus({
-      alertStatusId: alertId,
+      alertStatusId: alertStatusId,
       isRead: false
     });
   }
