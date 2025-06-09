@@ -35,6 +35,7 @@ export default function AlertsScreen() {
   // API 데이터를 UI 컴포넌트에서 사용할 수 있는 형태로 변환
   const transformedAlerts: Alert[] = alerts.map(alert => ({
     id: alert.id,
+    alertStatusId: alert.alertStatusId,
     title: alert.title,
     message: alert.message,
     timestamp: alert.timestamp,
@@ -44,12 +45,10 @@ export default function AlertsScreen() {
   }));
 
   // 알림 클릭 시 읽음 처리
-  const handleAlertPress = async (alertId: string) => {
-
-    
-    const alert = alerts.find(a => a.id === alertId);
+  const handleAlertPress = async (alertStatusId: number) => {
+    const alert = alerts.find(a => a.alertStatusId === alertStatusId);
     console.log('🔍 Alert 클릭:', {
-      alertId,
+      alertStatusId,
       alert: alert ? {
         id: alert.id,
         alertId: alert.alertId,
@@ -58,6 +57,7 @@ export default function AlertsScreen() {
         title: alert.title
       } : 'Not found'
     });
+    
     if (alert && !alert.isRead) {
       try {
         await markAsRead(alert.alertStatusId);

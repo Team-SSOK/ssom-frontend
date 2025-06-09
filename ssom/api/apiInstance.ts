@@ -14,8 +14,8 @@ import { setupInterceptors } from './interceptors';
  * - 비즈니스 로직 없음 (API 클래스에서 담당)
  */
 
-// const BASE_URL = 'https://ssom.ssok.kr/api';
-const BASE_URL = 'http://kudong.kr:55037/api';
+const BASE_URL = 'https://ssom.ssok.kr/api';
+// const BASE_URL = 'http://kudong.kr:55037/api';
 const DEFAULT_TIMEOUT = 30000; // LLM 분석을 위해 30초로 증가
 
 /**

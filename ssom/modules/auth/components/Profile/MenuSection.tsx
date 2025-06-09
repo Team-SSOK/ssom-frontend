@@ -23,7 +23,7 @@ export default function MenuSection({ onAlert }: MenuSectionProps) {
   const { colors } = useTheme();
 
   const handleChangePassword = () => {
-    router.replace('/(app)/pw-change');
+    router.replace('/pw-change');
   };
 
   const menuItems: MenuItem[] = [

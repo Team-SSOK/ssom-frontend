@@ -29,6 +29,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
   setAlerts: (alerts: AlertEntry[]) => {
     // Toss 원칙: 순수 함수를 사용한 예측 가능한 데이터 변환
+    // alertId 기준으로 중복 제거 (id 필드는 서버에서 중복될 수 있음)
     const uniqueAlerts = deduplicateById(alerts, (alert) => alert.alertId);
     const sortedAlerts = sortByTimestamp(uniqueAlerts);
     
@@ -37,15 +38,15 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
   addAlert: (alert: AlertEntry) => {
     set(state => {
-      // 중복 방지: 같은 alertId, alertStatusId 또는 id가 이미 있으면 추가하지 않음
+      // 중복 방지: 같은 alertId, alertStatusId가 이미 있으면 추가하지 않음
+      // id 필드는 서버에서 중복될 수 있으므로 체크에서 제외
       const exists = state.alerts.some(existingAlert => 
         existingAlert.alertId === alert.alertId || 
-        existingAlert.alertStatusId === alert.alertStatusId ||
-        existingAlert.id === alert.id
+        existingAlert.alertStatusId === alert.alertStatusId
       );
       
       if (exists) {
-        console.log('중복 알림 방지:', alert.id);
+        console.log('중복 알림 방지 (alertId 또는 alertStatusId):', alert.alertId, alert.alertStatusId);
         return state;
       }
       
@@ -111,6 +112,8 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const alertList = await alertApi.getAlerts();
+
+      console.log('🔍 Alert List:', alertList);
 
       get().setAlerts(alertList);
     } catch (error: any) {

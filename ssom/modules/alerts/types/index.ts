@@ -46,6 +46,7 @@ export interface AlertConnectionEventListener {
 // UI에서 사용하는 알림 타입 (기존 mock과 호환)
 export interface Alert {
   id: string;
+  alertStatusId: number;
   title: string;
   message: string;
   timestamp: string;

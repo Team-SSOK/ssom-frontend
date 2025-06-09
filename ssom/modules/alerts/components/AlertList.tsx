@@ -4,6 +4,7 @@ import AlertItem from './AlertItem';
 
 interface AlertData {
   id: string;
+  alertStatusId: number;
   title: string;
   message: string;
   timestamp: string;
@@ -14,14 +15,14 @@ interface AlertData {
 
 interface AlertListProps {
   alerts: AlertData[];
-  onAlertPress?: (alertId: string) => void;
+  onAlertPress?: (alertStatusId: number) => void;
 }
 
 export default function AlertList({ alerts, onAlertPress }: AlertListProps) {
   const renderAlertItem = ({ item }: { item: AlertData }) => (
     <AlertItem 
       item={item} 
-      onPress={() => onAlertPress?.(item.id)}
+      onPress={() => onAlertPress?.(item.alertStatusId)}
     />
   );
 
