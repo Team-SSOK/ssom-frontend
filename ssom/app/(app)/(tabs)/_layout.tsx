@@ -18,7 +18,7 @@ export default function TabLayout() {
     },
     {
       icon: 'monitor-dashboard',
-      onPress: () => router.push('/(app)/(tabs)/alerts'),
+      onPress: () => router.push('/(app)/(tabs)/grafana'),
       style: styles.fabActions,
     },
     {
