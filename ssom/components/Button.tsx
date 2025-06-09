@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Platform,
 } from 'react-native';
 import { FontFamily } from '@/styles/fonts';
 
@@ -141,8 +142,8 @@ const styles = StyleSheet.create({
   },
   large: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    minHeight: 52,
+    paddingVertical: Platform.OS === 'ios' ? 16 : 8,
+    minHeight: 48,
   },
   text: {
     fontFamily: FontFamily.semiBold,
@@ -156,6 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   largeText: {
-    fontSize: 18,
+    fontSize: 16,
   },
 });

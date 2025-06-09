@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
+import { useFCMStore } from '@/modules/notifications';
 import AppLogo from '@/modules/auth/components/SignIn/AppLogo';
 import LoginForm from '@/modules/auth/components/SignIn/LoginForm';
 import LoginNotice from '@/modules/auth/components/SignIn/LoginNotice';
@@ -21,6 +22,7 @@ export default function SignIn() {
   const { login, isLoading } = useAuthStore();
   const { colors } = useTheme();
   const toast = useToast();
+  const { resetPermissionRequest } = useFCMStore();
 
   const handleLogin = async (employeeId: string, password: string) => {
     if (!employeeId.trim() || !password.trim()) {
@@ -34,7 +36,7 @@ export default function SignIn() {
         password: password.trim(),
       });
 
-      console.log('로그인 완료 - (app) 레이아웃으로 이동');
+      console.log('로그인 완료 - 앱으로 이동...');
       toast.success('로그인 성공', '환영합니다!');
       
       router.replace('/(app)/(tabs)');
@@ -49,6 +51,9 @@ export default function SignIn() {
     try {
       const { clearAuth } = useAuthStore.getState();
       await clearAuth();
+      
+      // FCM 권한 요청 상태도 함께 리셋
+      resetPermissionRequest();
       
       toast.success('개발자 도구', '모든 인증 데이터가 리셋되었습니다.');
     } catch (error) {

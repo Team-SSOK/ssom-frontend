@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
+import { useFCMStore } from '@/modules/notifications';
 import PwChangeHeader from '@/modules/auth/components/PwChange/PwChangeHeader';
 import PwChangeForm, { PwChangeFormRef, PasswordChangeRequest } from '@/modules/auth/components/PwChange/PwChangeForm';
 import PwChangeButton from '@/modules/auth/components/PwChange/PwChangeButton';
@@ -14,6 +15,7 @@ export default function PasswordChange() {
   const { colors } = useTheme();
   const toast = useToast();
   const { changePassword, isLoading } = useAuthStore();
+  const { requestPermissionOnce } = useFCMStore();
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const formRef = useRef<PwChangeFormRef>(null);
 
@@ -33,11 +35,40 @@ export default function PasswordChange() {
     try {
       await changePassword(data);
 
+      console.log('비밀번호 변경 완료 - FCM 권한 요청 시작...');
+
+      // 비밀번호 변경 완료 후 FCM 권한 요청
+      const requestFCMPermission = async () => {
+        try {
+          await requestPermissionOnce();
+          
+          // 권한 요청 후 상태 확인
+          const currentState = useFCMStore.getState();
+          console.log('📱 FCM 권한 처리 완료. 현재 상태:', {
+            permissionGranted: currentState.permissionGranted,
+            registrationStatus: currentState.registrationStatus,
+            fcmToken: currentState.fcmToken ? '토큰 있음' : '토큰 없음'
+          });
+          
+          if (currentState.permissionGranted && currentState.registrationStatus === 'success') {
+            console.log('✅ FCM 등록 성공');
+          } else if (currentState.permissionGranted && currentState.registrationStatus === 'failed') {
+            console.log('❌ FCM 등록 실패');
+          }
+        } catch (error) {
+          console.error('📱 FCM 권한 처리 중 오류:', error);
+        }
+      };
+
       toast.showSuccess({
         title: '비밀번호 변경 완료',
         message: '비밀번호가 성공적으로 변경되었습니다! 메인 화면으로 이동합니다.',
         duration: 1000,
-        onHide: () => router.replace('/(app)/(tabs)')
+        onHide: async () => {
+          // 토스트가 사라진 후 FCM 권한 요청
+          await requestFCMPermission();
+          router.replace('/(app)/(tabs)');
+        }
       });
     } catch (error) {
       console.warn('비밀번호 변경 실패:', error);

@@ -113,8 +113,6 @@ export const useAlertStore = create<AlertState>((set, get) => ({
       set({ isLoading: true, error: null });
       const alertList = await alertApi.getAlerts();
 
-      console.log('🔍 Alert List:', alertList);
-
       get().setAlerts(alertList);
     } catch (error: any) {
       const errorMessage = error.message || '알림 목록을 불러오는데 실패했습니다.';
