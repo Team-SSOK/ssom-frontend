@@ -110,6 +110,68 @@ export abstract class BaseSSEService<T> {
         }
       });
 
+      // 백엔드 SSE_ALERT_INIT 이벤트 처리 (초기 연결)
+      (this.eventSource as any).addEventListener('SSE_ALERT_INIT', (event: any) => {
+        try {
+          console.log(`🔔 ${this.getServiceName()} SSE_ALERT_INIT:`, event.data);
+          if (event.data === 'connected') {
+            this.isConnected = true;
+            this.setState('connected', onConnectionEvent);
+          }
+        } catch (error) {
+          console.log(`${this.getServiceName()} SSE_ALERT_INIT 처리 오류:`, error);
+        }
+      });
+
+      // 백엔드 SSE_ALERT 이벤트 처리 (실제 알림 데이터)
+      (this.eventSource as any).addEventListener('SSE_ALERT', (event: any) => {
+        try {
+          console.log(`📨 ${this.getServiceName()} SSE_ALERT 데이터 수신:`, event.data);
+          if (event.data) {
+            const parsedData = this.handleMessage(event.data);
+            if (parsedData) {
+              onDataReceived(parsedData);
+            }
+          }
+        } catch (error) {
+          console.log(`${this.getServiceName()} SSE_ALERT 데이터 파싱 오류:`, error);
+        }
+      });
+
+      // 백엔드 heartbeat 이벤트 처리 (연결 상태 확인)
+      (this.eventSource as any).addEventListener('heartbeat', (event: any) => {
+        console.log(`💓 ${this.getServiceName()} heartbeat:`, event.data);
+        // heartbeat은 연결 상태 확인용이므로 별도 처리 불필요
+      });
+
+      // 백엔드 LOGGING_INIT 이벤트 처리 (초기 연결)
+      (this.eventSource as any).addEventListener('LOGGING_INIT', (event: any) => {
+        try {
+          console.log(`🔔 ${this.getServiceName()} LOGGING_INIT:`, event.data);
+          if (event.data === 'connected') {
+            this.isConnected = true;
+            this.setState('connected', onConnectionEvent);
+          }
+        } catch (error) {
+          console.log(`${this.getServiceName()} LOGGING_INIT 처리 오류:`, error);
+        }
+      });
+
+      // 백엔드 LOGGING 이벤트 처리 (실제 로그 데이터)
+      (this.eventSource as any).addEventListener('LOGGING', (event: any) => {
+        try {
+          console.log(`📨 ${this.getServiceName()} LOGGING 데이터 수신:`, event.data);
+          if (event.data) {
+            const parsedData = this.handleMessage(event.data);
+            if (parsedData) {
+              onDataReceived(parsedData);
+            }
+          }
+        } catch (error) {
+          console.log(`${this.getServiceName()} LOGGING 데이터 파싱 오류:`, error);
+        }
+      });
+
       // 에러 처리 - 서버 상태별 다른 전략
       this.eventSource.addEventListener('error', (event: any) => {
         this.isConnected = false;

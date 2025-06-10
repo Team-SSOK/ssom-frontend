@@ -83,10 +83,6 @@ export default function Root() {
 
 function RootNavigator() {
   const { user, isAuthenticated, isPasswordChanged } = useAuthStore();
-
-  console.log('isAuthenticated', isAuthenticated);
-  console.log('user', !!user);
-  console.log('isPasswordChanged', isPasswordChanged);
   
   // Alert SSE 연결 자동 관리
   useAlertSSEConnection({ isAuthenticated, user });

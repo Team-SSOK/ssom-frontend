@@ -8,10 +8,11 @@ import { LogEntry, LogEventListener, ConnectionEventListener as LogConnectionEve
  * - BaseSSEService를 상속받아 로그 특화 SSE 구현
  * - 로그 데이터 파싱 및 변환
  * - 로그 관련 엔드포인트 정의
+ * - 백엔드 SSE 이벤트 타입과 일치하는 처리
  */
 class LoggingSSEService extends BaseSSEService<LogEntry> {
   
-  // 로그 SSE 엔드포인트 정의
+  // 로그 SSE 엔드포인트 정의 - API 스펙에 맞춤
   protected getEndpoint(): string {
     return '/logging/subscribe';
   }
@@ -19,6 +20,13 @@ class LoggingSSEService extends BaseSSEService<LogEntry> {
   // 로그 데이터 파싱
   protected handleMessage(data: string): LogEntry | null {
     try {
+      // 백엔드에서 "connected" 문자열을 보내는 경우 (초기 연결)
+      if (data === 'connected') {
+        console.log('🔔 Logging SSE 초기화 완료');
+        return null; // 실제 로그 데이터가 아니므로 null 반환
+      }
+      
+      // 실제 로그 데이터 파싱
       return JSON.parse(data) as LogEntry;
     } catch (error) {
       console.log('로그 파싱 오류:', error);
