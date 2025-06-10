@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
+import { LoadingIndicator } from '@/components';
 import { useToast } from '@/hooks/useToast';
 import { useLocalSearchParams } from 'expo-router';
 import LogDetailHeader from '@/modules/logging/components/LogDetail/LogDetailHeader';
@@ -60,7 +61,7 @@ export default function LogDetailScreen() {
   };
 
   if(isLoadingCurrentLog || !currentLog){
-    return <ActivityIndicator size="large" color={colors.primary} />
+    return <LoadingIndicator />
   }
 
   return (
