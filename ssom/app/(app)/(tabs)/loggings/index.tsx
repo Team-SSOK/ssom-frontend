@@ -2,7 +2,9 @@ import React, { useEffect, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
+import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useLogStore } from '@/modules/logging/stores/logStore';
+import { useLogStream } from '@/modules/logging/hooks/useLogStream';
 import { useLogFilters } from '@/modules/logging/hooks/useLogFilters';
 import { useMultiSelectLogs } from '@/modules/logging/hooks/useMultiSelectLogs';
 import { useCombinedLogs } from '@/modules/logging/hooks/useCombinedLogs';
@@ -11,6 +13,33 @@ import LogList from '@/modules/logging/components/LogDashboard/LogList';
 
 export default function LogsScreen() {
   const { colors } = useTheme();
+  
+  // 인증 상태 가져오기
+  const { isAuthenticated, user } = useAuthStore();
+  
+  // 이 화면에서만 로깅 SSE 연결 관리 및 상태 가져오기
+  const {
+    connectionStatus,
+    connectionMessage,
+    reconnectAttempts,
+    connect,
+    disconnect,
+    forceReconnect,
+  } = useLogStream();
+  
+  // 인증 상태에 따른 자동 연결/해제
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('🟢 Logging 화면 - SSE 연결 시작');
+      connect();
+    }
+    
+    // 화면 나갈 때 연결 해제
+    return () => {
+      console.log('🔴 Logging 화면 - SSE 연결 해제');
+      disconnect();
+    };
+  }, [isAuthenticated, user, connect, disconnect]);
   
   // 로그 필터링 훅
   const {
@@ -23,7 +52,7 @@ export default function LogsScreen() {
     setSelectedService,
   } = useLogFilters();
 
-  // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어의 실시간 로그만 사용
+  // SSE 연결은 이 화면에서 관리하므로, 스토어의 실시간 로그 사용
   const { logs: realtimeLogs } = useLogStore();
 
   // 다중 선택 훅
@@ -51,13 +80,11 @@ export default function LogsScreen() {
     handleCreateIssuesFromLogs(filteredLogs);
   }, [handleCreateIssuesFromLogs, filteredLogs]);
 
-  // 임시 연결 상태 (SSE는 _layout.tsx에서 관리)
-  const connectionStatus = 'connected';
-  const connectionMessage = '연결됨 (전역 관리)';
-  const handleRetryConnection = () => {
-    console.log('연결은 전역에서 관리됩니다');
-  };
-  const reconnectAttempts = 0;
+  // 재연결 핸들러
+  const handleRetryConnection = useCallback(() => {
+    console.log('수동 재연결 시도');
+    forceReconnect();
+  }, [forceReconnect]);
 
   return (
     <SafeAreaView
@@ -77,7 +104,7 @@ export default function LogsScreen() {
         services={services}
         isLoading={isLoading}
         
-        // 연결 상태 (전역 관리)
+        // 실제 SSE 연결 상태
         connectionStatus={connectionStatus}
         connectionMessage={connectionMessage}
         onRetryConnection={handleRetryConnection}

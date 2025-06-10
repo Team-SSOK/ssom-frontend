@@ -93,10 +93,18 @@ export const useLogStore = create<LogState>((set, get) => ({
     
     // 중복 방지
     const exists = logs.some(existingLog => existingLog.logId === log.logId);
-    if (exists) return;
+    if (exists) {
+      console.log('🔍 [LogStore] 중복 로그 무시:', log.logId);
+      return;
+    }
     
     // 최신 로그를 맨 앞에 추가 (최대 개수 제한)
     const newLogs = [log, ...logs].slice(0, LOG_CONFIG.MAX_LOGS_COUNT);
+    console.log('🔍 [LogStore] 로그 추가됨:', {
+      logId: log.logId,
+      총개수: newLogs.length,
+      이전개수: logs.length,
+    });
     set({ logs: newLogs });
   },
 

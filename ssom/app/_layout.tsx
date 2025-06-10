@@ -88,9 +88,6 @@ function RootNavigator() {
   // Alert SSE 연결 자동 관리
   useAlertSSEConnection({ isAuthenticated, user });
   
-  // Logging SSE 연결 자동 관리
-  useLogSSEConnection({ isAuthenticated, user });
-
   return (
     <Stack>
       <Stack.Protected guard={isAuthenticated && !!user && isPasswordChanged !== false}>

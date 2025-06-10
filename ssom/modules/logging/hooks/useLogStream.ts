@@ -58,7 +58,6 @@ export function useLogStream(): UseLogStreamResult {
 
   // 새 로그 수신 처리 - 로컬 상태와 스토어 모두 업데이트
   const handleLogReceived: LogEventListener = useCallback((log: LogEntry) => {
-    console.log('📨 새 로그 수신:', log);
     
     // 1. 로컬 상태 업데이트 (기존 로직)
     setLogs(prevLogs => {
