@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { loggingSSEApi } from '@/modules/logging/apis/logSSEApi';
+import { useLogStore } from '@/modules/logging/stores/logStore';
 import { LogEntry, LogEventListener, ConnectionEventListener } from '@/modules/logging/types';
 import Toast from 'react-native-toast-message';
 
@@ -21,6 +22,9 @@ export function useLogStream(): UseLogStreamResult {
   const [connectionMessage, setConnectionMessage] = useState<string>('연결되지 않음');
   const [reconnectAttempts, setReconnectAttempts] = useState<number>(0);
   const isConnecting = useRef(false);
+
+  // 로그 스토어에서 addLog 액션 가져오기
+  const { addLog } = useLogStore();
 
   // 컴포넌트 마운트 시 현재 SSE 연결 상태와 동기화
   useEffect(() => {
@@ -52,8 +56,11 @@ export function useLogStream(): UseLogStreamResult {
     }
   }, []);
 
-  // 새 로그 수신 처리
+  // 새 로그 수신 처리 - 로컬 상태와 스토어 모두 업데이트
   const handleLogReceived: LogEventListener = useCallback((log: LogEntry) => {
+    console.log('📨 새 로그 수신:', log);
+    
+    // 1. 로컬 상태 업데이트 (기존 로직)
     setLogs(prevLogs => {
       // 중복 방지: 같은 logId가 이미 있으면 추가하지 않음
       const exists = prevLogs.some(existingLog => existingLog.logId === log.logId);
@@ -65,7 +72,10 @@ export function useLogStream(): UseLogStreamResult {
       const newLogs = [log, ...prevLogs];
       return newLogs.slice(0, 100);
     });
-  }, []);
+    
+    // 2. 스토어에도 로그 추가 (LogList.tsx에서 사용 가능)
+    addLog(log);
+  }, [addLog]);
 
   // 연결 상태 변경 처리
   const handleConnectionEvent: ConnectionEventListener = useCallback((event) => {

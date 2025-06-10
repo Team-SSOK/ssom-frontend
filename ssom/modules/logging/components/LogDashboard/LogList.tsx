@@ -1,5 +1,6 @@
 import React from 'react';
 import { FlatList, StyleSheet } from 'react-native';
+import { useLogStore } from '@/modules/logging/stores/logStore';
 import LogItem from './LogItem';
 
 interface LogData {
@@ -13,7 +14,8 @@ interface LogData {
 }
 
 interface LogListProps {
-  logs: LogData[];
+  logs?: LogData[]; // 선택적으로 로그 데이터 전달
+  useStoreData?: boolean; // 스토어 데이터를 사용할지 여부
   isMultiSelectMode?: boolean;
   selectedLogIds?: string[];
   onLogSelect?: (logId: string) => void;
@@ -21,12 +23,19 @@ interface LogListProps {
 }
 
 export default function LogList({ 
-  logs, 
+  logs: externalLogs, 
+  useStoreData = false,
   isMultiSelectMode = false,
   selectedLogIds = [],
   onLogSelect,
   onLogLongPress
 }: LogListProps) {
+  // 스토어에서 로그 데이터 가져오기 (useStoreData가 true일 때)
+  const { logs: storeLogs } = useLogStore();
+  
+  // 사용할 로그 데이터 결정
+  const logs = useStoreData ? storeLogs : (externalLogs || []);
+
   const renderLogItem = ({ item }: { item: LogData }) => (
     <LogItem 
       item={item}

@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { useLogStream } from '@/modules/logging/hooks/useLogStream';
+import { useLogStore } from '@/modules/logging/stores/logStore';
 import { useLogFilters } from '@/modules/logging/hooks/useLogFilters';
 import { useMultiSelectLogs } from '@/modules/logging/hooks/useMultiSelectLogs';
 import { useCombinedLogs } from '@/modules/logging/hooks/useCombinedLogs';
@@ -23,15 +23,8 @@ export default function LogsScreen() {
     setSelectedService,
   } = useLogFilters();
 
-  // SSE 스트림 훅
-  const { 
-    logs: sseLogs, 
-    connectionStatus, 
-    connectionMessage, 
-    connect, 
-    forceReconnect, 
-    reconnectAttempts 
-  } = useLogStream();
+  // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어의 실시간 로그만 사용
+  const { logs: realtimeLogs } = useLogStore();
 
   // 다중 선택 훅
   const {
@@ -48,26 +41,23 @@ export default function LogsScreen() {
   const {
     filteredLogs,
   } = useCombinedLogs({
-    sseLogs,
+    sseLogs: realtimeLogs, // 스토어의 실시간 로그 사용
     storeLogs,
     searchText: currentFilters.searchText,
   });
-
-  // 화면 진입시 SSE 자동 연결
-  useEffect(() => {
-    connect();
-  }, [connect]);
 
   // 이슈 생성 핸들러 (필터된 로그 전달)
   const handleCreateIssues = useCallback(() => {
     handleCreateIssuesFromLogs(filteredLogs);
   }, [handleCreateIssuesFromLogs, filteredLogs]);
 
-  // 수동 재연결 핸들러
-  const handleRetryConnection = useCallback(() => {
-    console.log('🔄 사용자 재연결 요청');
-    forceReconnect();
-  }, [forceReconnect]);
+  // 임시 연결 상태 (SSE는 _layout.tsx에서 관리)
+  const connectionStatus = 'connected';
+  const connectionMessage = '연결됨 (전역 관리)';
+  const handleRetryConnection = () => {
+    console.log('연결은 전역에서 관리됩니다');
+  };
+  const reconnectAttempts = 0;
 
   return (
     <SafeAreaView
@@ -87,7 +77,7 @@ export default function LogsScreen() {
         services={services}
         isLoading={isLoading}
         
-        // 연결 상태
+        // 연결 상태 (전역 관리)
         connectionStatus={connectionStatus}
         connectionMessage={connectionMessage}
         onRetryConnection={handleRetryConnection}

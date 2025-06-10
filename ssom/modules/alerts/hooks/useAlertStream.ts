@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'expo-router';
 import { alertSSEApi } from '../apis/alertSSEApi';
 import { useAlertStore } from '../stores/alertStore';
 import { AlertEntry, AlertEventListener, AlertConnectionEventListener } from '../types';
@@ -21,6 +22,8 @@ interface UseAlertStreamResult {
 }
 
 export function useAlertStream(): UseAlertStreamResult {
+  const router = useRouter();
+  
   // Zustand 스토어에서 상태와 액션 가져오기
   const {
     alerts,
@@ -74,10 +77,52 @@ export function useAlertStream(): UseAlertStreamResult {
     }
   }, []);
 
-  // 새 알림 수신 처리 - 스토어의 addAlert 사용
+  // 새 알림 수신 처리 - 스토어의 addAlert 사용 + 토스트 표시
   const handleAlertReceived: AlertEventListener = useCallback((alert: AlertEntry) => {
+    console.log('📨 새 알림 수신:', alert);
+    
+    // 스토어에 알림 추가
     addAlert(alert);
-  }, [addAlert]);
+    
+    // 알림 종류에 따른 토스트 타입 결정
+    let toastType: 'success' | 'error' | 'info' | 'warning' = 'info';
+    let toastIcon = '📱';
+    
+    switch (alert.kind?.toUpperCase()) {
+      case 'OPENSEARCH':
+      case 'ERROR':
+        toastType = 'error';
+        toastIcon = '🚨';
+        break;
+      case 'WARNING':
+      case 'WARN':
+        toastType = 'warning';
+        toastIcon = '⚠️';
+        break;
+      case 'SUCCESS':
+        toastType = 'success';
+        toastIcon = '✅';
+        break;
+      default:
+        toastType = 'info';
+        toastIcon = '📱';
+    }
+    
+    // 새 알림 토스트 표시
+    Toast.show({
+      type: toastType,
+      text1: `${toastIcon} ${alert.title || '새로운 알림'}`,
+      text2: alert.message || '새로운 알림이 도착했습니다.',
+      visibilityTime: 6000,
+      position: 'top',
+      topOffset: 60,
+      onPress: () => {
+        Toast.hide();
+        // 알림 탭으로 이동
+        router.push('/(app)/(tabs)/alerts');
+      }
+    });
+  }, [addAlert, router]);
 
   // 연결 상태 변경 처리
   const handleConnectionEvent: AlertConnectionEventListener = useCallback((event) => {
@@ -151,6 +196,12 @@ export function useAlertStream(): UseAlertStreamResult {
 
   // SSE 연결 해제
   const disconnect = useCallback(() => {
+    console.log('🔴 Alert SSE 연결 해제 요청:', {
+      connectionStatus: connectionStatusRef.current,
+      isConnecting: isConnecting.current,
+      timestamp: new Date().toISOString()
+    });
+    
     alertSSEApi.disconnect();
     setConnectionStatus('disconnected');
     setConnectionMessage('연결 해제됨');

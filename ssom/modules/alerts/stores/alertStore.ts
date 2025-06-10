@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { alertApi } from '../apis/alertApi';
 import { AlertEntry } from '../types';
 import { ALERT_CONFIG } from '@/api/constants';
-import { deduplicateById, sortByTimestamp } from '@/utils/storeHelpers';
+import { deduplicateById } from '@/utils/storeHelpers';
 
 interface AlertState {
   alerts: AlertEntry[];
@@ -30,10 +30,10 @@ export const useAlertStore = create<AlertState>((set, get) => ({
   setAlerts: (alerts: AlertEntry[]) => {
     // Toss 원칙: 순수 함수를 사용한 예측 가능한 데이터 변환
     // alertId 기준으로 중복 제거 (id 필드는 서버에서 중복될 수 있음)
+    // 백엔드에서 이미 시간순으로 정렬된 데이터를 보내주므로 별도 정렬 불필요
     const uniqueAlerts = deduplicateById(alerts, (alert) => alert.alertId);
-    const sortedAlerts = sortByTimestamp(uniqueAlerts);
     
-    set({ alerts: sortedAlerts });
+    set({ alerts: uniqueAlerts });
   },
 
   addAlert: (alert: AlertEntry) => {
@@ -50,9 +50,8 @@ export const useAlertStore = create<AlertState>((set, get) => ({
         return state;
       }
       
-      // 새 알림 추가 후 timestamp 기준으로 최신순 정렬 (최대 개수 제한)
+      // 새 알림을 맨 앞에 추가 (백엔드에서 정렬된 순서를 유지)
       const newAlerts = [alert, ...state.alerts]
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, ALERT_CONFIG.MAX_ALERTS_COUNT);
       
       return { alerts: newAlerts };
@@ -67,12 +66,8 @@ export const useAlertStore = create<AlertState>((set, get) => ({
           : alert
       );
       
-      // timestamp 기준 최신순 정렬 유지
-      const sortedAlerts = updatedAlerts.sort((a, b) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      );
-      
-      return { alerts: sortedAlerts };
+      // 백엔드에서 이미 정렬된 순서를 유지하므로 별도 정렬 불필요
+      return { alerts: updatedAlerts };
     });
   },
 

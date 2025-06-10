@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { useAlertStream } from '@/modules/alerts/hooks/useAlertStream';
+import { useAlertStore } from '@/modules/alerts/stores/alertStore';
 import LottieView from 'lottie-react-native';
 import { useRouter } from 'expo-router';
 
@@ -9,8 +9,8 @@ export default function DashboardHeader() {
   const { colors } = useTheme();
   const animationRef = useRef<LottieView>(null);
   
-  // 실제 알림 데이터 사용
-  const { alerts } = useAlertStream();
+  // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어만 사용
+  const { alerts } = useAlertStore();
   
   // 읽지 않은 모든 알림 개수 카운트
   const unreadAlerts = alerts.filter(alert => !alert.isRead);

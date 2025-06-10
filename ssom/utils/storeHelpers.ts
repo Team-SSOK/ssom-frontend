@@ -90,19 +90,4 @@ export function deduplicateById<T extends { id: number | string }>(
     seen.add(id);
     return true;
   });
-}
-
-/**
- * 타임스탬프 기준으로 최신순 정렬하는 유틸리티
- * Toss 원칙: 순수 함수로 예측 가능한 정렬
- */
-export function sortByTimestamp<T extends { timestamp: string }>(
-  items: T[],
-  order: 'asc' | 'desc' = 'desc'
-): T[] {
-  return [...items].sort((a, b) => {
-    const timeA = new Date(a.timestamp).getTime();
-    const timeB = new Date(b.timestamp).getTime();
-    return order === 'desc' ? timeB - timeA : timeA - timeB;
-  });
 } 

@@ -39,7 +39,6 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
     switch (level.toUpperCase()) {
       case 'ERROR':
         return colors.critical;
-      case 'WARNING':
       case 'WARN':
         return colors.warning;
       case 'INFO':
@@ -78,11 +77,6 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
           {!item.isRead && (
             <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
               <Text style={styles.unreadText}>New</Text>
-            </View>
-          )}
-          {item.actionRequired && (
-            <View style={[styles.actionBadge, { backgroundColor: colors.critical }]}>
-              <Text style={styles.actionText}>조치 필요</Text>
             </View>
           )}
         </View>

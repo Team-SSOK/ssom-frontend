@@ -5,6 +5,7 @@ import * as Font from 'expo-font';
 import { Entypo } from '@expo/vector-icons';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useAlertSSEConnection } from '@/modules/alerts/hooks/useAlertSSEConnection';
+import { useLogSSEConnection } from '@/modules/logging/hooks/useLogSSEConnection';
 import { PaperProvider } from 'react-native-paper';
 import { theme } from '@/styles/theme';
 import Toast from 'react-native-toast-message';
@@ -86,6 +87,9 @@ function RootNavigator() {
   
   // Alert SSE 연결 자동 관리
   useAlertSSEConnection({ isAuthenticated, user });
+  
+  // Logging SSE 연결 자동 관리
+  useLogSSEConnection({ isAuthenticated, user });
 
   return (
     <Stack>

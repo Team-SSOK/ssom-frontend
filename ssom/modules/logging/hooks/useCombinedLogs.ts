@@ -8,9 +8,19 @@ interface UseCombinedLogsParams {
 }
 
 export function useCombinedLogs({ sseLogs, storeLogs, searchText }: UseCombinedLogsParams) {
-  // SSE 로그와 기존 로그 합치기 (SSE 로그가 위에 오도록) - useMemo로 최적화
+  // SSE 로그와 기존 로그 합치기 + 중복 제거 (logId 기준) - useMemo로 최적화
   const combinedLogs = useMemo(() => {
-    return [...sseLogs, ...storeLogs];
+    // 모든 로그를 합친 후 logId 기준으로 중복 제거
+    const allLogs = [...sseLogs, ...storeLogs];
+    const logMap = new Map<string, LogEntry>();
+    
+    // logId를 키로 사용하여 중복 제거 (나중에 추가된 로그가 우선)
+    allLogs.forEach(log => {
+      logMap.set(log.logId, log);
+    });
+    
+    // Map의 값들을 배열로 변환
+    return Array.from(logMap.values());
   }, [sseLogs, storeLogs]);
 
   // 클라이언트 사이드 검색 필터링 - useMemo로 최적화

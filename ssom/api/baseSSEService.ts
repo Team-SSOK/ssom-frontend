@@ -284,27 +284,40 @@ export abstract class BaseSSEService<T> {
 
   // 연결 해제
   disconnect(): void {
+    console.log(`🔴 ${this.getServiceName()} SSE disconnect 호출:`, {
+      wasConnected: this.isConnected,
+      currentState: this.state,
+      hasEventSource: !!this.eventSource,
+      hasReconnectTimer: !!this.reconnectTimeoutId,
+      hasCooldownTimer: !!this.cooldownTimeoutId,
+      timestamp: new Date().toISOString()
+    });
+    
     // 타이머 정리
     if (this.reconnectTimeoutId) {
       clearTimeout(this.reconnectTimeoutId);
       this.reconnectTimeoutId = null;
+      console.log(`${this.getServiceName()} 재연결 타이머 정리됨`);
     }
     
     if (this.cooldownTimeoutId) {
       clearTimeout(this.cooldownTimeoutId);
       this.cooldownTimeoutId = null;
+      console.log(`${this.getServiceName()} 쿨다운 타이머 정리됨`);
     }
 
     if (this.eventSource) {
+      console.log(`${this.getServiceName()} EventSource 정리 중...`);
       this.eventSource.removeAllEventListeners();
       this.eventSource.close();
       this.eventSource = null;
+      console.log(`${this.getServiceName()} EventSource 정리 완료`);
     }
     
     this.isConnected = false;
     this.reconnectAttempts = 0;
     this.state = 'disconnected';
-    console.log(`${this.getServiceName()} SSE 연결 해제됨`);
+    console.log(`✅ ${this.getServiceName()} SSE 연결 해제 완료`);
   }
 
   // 연결 상태 확인

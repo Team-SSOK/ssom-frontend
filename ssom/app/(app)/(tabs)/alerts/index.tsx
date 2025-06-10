@@ -3,8 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
 import { useEffect } from 'react';
-import { useAlertStream } from '@/modules/alerts/hooks/useAlertStream';
-import { AlertEntry, Alert } from '@/modules/alerts/types';
+import { useAlertStore } from '@/modules/alerts/stores/alertStore';
+import { Alert } from '@/modules/alerts/types';
 import AlertHeader from '@/modules/alerts/components/AlertHeader';
 import AlertList from '@/modules/alerts/components/AlertList';
 
@@ -12,13 +12,14 @@ export default function AlertsScreen() {
   const { colors } = useTheme();
   const toast = useToast();
   
+  // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어만 사용
   const { 
     alerts, 
     loadAlerts, 
     markAsRead, 
     isLoading, 
     error 
-  } = useAlertStream();
+  } = useAlertStore();
 
   // 화면 진입 시 알림 목록 로드
   useEffect(() => {
