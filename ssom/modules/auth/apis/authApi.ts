@@ -43,6 +43,13 @@ export interface UserProfile {
   githubId: string;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  department: string;
+  githubId: string;
+}
+
 export interface TokenRefreshResult {
   accessToken: string;
   refreshToken: string;
@@ -146,6 +153,15 @@ class AuthApi {
    */
   async changePassword(data: PasswordChangeRequest): Promise<void> {
     await apiInstance.patch<ApiResponse<null>>('/users/password', data);
+  }
+
+  /**
+   * 사용자 목록 조회 API 호출
+   * GET /users/list
+   */
+  async getUserList(): Promise<User[]> {
+    const response = await apiInstance.get<ApiResponse<User[]>>('/users/list');
+    return response.data.result;
   }
 }
 

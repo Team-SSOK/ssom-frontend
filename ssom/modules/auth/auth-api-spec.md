@@ -186,3 +186,50 @@ Authorization: Bearer your-access-token
 - `200`: 성공
 - `400`: 잘못된 요청 (현재 비밀번호 불일치, 새 비밀번호 형식 오류 등)
 - `401`: 인증되지 않은 요청
+
+## 6. 사용자 목록 조회 🔒
+
+등록된 사용자 목록을 조회합니다.
+
+**Endpoint**
+```
+GET /users/list
+```
+
+**Headers**
+```
+Authorization: Bearer your-access-token
+```
+
+**Response**
+```json
+{
+  "isSuccess": true,
+  "code": 1000,
+  "message": "요청에 성공하였습니다.",
+  "result": [
+    {
+      "id": "CHN0001",
+      "username": "트랄렐로트랄랄라",
+      "department": "CHANNEL",
+      "githubId": "hong-gildong"
+    },
+    {
+      "id": "CHN0002",
+      "username": "도라에몽",
+      "department": "CHANNEL",
+      "githubId": "kim-chulsoo"
+    },
+    {
+      "id": "CORE0001",
+      "username": "퉁퉁퉁퉁퉁퉁퉁퉁퉁사후르",
+      "department": "CORE_BANK",
+      "githubId": "lee-younghee"
+    }
+  ]
+}
+```
+
+**Status Codes**
+- `200`: 성공
+- `401`: 인증되지 않은 요청

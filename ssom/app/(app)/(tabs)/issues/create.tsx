@@ -14,6 +14,7 @@ import IssueFormHeader from '@/modules/issues/components/Creation/Issue/IssueFor
 import IssueMetaInfoBanner from '@/modules/issues/components/Creation/Issue/IssueMetaInfoBanner';
 import IssueSubmitButton from '@/modules/issues/components/Creation/Issue/IssueSubmitButton';
 import IssueFormField from '@/modules/issues/components/IssueFormField';
+import AssigneeAutoComplete from '@/modules/issues/components/AssigneeAutoComplete';
 
 // Hooks
 import { useIssueForm } from '@/modules/issues/hooks/useIssueForm';
@@ -48,6 +49,7 @@ export default function IssueCreateScreen() {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           <IssueMetaInfoBanner
             isAnalyzing={isAnalyzing}
@@ -131,11 +133,11 @@ export default function IssueCreateScreen() {
             disabled={isAnalyzing}
           />
 
-          <IssueFormField
+          <AssigneeAutoComplete
             label="담당자"
             value={form.assignee}
             onChangeText={updateField('assignee')}
-            placeholder="담당자를 입력하세요 (선택사항)"
+            placeholder="담당자를 검색하세요 (선택사항)"
             error={errors.assignee}
             disabled={isAnalyzing}
           />
