@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import Checkbox from 'expo-checkbox';
@@ -30,6 +30,31 @@ export default function LogItem({
   onLongPress
 }: LogItemProps) {
   const { colors } = useTheme();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const itemScaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: isSelected ? 1.2 : 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [isSelected, scaleAnim]);
+
+  useEffect(() => {
+    Animated.timing(itemScaleAnim, {
+      toValue: isSelected ? 1.02 : 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [isSelected, itemScaleAnim]);
 
   const getLevelColor = (level: string) => {
     switch (level) {
@@ -68,6 +93,24 @@ export default function LogItem({
     }
   };
 
+  // Press 시작 시 즉각적인 애니메이션
+  const handlePressIn = () => {
+    Animated.timing(itemScaleAnim, {
+      toValue: 0.98,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Press 끝날 때 원래 크기로 복귀
+  const handlePressOut = () => {
+    Animated.timing(itemScaleAnim, {
+      toValue: isSelected ? 1.02 : 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const handleCheckboxChange = () => {
     if (onSelect) {
       onSelect(item.logId);
@@ -75,51 +118,70 @@ export default function LogItem({
   };
 
   return (
-    <Pressable
+    <Animated.View
       style={[
-        styles.logCard,
-        { 
-          backgroundColor: colors.card,
-          borderColor: isSelected ? colors.primary : colors.border,
-          borderWidth: isSelected ? 2 : 1,
-        },
+        {
+          transform: [{ scale: itemScaleAnim }]
+        }
       ]}
-      onPress={handlePress}
-      onLongPress={handleLongPress}
     >
-      <View style={styles.logContent}>
-        {isMultiSelectMode && (
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              style={styles.checkbox}
-              value={isSelected}
-              onValueChange={handleCheckboxChange}
-              color={isSelected ? colors.primary : undefined}
-            />
-          </View>
-        )}
-        
-        <View style={styles.logInfo}>
-          <View style={styles.logHeader}>
-            <View style={styles.logHeaderInfo}>
-              <View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
-                <Text style={styles.levelText}>{item.level}</Text>
+      <Pressable
+        style={[
+          styles.logCard,
+          { 
+            backgroundColor: colors.card,
+            borderColor: isSelected ? colors.primary : colors.border,
+            borderWidth: isSelected ? 2 : 1,
+          },
+        ]}
+        onPress={handlePress}
+        onLongPress={handleLongPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <View style={styles.logContent}>
+          {isMultiSelectMode && (
+            <View style={styles.checkboxContainer}>
+              <Animated.View 
+                style={[
+                  styles.animatedCheckbox,
+                  {
+                    transform: [{ scale: scaleAnim }]
+                  }
+                ]}
+              >
+                <Checkbox
+                  style={styles.checkbox}
+                  value={isSelected}
+                  onValueChange={handleCheckboxChange}
+                  color={isSelected ? colors.primary : undefined}
+                />
+              </Animated.View>
+            </View>
+          )}
+          
+          <View style={styles.logInfo}>
+            <View style={styles.logHeader}>
+              <View style={styles.logHeaderInfo}>
+                <View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
+                  <Text style={styles.levelText}>{item.level}</Text>
+                </View>
+                <Text style={[styles.serviceName, { color: colors.textSecondary }]}>
+                  {item.app}
+                </Text>
               </View>
-              <Text style={[styles.serviceName, { color: colors.textSecondary }]}>
-                {item.app}
+              <Text style={[styles.timestamp, { color: colors.textMuted }]}>
+                {new Date(item.timestamp).toLocaleTimeString()}
               </Text>
             </View>
-            <Text style={[styles.timestamp, { color: colors.textMuted }]}>
-              {new Date(item.timestamp).toLocaleTimeString()}
+            
+            <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.logMessage, { color: colors.text }]}>
+              {item.message}
             </Text>
           </View>
-          
-          <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.logMessage, { color: colors.text }]}>
-            {item.message}
-          </Text>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </Animated.View>
   );
 }
 
@@ -136,6 +198,10 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     marginRight: 12,
     paddingTop: 2,
+  },
+  animatedCheckbox: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   checkbox: {
     width: 20,
