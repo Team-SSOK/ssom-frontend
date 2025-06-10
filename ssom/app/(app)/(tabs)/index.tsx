@@ -9,6 +9,7 @@ import DashboardHeader from '@/modules/issues/components/Dashboard/DashboardHead
 import IssueStatusSummary from '@/modules/issues/components/Dashboard/IssueStatusSummary';
 import IssueList from '@/modules/issues/components/Dashboard/IssueList';
 import IssueTabNavigation from '@/modules/issues/components/Dashboard/IssueTabNavigation';
+import { LoadingIndicator } from '@/components';
 
 export default function MainDashboard() {
   const { colors } = useTheme();
@@ -82,7 +83,7 @@ export default function MainDashboard() {
   }));
 
   if (isCurrentLoading && !refreshing) {
-    return <ActivityIndicator size="large" color={colors.primary} />
+    return <LoadingIndicator />
   }
 
   return (

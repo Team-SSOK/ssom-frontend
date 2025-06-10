@@ -14,7 +14,7 @@ export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) 
   const { colors } = useTheme();
 
   const openCount = issues.filter(issue => issue.status === 'OPEN').length;
-  const closeCount = issues.filter(issue => issue.status === 'CLOSE').length;
+  const closeCount = issues.filter(issue => issue.status === 'CLOSED').length;
 
   return (
     <View style={styles.statsContainer}>

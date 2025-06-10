@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { Ionicons } from '@expo/vector-icons';
 
 interface AlertData {
   id: string;
@@ -35,16 +36,33 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
   const level = extractLevel(item.title);
   const appName = extractAppName(item.title);
 
-  const getLevelColor = (level: string) => {
+  const getIconAndColor = (level: string) => {
     switch (level.toUpperCase()) {
       case 'ERROR':
-        return colors.critical;
+        return { icon: 'alert-circle', color: '#FF3B30', bgColor: '#FFE5E5' };
       case 'WARN':
-        return colors.warning;
+        return { icon: 'warning', color: '#FF9500', bgColor: '#FFF4E5' };
       case 'INFO':
-        return colors.primary;
+        return { icon: 'information-circle', color: '#007AFF', bgColor: '#E5F4FF' };
       default:
-        return colors.textSecondary;
+        return { icon: 'notifications', color: '#8E8E93', bgColor: '#F2F2F7' };
+    }
+  };
+
+  const { icon, color, bgColor } = getIconAndColor(level);
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+      return `${diffInMinutes}m`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours}h`;
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
   };
 
@@ -55,121 +73,94 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
   return (
     <Pressable
       style={[
-        styles.alertCard,
-        { 
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-          opacity: item.isRead ? 0.4 : 1,
-        },
+        styles.alertItem,
+        { backgroundColor: colors.background }
       ]}
       onPress={handlePress}
     >
-      <View style={styles.alertHeader}>
-        <View style={styles.titleSection}>
-          <View style={[styles.levelBadge, { backgroundColor: getLevelColor(level) }]}>
-            <Text style={styles.levelText}>{level}</Text>
+      <View style={styles.alertContent}>
+        {/* Icon */}
+        <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>
+          <Ionicons name={icon as any} size={20} color={color} />
+        </View>
+
+        {/* Content */}
+        <View style={styles.contentContainer}>
+          <View style={styles.headerRow}>
+            <Text style={[styles.alertTitle, { color: colors.text }]} numberOfLines={1}>
+              {appName || level}
+            </Text>
+            <View style={styles.rightSection}>
+              <Text style={[styles.timeText, { color: colors.textSecondary }]}>
+                {formatTime(item.timestamp)}
+              </Text>
+              {!item.isRead && (
+                <View style={[styles.unreadDot, { backgroundColor: '#007AFF' }]} />
+              )}
+            </View>
           </View>
-          <Text style={[styles.appName, { color: colors.textSecondary }]}>
-            {appName}
+          
+          <Text 
+            style={[styles.alertMessage, { color: colors.textSecondary }]} 
+            numberOfLines={2}
+          >
+            {item.message}
           </Text>
         </View>
-        <View style={styles.badges}>
-          {!item.isRead && (
-            <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
-              <Text style={styles.unreadText}>New</Text>
-            </View>
-          )}
-        </View>
-      </View>
-      
-      <Text style={[styles.alertMessage, { color: colors.text }]}>
-        {item.message}
-      </Text>
-      
-      <View style={styles.alertFooter}>
-        <Text style={[styles.timestamp, { color: colors.textMuted }]}>
-          {new Date(item.timestamp).toLocaleString('ko-KR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          })}
-        </Text>
       </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  alertCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+  alertItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  alertHeader: {
+  alertContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: 4,
   },
-  titleSection: {
+  alertTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+    marginRight: 8,
+  },
+  rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    flex: 1,
   },
-  levelBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+  timeText: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  unreadDot: {
+    width: 8,
+    height: 8,
     borderRadius: 4,
-  },
-  levelText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  appName: {
-    fontSize: 14,
-    fontWeight: '600',
-    flex: 1,
-  },
-  badges: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  unreadBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  unreadText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  actionBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  actionText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '700',
   },
   alertMessage: {
     fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  alertFooter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  timestamp: {
-    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 2,
   },
 }); 

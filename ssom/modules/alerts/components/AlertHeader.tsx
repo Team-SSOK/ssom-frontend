@@ -8,11 +8,15 @@ import { FontFamily } from '@/styles/fonts';
 interface AlertHeaderProps {
   onMarkAllAsRead?: () => void;
   hasUnreadAlerts?: boolean;
+  selectedTab?: 'all' | 'unread';
+  onTabChange?: (tab: 'all' | 'unread') => void;
 }
 
 export default function AlertHeader({ 
   onMarkAllAsRead, 
-  hasUnreadAlerts = false 
+  hasUnreadAlerts = false,
+  selectedTab = 'all',
+  onTabChange
 }: AlertHeaderProps) {
   const { colors } = useTheme();
 
@@ -42,16 +46,49 @@ export default function AlertHeader({
         
         {hasUnreadAlerts ? (
           <Pressable 
-            style={[styles.markAllButton, { backgroundColor: colors.primary }]} 
+            style={styles.markAllButton} 
             onPress={handleMarkAllPress}
           >
-            <Text style={[styles.markAllText, { color: colors.background }]}>
+            <Text style={[styles.markAllText, { color: colors.primary }]}>
               모두 읽음
             </Text>
           </Pressable>
         ) : (
           <View style={styles.iconButton} />
         )}
+      </View>
+      
+      {/* Tab Section */}
+      <View style={styles.tabContainer}>
+        <Pressable
+          style={[
+            styles.tab,
+            selectedTab === 'all' && [styles.activeTab, { borderBottomColor: colors.primary }]
+          ]}
+          onPress={() => onTabChange?.('all')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: selectedTab === 'all' ? colors.primary : colors.textSecondary }
+          ]}>
+            All
+          </Text>
+        </Pressable>
+        
+        <Pressable
+          style={[
+            styles.tab,
+            selectedTab === 'unread' && [styles.activeTab, { borderBottomColor: colors.primary }]
+          ]}
+          onPress={() => onTabChange?.('unread')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: selectedTab === 'unread' ? colors.primary : colors.textSecondary }
+          ]}>
+            Unread
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -82,17 +119,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   markAllButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     paddingVertical: 8,
-    borderRadius: 16,
-    minWidth: 40,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   markAllText: {
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: 16,
+    paddingHorizontal: 16,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 

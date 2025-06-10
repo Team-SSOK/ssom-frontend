@@ -7,7 +7,11 @@ import { deduplicateById } from '@/utils/storeHelpers';
 interface AlertState {
   alerts: AlertEntry[];
   isLoading: boolean;
+  isLoadingMore: boolean;
   error: string | null;
+  page: number;
+  hasNextPage: boolean;
+  pageSize: number;
   
   // Actions
   setAlerts: (alerts: AlertEntry[]) => void;
@@ -18,15 +22,23 @@ interface AlertState {
   markAllAsRead: () => Promise<void>;
   deleteAlert: (alertStatusId: number) => Promise<void>;
   loadAlerts: () => Promise<void>;
+  loadMoreAlerts: () => Promise<void>;
+  refreshAlerts: () => Promise<void>;
   clearAlerts: () => void;
   setLoading: (loading: boolean) => void;
+  setLoadingMore: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  resetPagination: () => void;
 }
 
 export const useAlertStore = create<AlertState>((set, get) => ({
   alerts: [],
   isLoading: false,
+  isLoadingMore: false,
   error: null,
+  page: 0,
+  hasNextPage: true,
+  pageSize: 10,
 
   setAlerts: (alerts: AlertEntry[]) => {
     // Toss 원칙: 순수 함수를 사용한 예측 가능한 데이터 변환
@@ -119,10 +131,14 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
   loadAlerts: async () => {
     try {
-      set({ isLoading: true, error: null });
-      const alertList = await alertApi.getAlerts();
+      set({ isLoading: true, error: null, page: 0 });
+      const response = await alertApi.getPagedAlerts(0, get().pageSize);
 
-      get().setAlerts(alertList);
+      set({ 
+        alerts: response.content,
+        page: 0,
+        hasNextPage: !response.last
+      });
     } catch (error: any) {
       const errorMessage = error.message || '알림 목록을 불러오는데 실패했습니다.';
       if (__DEV__) console.error('알림 목록 로드 실패:', error);
@@ -134,6 +150,48 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     }
   },
 
+  loadMoreAlerts: async () => {
+    const state = get();
+    
+    // 이미 로딩 중이거나 더 이상 페이지가 없으면 리턴
+    if (state.isLoadingMore || !state.hasNextPage) {
+      return;
+    }
+
+    try {
+      set({ isLoadingMore: true, error: null });
+      const nextPage = state.page + 1;
+      const response = await alertApi.getPagedAlerts(nextPage, state.pageSize);
+
+      // 기존 알림에 새로운 알림 추가 (중복 제거)
+      const allAlerts = [...state.alerts, ...response.content];
+      const uniqueAlerts = deduplicateById(allAlerts, (alert) => alert.alertId);
+
+      set({ 
+        alerts: uniqueAlerts,
+        page: nextPage,
+        hasNextPage: !response.last
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || '추가 알림을 불러오는데 실패했습니다.';
+      if (__DEV__) console.error('추가 알림 로드 실패:', error);
+      
+      set({ error: errorMessage });
+    } finally {
+      set({ isLoadingMore: false });
+    }
+  },
+
+  refreshAlerts: async () => {
+    try {
+      set({ page: 0, hasNextPage: true });
+      await get().loadAlerts();
+    } catch (error: any) {
+      if (__DEV__) console.error('알림 새로고침 실패:', error);
+      throw error;
+    }
+  },
+
   clearAlerts: () => {
     set({ alerts: [] });
   },
@@ -142,7 +200,15 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     set({ isLoading: loading });
   },
 
+  setLoadingMore: (loading: boolean) => {
+    set({ isLoadingMore: loading });
+  },
+
   setError: (error: string | null) => {
     set({ error });
+  },
+
+  resetPagination: () => {
+    set({ page: 0, hasNextPage: true });
   },
 }));

@@ -7,6 +7,20 @@ import {
   FCMTokenRequest
 } from '../types';
 
+export interface PaginatedAlertResponse {
+  content: AlertEntry[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+  };
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  first: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
 /**
  * 알림 관련 API 클래스
  * 
@@ -29,6 +43,34 @@ class AlertApi {
   async getAlerts(): Promise<AlertEntry[]> {
     const response = await apiInstance.get<ApiResponse<AlertEntry[]>>(
       '/alert'
+    );
+
+    return response.data.result;
+  }
+
+  /**
+   * 페이징 알림 목록 조회 (API 스펙 3번)
+   * GET /api/alert/paged
+   * 
+   * @param page 페이지 번호 (0부터 시작)
+   * @param size 페이지 크기 (기본값: 10)
+   * @param sort 정렬 기준 (기본값: alert.timestamp,DESC)
+   * @returns 페이징된 알림 목록
+   */
+  async getPagedAlerts(
+    page: number = 0, 
+    size: number = 10, 
+    sort: string = 'alert.timestamp,DESC'
+  ): Promise<PaginatedAlertResponse> {
+    const response = await apiInstance.get<ApiResponse<PaginatedAlertResponse>>(
+      '/alert/paged',
+      {
+        params: {
+          page,
+          size,
+          sort
+        }
+      }
     );
 
     return response.data.result;

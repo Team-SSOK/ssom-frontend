@@ -1,24 +1,29 @@
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAlertStore } from '@/modules/alerts/stores/alertStore';
 import { Alert } from '@/modules/alerts/types';
 import AlertHeader from '@/modules/alerts/components/AlertHeader';
 import AlertList from '@/modules/alerts/components/AlertList';
+import { LoadingIndicator } from '@/components';
 
 export default function AlertsScreen() {
   const { colors } = useTheme();
   const toast = useToast();
+  const [selectedTab, setSelectedTab] = useState<'all' | 'unread'>('all');
   
   // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어만 사용
   const { 
     alerts, 
     loadAlerts, 
+    loadMoreAlerts,
+    refreshAlerts,
     markAsRead, 
     markAllAsRead,
-    isLoading, 
+    isLoading,
+    isLoadingMore,
     error 
   } = useAlertStore();
 
@@ -45,6 +50,11 @@ export default function AlertsScreen() {
     isRead: alert.isRead,
     actionRequired: !alert.isRead, // 읽지 않은 알림은 액션이 필요한 것으로 간주
   }));
+
+  // 탭에 따라 필터된 알림 목록
+  const filteredAlerts = selectedTab === 'unread' 
+    ? transformedAlerts.filter(alert => !alert.isRead)
+    : transformedAlerts;
 
   // 알림 클릭 시 읽음 처리
   const handleAlertPress = async (alertStatusId: number) => {
@@ -81,6 +91,26 @@ export default function AlertsScreen() {
     }
   };
 
+  // 무한스크롤 - 더 많은 알림 로드
+  const handleLoadMore = async () => {
+    try {
+      await loadMoreAlerts();
+    } catch (error) {
+      if (__DEV__) console.error('추가 알림 로드 실패:', error);
+      toast.error('로드 실패', '추가 알림을 불러오는데 실패했습니다.');
+    }
+  };
+
+  // Pull to Refresh
+  const handleRefresh = async () => {
+    try {
+      await refreshAlerts();
+    } catch (error) {
+      if (__DEV__) console.error('알림 새로고침 실패:', error);
+      toast.error('새로고침 실패', '알림을 새로고침하는데 실패했습니다.');
+    }
+  };
+
   // 읽지 않은 알림이 있는지 확인
   const hasUnreadAlerts = alerts.some(alert => !alert.isRead);
 
@@ -93,13 +123,12 @@ export default function AlertsScreen() {
         <AlertHeader 
           onMarkAllAsRead={handleMarkAllAsRead}
           hasUnreadAlerts={hasUnreadAlerts}
+          selectedTab={selectedTab}
+          onTabChange={setSelectedTab}
         />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.text }]}>
-            알림을 불러오는 중...
-          </Text>
-        </View>
+        <LoadingIndicator 
+          fullScreen 
+        />
       </SafeAreaView>
     );
   }
@@ -111,10 +140,16 @@ export default function AlertsScreen() {
       <AlertHeader 
         onMarkAllAsRead={handleMarkAllAsRead}
         hasUnreadAlerts={hasUnreadAlerts}
+        selectedTab={selectedTab}
+        onTabChange={setSelectedTab}
       />
       <AlertList 
-        alerts={transformedAlerts} 
+        alerts={filteredAlerts} 
         onAlertPress={handleAlertPress}
+        onEndReached={handleLoadMore}
+        onRefresh={handleRefresh}
+        isRefreshing={isLoading}
+        isLoadingMore={isLoadingMore}
       />
     </SafeAreaView>
   );
@@ -123,16 +158,5 @@ export default function AlertsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: 'center',
   },
 }); 
