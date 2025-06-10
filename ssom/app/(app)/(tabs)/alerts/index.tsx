@@ -17,6 +17,7 @@ export default function AlertsScreen() {
     alerts, 
     loadAlerts, 
     markAsRead, 
+    markAllAsRead,
     isLoading, 
     error 
   } = useAlertStore();
@@ -69,13 +70,30 @@ export default function AlertsScreen() {
     }
   };
 
+  // 전체 읽음 처리
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsRead();
+      toast.success('전체 읽음 완료', '모든 알림이 읽음 처리되었습니다.');
+    } catch (error) {
+      if (__DEV__) console.error('전체 읽음 처리 실패:', error);
+      toast.error('전체 읽음 실패', '모든 알림을 읽음으로 처리하는데 실패했습니다.');
+    }
+  };
+
+  // 읽지 않은 알림이 있는지 확인
+  const hasUnreadAlerts = alerts.some(alert => !alert.isRead);
+
   // 로딩 중일 때 표시할 컴포넌트
   if (isLoading && alerts.length === 0) {
     return (
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <AlertHeader />
+        <AlertHeader 
+          onMarkAllAsRead={handleMarkAllAsRead}
+          hasUnreadAlerts={hasUnreadAlerts}
+        />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Text style={[styles.loadingText, { color: colors.text }]}>
@@ -90,7 +108,10 @@ export default function AlertsScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <AlertHeader />
+      <AlertHeader 
+        onMarkAllAsRead={handleMarkAllAsRead}
+        hasUnreadAlerts={hasUnreadAlerts}
+      />
       <AlertList 
         alerts={transformedAlerts} 
         onAlertPress={handleAlertPress}

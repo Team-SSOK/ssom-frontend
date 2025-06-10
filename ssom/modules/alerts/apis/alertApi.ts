@@ -139,6 +139,22 @@ class AlertApi {
     const alerts = await this.getAlerts();
     return alerts.filter(alert => alert.kind === kind);
   }
+
+  /**
+   * 알림 일괄 상태 변경 (API 스펙 6번)
+   * PATCH /api/alert/modifyAll
+   * 
+   * 부작용: 모든 알림이 읽음 처리됨
+   * 
+   * @returns 업데이트된 알림 목록
+   */
+  async markAllAlertsAsRead(): Promise<AlertEntry[]> {
+    const response = await apiInstance.patch<ApiResponse<AlertEntry[]>>(
+      '/alert/modifyAll'
+    );
+
+    return response.data.result;
+  }
 }
 
 // 싱글톤 인스턴스

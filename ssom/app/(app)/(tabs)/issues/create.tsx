@@ -14,7 +14,7 @@ import IssueFormHeader from '@/modules/issues/components/Creation/Issue/IssueFor
 import IssueMetaInfoBanner from '@/modules/issues/components/Creation/Issue/IssueMetaInfoBanner';
 import IssueSubmitButton from '@/modules/issues/components/Creation/Issue/IssueSubmitButton';
 import IssueFormField from '@/modules/issues/components/IssueFormField';
-import AssigneeAutoComplete from '@/modules/issues/components/AssigneeAutoComplete';
+import AssigneeAutoComplete from '@/modules/issues/components/Creation/AssigneeAutoComplete';
 
 // Hooks
 import { useIssueForm } from '@/modules/issues/hooks/useIssueForm';

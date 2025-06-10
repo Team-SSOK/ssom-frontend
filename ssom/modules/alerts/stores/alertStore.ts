@@ -15,6 +15,7 @@ interface AlertState {
   updateAlert: (alertStatusId: number, updates: Partial<AlertEntry>) => void;
   removeAlert: (alertStatusId: number) => void;
   markAsRead: (alertStatusId: number) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
   deleteAlert: (alertStatusId: number) => Promise<void>;
   loadAlerts: () => Promise<void>;
   clearAlerts: () => void;
@@ -86,6 +87,19 @@ export const useAlertStore = create<AlertState>((set, get) => ({
     } catch (error: any) {
       console.log('알림 읽음 처리 실패:', error);
       set({ error: '알림 읽음 처리에 실패했습니다.' });
+      throw error;
+    }
+  },
+
+  markAllAsRead: async () => {
+    try {
+      const updatedAlerts = await alertApi.markAllAlertsAsRead();
+      
+      // 서버에서 받은 업데이트된 알림 목록으로 전체 상태 업데이트
+      get().setAlerts(updatedAlerts);
+    } catch (error: any) {
+      console.log('전체 알림 읽음 처리 실패:', error);
+      set({ error: '전체 알림 읽음 처리에 실패했습니다.' });
       throw error;
     }
   },

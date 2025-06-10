@@ -5,15 +5,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { FontFamily } from '@/styles/fonts';
 
-export default function AlertHeader() {
+interface AlertHeaderProps {
+  onMarkAllAsRead?: () => void;
+  hasUnreadAlerts?: boolean;
+}
+
+export default function AlertHeader({ 
+  onMarkAllAsRead, 
+  hasUnreadAlerts = false 
+}: AlertHeaderProps) {
   const { colors } = useTheme();
 
   const handleBackPress = () => {
     router.back();
   };
 
-  const handleSettingsPress = () => {
-    console.log("설정이 클릭되었습니다");
+  const handleMarkAllPress = () => {
+    if (onMarkAllAsRead) {
+      onMarkAllAsRead();
+    }
   };
 
   return (
@@ -30,12 +40,18 @@ export default function AlertHeader() {
           알림
         </Text>
         
-        <Pressable 
-          style={styles.iconButton} 
-          onPress={handleSettingsPress}
-        >
-          <Ionicons name="settings-outline" size={24} color={colors.text} />
-        </Pressable>
+        {hasUnreadAlerts ? (
+          <Pressable 
+            style={[styles.markAllButton, { backgroundColor: colors.primary }]} 
+            onPress={handleMarkAllPress}
+          >
+            <Text style={[styles.markAllText, { color: colors.background }]}>
+              모두 읽음
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={styles.iconButton} />
+        )}
       </View>
     </View>
   );
@@ -63,6 +79,20 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.bold,
     fontWeight: '700',
     flex: 1,
+    textAlign: 'center',
+  },
+  markAllButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    minWidth: 40,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  markAllText: {
+    fontSize: 12,
+    fontWeight: '600',
     textAlign: 'center',
   },
 }); 
