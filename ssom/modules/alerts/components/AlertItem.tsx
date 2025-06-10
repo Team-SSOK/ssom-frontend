@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 
 interface AlertData {
@@ -53,7 +53,7 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[
         styles.alertCard,
         { 
@@ -98,7 +98,7 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
           })}
         </Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

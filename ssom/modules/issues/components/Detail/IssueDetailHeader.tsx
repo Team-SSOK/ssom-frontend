@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,13 +13,13 @@ export default function IssueDetailHeader({ issueId }: IssueDetailHeaderProps) {
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <Pressable onPress={() => router.back()} style={styles.backButton}>
         <Ionicons 
           name="arrow-back" 
           size={24} 
           color={colors.text} 
         />
-      </TouchableOpacity>
+      </Pressable>
       <Text style={[styles.headerTitle, { color: colors.text }]}>
         Issue #{issueId}
       </Text>

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, Pressable } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { createDashboardUrl, createGrafanaHeaders, createSimpleDashboardUrl, GRAFANA_CONFIG, ERROR_MESSAGES } from '../config';
 
@@ -101,13 +101,13 @@ export default function GrafanaWebView({
     <View style={styles.errorContainer}>
       <Text style={styles.errorText}>{error}</Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
+        <Pressable style={styles.retryButton} onPress={handleReload}>
           <Text style={styles.retryButtonText}>다시 시도</Text>
-        </TouchableOpacity>
+        </Pressable>
         {!useSimpleUrl && (
-          <TouchableOpacity style={styles.simpleButton} onPress={handleTrySimpleUrl}>
+          <Pressable style={styles.simpleButton} onPress={handleTrySimpleUrl}>
             <Text style={styles.simpleButtonText}>간단 모드</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
       <Text style={styles.helpText}>
