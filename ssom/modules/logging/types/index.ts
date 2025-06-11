@@ -21,6 +21,12 @@ export interface LogFilters {
   level?: string;  // 로그 레벨로 필터링 (WARN, ERROR 등)
 }
 
+// 무한 스크롤을 위한 확장된 로그 필터
+export interface LogFiltersWithPagination extends LogFilters {
+  searchAfterTimestamp?: string;  // 이전에 마지막으로 조회한 로그의 timestamp
+  searchAfterId?: string;         // 이전에 마지막으로 조회한 로그의 로그 ID
+}
+
 // SSE 이벤트 리스너 타입
 export type LogEventListener = (log: LogEntry) => void;
 export type ConnectionEventListener = (event: { type: 'connected' | 'disconnected' | 'connecting' | 'reconnecting' | 'error'; message: string }) => void;
@@ -33,6 +39,13 @@ export interface ServicesResponse {
 
 export interface LogsResponse {
   logs: LogEntry[];
+}
+
+// 무한 스크롤을 위한 확장된 로그 응답 타입
+export interface LogsResponseWithPagination {
+  logs: LogEntry[];
+  lastTimestamp?: string;  // 다음 페이지 요청을 위한 마지막 타임스탬프
+  lastLogId?: string;      // 다음 페이지 요청을 위한 마지막 로그 ID
 }
 
 // LLM 분석 결과 타입

@@ -46,8 +46,6 @@
 | app      | String | false | 로그가 발생한 서비스 이름 (예: ssok-account-service) |
 | level    | String | false | 로그 레벨 필터 (예: WARN, ERROR) |
 
----
-
 ### 📄 응답 예시 - 중복 처리 및 최신순 정렬 후
 
 ```json
@@ -89,8 +87,6 @@
 }
 ```
 
----
-
 ### 📄 응답 예시 - 중복 처리 후
 
 ```json
@@ -131,6 +127,93 @@
   }
 }
 ```
+
+---
+
+## <span style="color: blue">3-2. 로그 목록 조회 (무한 스크롤)</span>
+
+- **Method**: `GET`
+- **Endpoint**: `/api/logging`
+- **설명**: 필터 조건에 따라 수집된 로그 데이터를 조회합니다.
+
+### <span style="color: blue">📋 사용 설명</span>
+
+- **목적**
+    - OpenSearch 측으로부터 로그 목록을 가져옴. 현재는 가장 최신 로그부터 최대 <span style="color: blue">**100개**</span>를 가져오도록 설정해둠.
+- **사용 시기**
+    - 사용자가 로그 목록 화면에 들어왔을 때
+    - 사용자가 필터링 조건을 변경했을 때
+    - <span style="color: blue">**사용자가 스크롤 끝까지 도달했을 때**</span>
+
+### 🔍 요청 쿼리 파라미터
+
+| 매개변수 | 타입 | 필수 여부 | 설명 |
+|----------|------|-----------|------|
+| app      | String | false | 로그가 발생한 서비스 이름 (예: ssok-account-service) |
+| level    | String | false | 로그 레벨 필터 (예: WARN, ERROR) |
+| <span style="color: blue">**searchAfterTimestamp**</span> | String | false | <span style="color: blue">이전에 마지막으로 조회한 로그의 timestamp</span> |
+| <span style="color: blue">**searchAfterId**</span> | String | false | <span style="color: blue">이전에 마지막으로 조회한 로그의 로그 ID</span> |
+
+### 🔐 요청 헤더
+```
+Authorization: Bearer {accessToken}
+```
+
+### ✅ 성공 응답 예시
+
+```json
+{
+    "isSuccess": true,
+    "code": 2000,
+    "message": "요청에 성공하였습니다.",
+    "result": {
+        "logs": [
+            {
+                "logId": "lj8nP5cBEKdnQBbeGJZP",
+                "timestamp": "2025-06-05T08:13:28.652118686+00:00",
+                "level": "ERROR",
+                "logger": "kr.ssok.gateway.security.filter.JwtAuthenticationFilter",
+                "thread": "reactor-http-epoll-1",
+                "message": "Authentication error: Authorization header is missing or invalid",
+                "app": "ssok-gateway-service"
+            },
+            {
+                "logId": "LT8fP5cBEKdnQBbe45bK",
+                "timestamp": "2025-06-05T08:04:42.078518420+00:00",
+                "level": "WARN",
+                "logger": "org.springframework.cloud.kubernetes.commons.config.ConfigUtils",
+                "thread": "pool-6-thread-1",
+                "message": "sourceName : ssok-notification-service-kubernetes was requested, but not found in namespace : ssok",
+                "app": "ssok-notification-service"
+            },
+            {
+                "logId": "Pz8fP5cBEKdnQBbe5ZYs",
+                "timestamp": "2025-06-05T08:04:41.774698618+00:00",
+                "level": "WARN",
+                "logger": "org.springframework.cloud.kubernetes.commons.config.ConfigUtils",
+                "thread": "pool-4-thread-1",
+                "message": "sourceName : ssok-account-service-kubernetes was requested, but not found in namespace : ssok",
+                "app": "ssok-account-service"
+            }
+        ],
+        <span style="color: blue">**"lastTimestamp": "1749110545893",
+        "lastLogId": "9D8dP5cBEKdnQBbeUJXN"**</span>
+    }
+}
+```
+
+### ❌ 실패 응답 예시
+
+```json
+{
+    "isSuccess": false,
+    "code": 8002,
+    "message": "OpenSearch에서 로그 목록 조회에 실패했습니다."
+}
+```
+
+---
+
 ## 4. 로그 상세 조회 - 기존 LLM 분석 조회 요청
 
 ### API 형식

@@ -4,8 +4,10 @@ import {
   ServiceInfo, 
   LogEntry, 
   LogFilters, 
+  LogFiltersWithPagination,
   ServicesResponse, 
   LogsResponse,
+  LogsResponseWithPagination,
   LogAnalysisResult 
 } from '../types';
 
@@ -54,6 +56,34 @@ class LogApi {
     );
 
     return response.data.result.logs;
+  }
+
+  /**
+   * 무한 스크롤을 위한 로그 목록 조회 (API 스펙 3-2번)
+   * GET /api/logging
+   */
+  async getLogsWithPagination(filters?: LogFiltersWithPagination): Promise<LogsResponseWithPagination> {
+    const params: Record<string, string> = {};
+    
+    if (filters?.app) {
+      params.app = filters.app;
+    }
+    if (filters?.level) {
+      params.level = filters.level;
+    }
+    if (filters?.searchAfterTimestamp) {
+      params.searchAfterTimestamp = filters.searchAfterTimestamp;
+    }
+    if (filters?.searchAfterId) {
+      params.searchAfterId = filters.searchAfterId;
+    }
+
+    const response = await apiInstance.get<ApiResponse<LogsResponseWithPagination>>(
+      '/logging/infinitescroll',
+      { params }
+    );
+
+    return response.data.result;
   }
 
   // 특정 앱의 로그만 조회하는 헬퍼 메서드

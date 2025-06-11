@@ -1,6 +1,6 @@
 import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
-import { useLogStore } from '@/modules/logging/stores/logStore';
+import { FlatList, StyleSheet, ActivityIndicator, View } from 'react-native';
+import { useTheme } from '@/hooks/useTheme';
 import { useFab } from '@/contexts/FabContext';
 import LogItem from './LogItem';
 
@@ -16,28 +16,31 @@ interface LogData {
 
 interface LogListProps {
   logs?: LogData[]; // 선택적으로 로그 데이터 전달
-  useStoreData?: boolean; // 스토어 데이터를 사용할지 여부
   isMultiSelectMode?: boolean;
   selectedLogIds?: string[];
   onLogSelect?: (logId: string) => void;
   onLogLongPress?: (logId: string) => void;
+  // 무한 스크롤 관련 props
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
+  hasMoreLogs?: boolean;
 }
 
+// LogItem 높이 계산: padding(16*2) + content(~40) + marginBottom(12) = ~84
+const ITEM_HEIGHT = 84;
+
 export default function LogList({ 
-  logs: externalLogs, 
-  useStoreData = false,
+  logs = [],
   isMultiSelectMode = false,
   selectedLogIds = [],
   onLogSelect,
-  onLogLongPress
+  onLogLongPress,
+  onLoadMore,
+  isLoadingMore = false,
+  hasMoreLogs = true,
 }: LogListProps) {
+  const { colors } = useTheme();
   const { handleScroll } = useFab();
-  
-  // 스토어에서 로그 데이터 가져오기 (useStoreData가 true일 때)
-  const { logs: storeLogs } = useLogStore();
-  
-  // 사용할 로그 데이터 결정
-  const logs = useStoreData ? storeLogs : (externalLogs || []);
 
   const renderLogItem = ({ item }: { item: LogData }) => (
     <LogItem 
@@ -49,16 +52,51 @@ export default function LogList({
     />
   );
 
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+    
+    return (
+      <View style={styles.footerContainer}>
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    );
+  };
+
+  const handleEndReached = () => {
+    if (hasMoreLogs && !isLoadingMore && onLoadMore) {
+      onLoadMore();
+    }
+  };
+
+  const keyExtractor = (item: LogData) => item.logId;
+
+  const getItemLayout = (data: ArrayLike<LogData> | null | undefined, index: number) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  });
+
   return (
     <FlatList
       data={logs}
       renderItem={renderLogItem}
-      keyExtractor={(item) => item.logId}
+      keyExtractor={keyExtractor}
       contentContainerStyle={styles.listContainer}
       showsVerticalScrollIndicator={false}
       // 스크롤 이벤트
       onScroll={handleScroll}
       scrollEventThrottle={16}
+      // 무한 스크롤 관련
+      onEndReached={handleEndReached}
+      onEndReachedThreshold={0.3}
+      ListFooterComponent={renderFooter}
+      // 성능 최적화
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={10}
+      updateCellsBatchingPeriod={50}
+      initialNumToRender={15}
+      windowSize={10}
+      getItemLayout={getItemLayout}
     />
   );
 }
@@ -66,5 +104,9 @@ export default function LogList({
 const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: 16,
+  },
+  footerContainer: {
+    paddingVertical: 16,
+    alignItems: 'center',
   },
 }); 

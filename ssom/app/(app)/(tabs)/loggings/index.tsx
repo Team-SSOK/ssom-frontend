@@ -41,15 +41,18 @@ export default function LogsScreen() {
     };
   }, [isAuthenticated, user, connect, disconnect]);
   
-  // 로그 필터링 훅
+  // 로그 필터링 훅 (무한 스크롤 지원)
   const {
     logs: storeLogs,
     services,
     isLoading,
+    isLoadingMore,
+    hasMoreLogs,
     currentFilters,
     setSearchText,
     setSelectedLevel,
     setSelectedService,
+    fetchMoreLogs,
   } = useLogFilters();
 
   // SSE 연결은 이 화면에서 관리하므로, 스토어의 실시간 로그 사용
@@ -85,6 +88,13 @@ export default function LogsScreen() {
     console.log('수동 재연결 시도');
     forceReconnect();
   }, [forceReconnect]);
+
+  // 무한 스크롤 핸들러
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasMoreLogs) {
+      fetchMoreLogs();
+    }
+  }, [fetchMoreLogs, isLoadingMore, hasMoreLogs]);
 
   return (
     <SafeAreaView
@@ -129,6 +139,10 @@ export default function LogsScreen() {
           selectedLogIds={selectedLogIds}
           onLogSelect={handleLogSelect}
           onLogLongPress={handleLogLongPress}
+          // 무한 스크롤 관련 props
+          onLoadMore={handleLoadMore}
+          isLoadingMore={isLoadingMore}
+          hasMoreLogs={hasMoreLogs}
         />
       )}
     </SafeAreaView>

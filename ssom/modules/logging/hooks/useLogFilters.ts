@@ -14,7 +14,18 @@ export function useLogFilters() {
   const [selectedLevel, setSelectedLevel] = useState('ALL');
   const [selectedService, setSelectedService] = useState('ALL');
   
-  const { logs, services, isLoading, fetchLogs, fetchServices, setFilters } = useLogStore();
+  const { 
+    logs, 
+    services, 
+    isLoading, 
+    isLoadingMore,
+    hasMoreLogs,
+    fetchInitialLogs,
+    fetchMoreLogs,
+    fetchServices, 
+    setFilters,
+    resetPagination
+  } = useLogStore();
 
   // 서비스 목록 로드
   useEffect(() => {
@@ -32,7 +43,7 @@ export function useLogFilters() {
     loadServices();
   }, [fetchServices]);
 
-  // 필터 변경 시 서버에서 데이터 다시 로드
+  // 필터 변경 시 서버에서 데이터 다시 로드 (무한 스크롤 사용)
   useEffect(() => {
     const applyFilters = async () => {
       const filters: { app?: string; level?: string } = {};
@@ -47,7 +58,8 @@ export function useLogFilters() {
       
       try {
         setFilters(filters);
-        await fetchLogs(filters);
+        resetPagination(); // 페이지네이션 상태 초기화
+        await fetchInitialLogs(filters); // 무한 스크롤을 위한 초기 로그 조회
       } catch (error) {
         toast.showError({
           title: '로그 로드 실패',
@@ -57,7 +69,7 @@ export function useLogFilters() {
     };
 
     applyFilters();
-  }, [selectedLevel, selectedService, setFilters, fetchLogs]);
+  }, [selectedLevel, selectedService, setFilters, fetchInitialLogs, resetPagination]);
 
   // 현재 필터 상태를 객체로 반환
   const currentFilters = useMemo((): LogFilters => ({
@@ -71,11 +83,14 @@ export function useLogFilters() {
     logs,
     services,
     isLoading,
+    isLoadingMore,
+    hasMoreLogs,
     currentFilters,
     
     // 액션
     setSearchText,
     setSelectedLevel,
     setSelectedService,
+    fetchMoreLogs,
   };
 } 

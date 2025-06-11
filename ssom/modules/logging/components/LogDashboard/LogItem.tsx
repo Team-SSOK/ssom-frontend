@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Pressable, Animated } from 'react-native';
 import { Text } from '@/components';
 import { router } from 'expo-router';
@@ -23,7 +23,7 @@ interface LogItemProps {
   onLongPress?: (logId: string) => void;
 }
 
-export default function LogItem({ 
+const LogItem = React.memo(function LogItem({ 
   item, 
   isMultiSelectMode = false,
   isSelected = false,
@@ -32,33 +32,21 @@ export default function LogItem({
 }: LogItemProps) {
   const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const itemScaleAnim = useRef(new Animated.Value(1)).current;
 
+  // 선택 상태가 변경될 때만 간단한 애니메이션 실행
   useEffect(() => {
-    Animated.sequence([
+    if (isMultiSelectMode) {
       Animated.timing(scaleAnim, {
-        toValue: isSelected ? 1.2 : 0.9,
-        duration: 100,
+        toValue: isSelected ? 1.02 : 1,
+        duration: 150,
         useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [isSelected, scaleAnim]);
+      }).start();
+    }
+  }, [isSelected, isMultiSelectMode, scaleAnim]);
 
-  useEffect(() => {
-    Animated.timing(itemScaleAnim, {
-      toValue: isSelected ? 1.02 : 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [isSelected, itemScaleAnim]);
-
-  const getLevelColor = (level: string) => {
-    switch (level) {
+  // 레벨 색상 메모화
+  const levelColor = useMemo(() => {
+    switch (item.level) {
       case 'ERROR':
         return colors.critical;
       case 'WARN':
@@ -66,9 +54,29 @@ export default function LogItem({
       default:
         return colors.textSecondary;
     }
-  };
+  }, [item.level, colors]);
 
-  const handlePress = () => {
+  // 시간 포맷 메모화
+  const formattedTime = useMemo(() => {
+    return new Date(item.timestamp).toLocaleTimeString();
+  }, [item.timestamp]);
+
+  // 스타일 메모화
+  const cardStyle = useMemo(() => [
+    styles.logCard,
+    { 
+      backgroundColor: colors.card,
+      borderColor: isSelected ? colors.primary : colors.border,
+      borderWidth: isSelected ? 2 : 1,
+    },
+  ], [colors.card, colors.primary, colors.border, isSelected]);
+
+  const levelBadgeStyle = useMemo(() => [
+    styles.levelBadge, 
+    { backgroundColor: levelColor }
+  ], [levelColor]);
+
+  const handlePress = useCallback(() => {
     if (isMultiSelectMode && onSelect) {
       onSelect(item.logId);
     } else {
@@ -86,85 +94,47 @@ export default function LogItem({
         }
       });
     }
-  };
+  }, [isMultiSelectMode, onSelect, item]);
 
-  const handleLongPress = () => {
+  const handleLongPress = useCallback(() => {
     if (onLongPress) {
       onLongPress(item.logId);
     }
-  };
+  }, [onLongPress, item.logId]);
 
-  // Press 시작 시 즉각적인 애니메이션
-  const handlePressIn = () => {
-    Animated.timing(itemScaleAnim, {
-      toValue: 0.98,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  // Press 끝날 때 원래 크기로 복귀
-  const handlePressOut = () => {
-    Animated.timing(itemScaleAnim, {
-      toValue: isSelected ? 1.02 : 1,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handleCheckboxChange = () => {
+  const handleCheckboxChange = useCallback(() => {
     if (onSelect) {
       onSelect(item.logId);
     }
-  };
+  }, [onSelect, item.logId]);
+
+  const containerStyle = useMemo(() => ({
+    transform: [{ scale: scaleAnim }]
+  }), [scaleAnim]);
 
   return (
-    <Animated.View
-      style={[
-        {
-          transform: [{ scale: itemScaleAnim }]
-        }
-      ]}
-    >
+    <Animated.View style={containerStyle}>
       <Pressable
-        style={[
-          styles.logCard,
-          { 
-            backgroundColor: colors.card,
-            borderColor: isSelected ? colors.primary : colors.border,
-            borderWidth: isSelected ? 2 : 1,
-          },
-        ]}
+        style={cardStyle}
         onPress={handlePress}
         onLongPress={handleLongPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
       >
         <View style={styles.logContent}>
           {isMultiSelectMode && (
             <View style={styles.checkboxContainer}>
-              <Animated.View 
-                style={[
-                  styles.animatedCheckbox,
-                  {
-                    transform: [{ scale: scaleAnim }]
-                  }
-                ]}
-              >
-                <Checkbox
-                  style={styles.checkbox}
-                  value={isSelected}
-                  onValueChange={handleCheckboxChange}
-                  color={isSelected ? colors.primary : undefined}
-                />
-              </Animated.View>
+              <Checkbox
+                style={styles.checkbox}
+                value={isSelected}
+                onValueChange={handleCheckboxChange}
+                color={isSelected ? colors.primary : undefined}
+              />
             </View>
           )}
           
           <View style={styles.logInfo}>
             <View style={styles.logHeader}>
               <View style={styles.logHeaderInfo}>
-                <View style={[styles.levelBadge, { backgroundColor: getLevelColor(item.level) }]}>
+                <View style={levelBadgeStyle}>
                   <Text style={styles.levelText}>{item.level}</Text>
                 </View>
                 <Text style={[styles.serviceName, { color: colors.textSecondary }]}>
@@ -172,7 +142,7 @@ export default function LogItem({
                 </Text>
               </View>
               <Text style={[styles.timestamp, { color: colors.textMuted }]}>
-                {new Date(item.timestamp).toLocaleTimeString()}
+                {formattedTime}
               </Text>
             </View>
             
@@ -184,7 +154,9 @@ export default function LogItem({
       </Pressable>
     </Animated.View>
   );
-}
+});
+
+export default LogItem;
 
 const styles = StyleSheet.create({
   logCard: {
@@ -199,10 +171,6 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     marginRight: 12,
     paddingTop: 2,
-  },
-  animatedCheckbox: {
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   checkbox: {
     width: 20,

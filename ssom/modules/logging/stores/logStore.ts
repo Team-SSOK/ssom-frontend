@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { logApi } from '@/modules/logging/apis/logApi';
-import { LogEntry, ServiceInfo, LogFilters, LogAnalysisResult } from '@/modules/logging/types';
+import { LogEntry, ServiceInfo, LogFilters, LogFiltersWithPagination, LogAnalysisResult } from '@/modules/logging/types';
 import { LOG_CONFIG } from '@/api/constants';
 
 interface LogState {
@@ -9,6 +9,12 @@ interface LogState {
   services: ServiceInfo[];
   isLoading: boolean;
   filters: LogFilters;
+  
+  // 무한 스크롤 관련 상태
+  isLoadingMore: boolean;
+  hasMoreLogs: boolean;
+  lastTimestamp?: string;
+  lastLogId?: string;
   
   // 로그 상세 조회 관련 상태
   currentLog: LogEntry | null;
@@ -25,6 +31,11 @@ interface LogState {
   setFilters: (filters: LogFilters) => void;
   clearLogs: () => void;
   addLog: (log: LogEntry) => void; // SSE로 받은 로그 추가용
+  
+  // 무한 스크롤 관련 액션
+  fetchInitialLogs: (filters?: LogFilters) => Promise<void>;
+  fetchMoreLogs: () => Promise<void>;
+  resetPagination: () => void;
   
   // 로그 상세 조회 관련 액션
   fetchLogById: (logId: string) => Promise<void>;
@@ -43,6 +54,12 @@ export const useLogStore = create<LogState>((set, get) => ({
   isLoading: false,
   filters: {},
   
+  // 무한 스크롤 관련 초기 상태
+  isLoadingMore: false,
+  hasMoreLogs: true,
+  lastTimestamp: undefined,
+  lastLogId: undefined,
+  
   // 로그 상세 조회 관련 초기 상태
   currentLog: null,
   isLoadingCurrentLog: false,
@@ -52,7 +69,7 @@ export const useLogStore = create<LogState>((set, get) => ({
   isAnalyzing: false,
   hasExistingAnalysis: null,
 
-  // 로그 목록 조회
+  // 로그 목록 조회 (기존 방식 - 호환성 유지)
   fetchLogs: async (filters?: LogFilters) => {
     set({ isLoading: true });
     
@@ -64,6 +81,73 @@ export const useLogStore = create<LogState>((set, get) => ({
       set({ isLoading: false });
       throw error;
     }
+  },
+
+  // 무한 스크롤을 위한 초기 로그 조회
+  fetchInitialLogs: async (filters?: LogFilters) => {
+    set({ isLoading: true });
+    
+    try {
+      const currentFilters = filters || get().filters;
+      const response = await logApi.getLogsWithPagination(currentFilters);
+      
+      set({ 
+        logs: response.logs,
+        lastTimestamp: response.lastTimestamp,
+        lastLogId: response.lastLogId,
+        hasMoreLogs: response.logs.length > 0 && (response.lastTimestamp !== undefined || response.lastLogId !== undefined),
+        isLoading: false 
+      });
+    } catch (error) {
+      console.log('초기 로그 조회 실패:', error);
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+
+  // 추가 로그 조회 (무한 스크롤)
+  fetchMoreLogs: async () => {
+    const { isLoadingMore, hasMoreLogs, filters, lastTimestamp, lastLogId } = get();
+    
+    if (isLoadingMore || !hasMoreLogs) {
+      return;
+    }
+    
+    set({ isLoadingMore: true });
+    
+    try {
+      const paginationFilters: LogFiltersWithPagination = {
+        ...filters,
+        searchAfterTimestamp: lastTimestamp,
+        searchAfterId: lastLogId,
+      };
+      
+      const response = await logApi.getLogsWithPagination(paginationFilters);
+      
+      const { logs: currentLogs } = get();
+      const newLogs = [...currentLogs, ...response.logs];
+      
+      set({ 
+        logs: newLogs,
+        lastTimestamp: response.lastTimestamp,
+        lastLogId: response.lastLogId,
+        hasMoreLogs: response.logs.length > 0 && (response.lastTimestamp !== undefined || response.lastLogId !== undefined),
+        isLoadingMore: false 
+      });
+    } catch (error) {
+      console.log('추가 로그 조회 실패:', error);
+      set({ isLoadingMore: false });
+      throw error;
+    }
+  },
+
+  // 페이지네이션 상태 초기화
+  resetPagination: () => {
+    set({
+      lastTimestamp: undefined,
+      lastLogId: undefined,
+      hasMoreLogs: true,
+    });
   },
 
   // 서비스 목록 조회
