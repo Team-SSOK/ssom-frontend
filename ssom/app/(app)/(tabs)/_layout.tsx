@@ -4,17 +4,22 @@ import { useTheme } from '@/hooks/useTheme';
 import { FAB, Portal } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
+import { Octicons, MaterialIcons } from '@expo/vector-icons';
+import { FabProvider, useFab } from '@/contexts/FabContext';
 
-export default function TabLayout() {
+function TabLayoutInner() {
   const { isDark, colors } = useTheme();
+  const { fabVisible } = useFab();
   const router = useRouter();
   const [fabOpen, setFabOpen] = useState(false);
 
   const fabActions = [
     {
-      icon: 'bug-outline',
+      icon: ({ size, color }: { size: number; color: string }) => (
+        <MaterialIcons name="space-dashboard" size={24} color="black" />
+      ),
       onPress: () => router.push('/(app)/(tabs)'),
-      style:  styles.fabActions ,
+      style: styles.fabActions,
     },
     {
       icon: 'monitor-dashboard',
@@ -22,7 +27,16 @@ export default function TabLayout() {
       style: styles.fabActions,
     },
     {
-      icon: 'console-line',
+      icon: ({ size, color }: { size: number; color: string }) => (
+        <Octicons name="issue-opened" size={size} color={color} />
+      ),
+      onPress: () => router.push('/(app)/(tabs)/issues/'),
+      style: styles.fabActions,
+    },
+    {
+      icon: ({ size, color }: { size: number; color: string }) => (
+        <Octicons name="log" size={size} color={color} />
+      ),
       onPress: () => router.push('/(app)/(tabs)/loggings'),
       style: styles.fabActions,
     },
@@ -50,7 +64,7 @@ export default function TabLayout() {
       <Portal>
         <FAB.Group
           open={fabOpen}
-          visible={true}
+          visible={fabVisible}
           icon={fabOpen ? 'close' : 'menu'}
           actions={fabActions}
           onStateChange={() => { setFabOpen(!fabOpen) }}
@@ -61,6 +75,14 @@ export default function TabLayout() {
         />
       </Portal>
     </>
+  );
+}
+
+export default function TabLayout() {
+  return (
+    <FabProvider>
+      <TabLayoutInner />
+    </FabProvider>
   );
 }
 

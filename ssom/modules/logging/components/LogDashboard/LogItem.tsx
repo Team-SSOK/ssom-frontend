@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
+import { View, StyleSheet, Pressable, Animated } from 'react-native';
+import { Text } from '@/components';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import Checkbox from 'expo-checkbox';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
 import { router } from 'expo-router';
 

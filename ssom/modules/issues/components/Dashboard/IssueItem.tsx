@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text } from '@/components';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import StatusBadge from '@/modules/issues/components/Dashboard/Common/StatusBadge';

@@ -12,7 +12,7 @@ export const Colors = {
     background: '#FFFFFF',      // White
     backgroundSecondary: '#F5F7FA', // Silver
     surface: '#E5E5E5',        // Next (Action)
-    border: '#D3D4DC',         // Disabled
+    border: '#F5F7FA',         // Disabled
     white: '#FFFFFF',
     
     // Primary Colors

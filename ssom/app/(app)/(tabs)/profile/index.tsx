@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Text } from '@/components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useAlertModal } from '@/components';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
+import { useFab } from '@/contexts/FabContext';
 import UserInfoCard from '@/modules/auth/components/Profile/UserInfoCard';
 import UserDetailsCard from '@/modules/auth/components/Profile/UserDetailsCard';
 import MenuSection from '@/modules/auth/components/Profile/MenuSection';
@@ -14,6 +16,7 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
   const { AlertModal, alert } = useAlertModal();
   const { user, profile, isLoading, getProfile } = useAuthStore();
+  const { handleScroll } = useFab();
 
   useEffect(() => {
     getProfile();
@@ -27,7 +30,12 @@ export default function ProfileScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
@@ -72,7 +80,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: '700',
   },
   versionText: {

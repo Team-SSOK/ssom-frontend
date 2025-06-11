@@ -91,6 +91,12 @@ export default function AlertsScreen() {
 
   // 무한스크롤 - 더 많은 알림 로드
   const handleLoadMore = async () => {
+    // Unread 탭일 때는 무한스크롤 비활성화
+    // (필터링된 데이터가 작아서 onEndReached가 즉시 트리거되는 문제 방지)
+    if (selectedTab === 'unread') {
+      return;
+    }
+    
     try {
       await loadMoreAlerts();
     } catch (error) {
@@ -146,6 +152,7 @@ export default function AlertsScreen() {
         onRefresh={handleRefresh}
         isRefreshing={isLoading}
         isLoadingMore={isLoadingMore}
+        disableInfiniteScroll={selectedTab === 'unread'}
       />
     </SafeAreaView>
   );

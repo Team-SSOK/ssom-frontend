@@ -1,5 +1,6 @@
 import React, { memo, useCallback } from 'react';
 import { StyleSheet, FlatList } from 'react-native';
+import { useFab } from '@/contexts/FabContext';
 import IssueItem from '@/modules/issues/components/Dashboard/IssueItem';
 
 interface Issue {
@@ -17,6 +18,8 @@ interface IssueListProps {
 }
 
 function IssueList({ issues, refreshControl, headerComponent }: IssueListProps) {
+  const { handleScroll } = useFab();
+  
   const renderItem = useCallback(({ item }: { item: Issue }) => (
     <IssueItem item={item} />
   ), []);
@@ -30,6 +33,9 @@ function IssueList({ issues, refreshControl, headerComponent }: IssueListProps) 
       keyExtractor={keyExtractor}
       contentContainerStyle={styles.listContainer}
       showsVerticalScrollIndicator={false}
+      // 스크롤 이벤트
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
       refreshControl={refreshControl}
       ListHeaderComponent={headerComponent}
       // 성능 최적화 설정

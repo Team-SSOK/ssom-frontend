@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TextInput, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text, TextInput } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
 
 interface IssueTextInputProps {

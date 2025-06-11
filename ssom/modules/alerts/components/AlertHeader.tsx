@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -44,18 +45,17 @@ export default function AlertHeader({
           알림
         </Text>
         
-        {hasUnreadAlerts ? (
-          <Pressable 
-            style={styles.markAllButton} 
-            onPress={handleMarkAllPress}
-          >
-            <Text style={[styles.markAllText, { color: colors.primary }]}>
-              모두 읽음
-            </Text>
-          </Pressable>
-        ) : (
-          <View style={styles.iconButton} />
-        )}
+        <View style={styles.markAllButton}>
+          {hasUnreadAlerts && (
+            <Pressable 
+              onPress={handleMarkAllPress}
+            >
+              <Text style={[styles.markAllText, { color: colors.primary }]}>
+                모두 읽음
+              </Text>
+            </Pressable>
+          )}
+        </View>
       </View>
       
       {/* Tab Section */}
@@ -102,13 +102,13 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    height: 48,
   },
   iconButton: {
-    width: 40,
+    width: 80,
     height: 40,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     borderRadius: 20,
   },
   title: {
@@ -119,8 +119,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   markAllButton: {
+    width: 80,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
     paddingHorizontal: 8,
-    paddingVertical: 8,
   },
   markAllText: {
     fontSize: 12,

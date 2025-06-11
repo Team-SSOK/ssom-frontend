@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Modal, FlatList, Platform } from 'react-native';
+import { View, StyleSheet, Pressable, Modal, FlatList, Platform } from 'react-native';
+import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
 import { ServiceInfo } from '@/modules/logging/types';
 import { FontFamily } from '@/styles/fonts';

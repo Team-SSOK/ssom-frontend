@@ -2,6 +2,7 @@ import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { LoadingIndicator } from '@/components';
+import { useFab } from '@/contexts/FabContext';
 import AlertItem from './AlertItem';
 
 interface AlertData {
@@ -22,6 +23,7 @@ interface AlertListProps {
   onRefresh?: () => void;
   isRefreshing?: boolean;
   isLoadingMore?: boolean;
+  disableInfiniteScroll?: boolean;
 }
 
 export default function AlertList({ 
@@ -30,9 +32,11 @@ export default function AlertList({
   onEndReached,
   onRefresh,
   isRefreshing = false,
-  isLoadingMore = false
+  isLoadingMore = false,
+  disableInfiniteScroll = false
 }: AlertListProps) {
   const { colors } = useTheme();
+  const { handleScroll } = useFab();
 
   const renderAlertItem = ({ item, index }: { item: AlertData; index: number }) => (
     <View>
@@ -47,7 +51,7 @@ export default function AlertList({
   );
 
   const renderFooter = () => {
-    if (!isLoadingMore) return null;
+    if (!isLoadingMore || disableInfiniteScroll) return null;
     
     return (
       <View style={styles.footer}>
@@ -66,9 +70,12 @@ export default function AlertList({
       removeClippedSubviews={true}
       maxToRenderPerBatch={10}
       windowSize={10}
+      // 스크롤 이벤트
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
       // 무한스크롤 관련 props
-      onEndReached={onEndReached}
-      onEndReachedThreshold={0.3} // 30% 지점에서 트리거
+      onEndReached={disableInfiniteScroll ? undefined : onEndReached}
+      onEndReachedThreshold={disableInfiniteScroll ? undefined : 0.3} // 30% 지점에서 트리거
       // Pull to Refresh 관련 props
       refreshing={isRefreshing}
       onRefresh={onRefresh}

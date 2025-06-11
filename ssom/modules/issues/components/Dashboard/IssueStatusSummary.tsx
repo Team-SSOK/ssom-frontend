@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
 
 interface Issue {
@@ -19,18 +20,18 @@ export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) 
   return (
     <View style={styles.statsContainer}>
       <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-        <Text style={[styles.statNumber, { color: colors.critical }]}>
+        <Text variant="h4" weight="bold" style={[styles.statNumber, { color: colors.critical }]}>
           {openCount}
         </Text>
-        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+        <Text variant="caption" weight="medium" style={[styles.statLabel, { color: colors.textSecondary }]}>
           OPEN
         </Text>
       </View>
       <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-        <Text style={[styles.statNumber, { color: colors.success || colors.primary }]}>
+        <Text variant="h4" weight="bold" style={[styles.statNumber, { color: colors.success || colors.primary }]}>
           {closeCount}
         </Text>
-        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+        <Text variant="caption" weight="medium" style={[styles.statLabel, { color: colors.textSecondary }]}>
           CLOSE
         </Text>
       </View>
@@ -52,12 +53,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
     textTransform: 'uppercase',
   },
 }); 

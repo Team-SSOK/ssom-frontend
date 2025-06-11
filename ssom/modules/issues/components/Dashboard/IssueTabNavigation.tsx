@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
 
 interface IssueTabNavigationProps {
@@ -21,6 +22,8 @@ export default function IssueTabNavigation({ activeTab, onTabChange }: IssueTabN
           onPress={() => onTabChange('my')}
         >
           <Text
+            variant="body2"
+            weight="semiBold"
             style={[
               styles.tabText,
               { color: activeTab === 'my' ? 'white' : colors.textSecondary },
@@ -38,6 +41,8 @@ export default function IssueTabNavigation({ activeTab, onTabChange }: IssueTabN
           onPress={() => onTabChange('all')}
         >
           <Text
+            variant="body2"
+            weight="semiBold"
             style={[
               styles.tabText,
               { color: activeTab === 'all' ? 'white' : colors.textSecondary },
@@ -68,7 +73,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabText: {
-    fontSize: 14,
-    fontWeight: '600',
+    // 스타일은 variant와 weight로 처리
   },
 }); 

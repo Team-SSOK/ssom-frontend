@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { Text } from '@/components';
 import { useAlertStore } from '@/modules/alerts/stores/alertStore';
 import LottieView from 'lottie-react-native';
 import { useRouter } from 'expo-router';
+import { useAuthStore } from '@/modules/auth/stores/authStore';
 
 export default function DashboardHeader() {
   const { colors } = useTheme();
@@ -11,6 +13,7 @@ export default function DashboardHeader() {
   
   // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어만 사용
   const { alerts } = useAlertStore();
+  const userName = useAuthStore(state => state.user?.username);
   
   // 읽지 않은 모든 알림 개수 카운트
   const unreadAlerts = alerts.filter(alert => !alert.isRead);
@@ -28,9 +31,9 @@ export default function DashboardHeader() {
     <View style={[styles.header, { borderBottomColor: colors.border }]}>
       <View style={styles.content}>
         <View style={styles.leftSpacer} />
-        <Text style={[styles.title, { color: colors.text }]}>
-          이슈 관리
-        </Text>
+                 <Text variant="h5" weight="semiBold" style={styles.title}>
+           안녕하세요, {userName}님
+         </Text>
         <Pressable 
           style={styles.rightSection}
           onPress={handleAlertPress}
@@ -43,12 +46,12 @@ export default function DashboardHeader() {
           />
           {hasNotifications && (
             <View style={[styles.notificationBadge, { backgroundColor: colors.warning }]}>
-              {notificationCount > 0 && notificationCount < 10 && (
-                <Text style={styles.badgeText}>{notificationCount}</Text>
-              )}
-              {notificationCount >= 10 && (
-                <Text style={styles.badgeText}>9+</Text>
-              )}
+                             {notificationCount > 0 && notificationCount < 10 && (
+                 <Text weight="bold" style={styles.badgeText}>{notificationCount}</Text>
+               )}
+               {notificationCount >= 10 && (
+                 <Text weight="bold" style={styles.badgeText}>9+</Text>
+               )}
             </View>
           )}
         </Pressable>
@@ -70,12 +73,10 @@ const styles = StyleSheet.create({
   leftSpacer: {
     width: 40,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
-  },
+     title: {
+     flex: 1,
+     textAlign: 'center',
+   },
   rightSection: {
     width: 40,
     height: 40,
@@ -98,7 +99,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 2,
-    shadowColor: 'black',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -106,9 +106,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },
-  badgeText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
+     badgeText: {
+     color: 'white',
+     fontSize: 10,
+   },
 }); 

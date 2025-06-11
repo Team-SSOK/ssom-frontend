@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { useLogStore } from '@/modules/logging/stores/logStore';
+import { useFab } from '@/contexts/FabContext';
 import LogItem from './LogItem';
 
 interface LogData {
@@ -30,6 +31,8 @@ export default function LogList({
   onLogSelect,
   onLogLongPress
 }: LogListProps) {
+  const { handleScroll } = useFab();
+  
   // 스토어에서 로그 데이터 가져오기 (useStoreData가 true일 때)
   const { logs: storeLogs } = useLogStore();
   
@@ -53,6 +56,9 @@ export default function LogList({
       keyExtractor={(item) => item.logId}
       contentContainerStyle={styles.listContainer}
       showsVerticalScrollIndicator={false}
+      // 스크롤 이벤트
+      onScroll={handleScroll}
+      scrollEventThrottle={16}
     />
   );
 }
