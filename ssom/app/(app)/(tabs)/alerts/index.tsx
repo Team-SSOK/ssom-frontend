@@ -1,116 +1,155 @@
-import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-
-// Mock data for demonstration
-const mockAlerts = [
-  {
-    id: '1',
-    title: 'High CPU Usage Alert',
-    severity: 'critical',
-    timestamp: '2024-06-03T10:00:00Z',
-    isRead: false,
-    actionRequired: true,
-    description: 'CPU usage has exceeded 90% for more than 5 minutes',
-  },
-  {
-    id: '2',
-    title: 'Disk Space Warning',
-    severity: 'warning',
-    timestamp: '2024-06-03T09:30:00Z',
-    isRead: true,
-    actionRequired: false,
-    description: 'Disk space is running low on server-01',
-  },
-  {
-    id: '3',
-    title: 'Service Health Check Failed',
-    severity: 'high',
-    timestamp: '2024-06-03T09:00:00Z',
-    isRead: false,
-    actionRequired: true,
-    description: 'Authentication service health check has failed',
-  },
-];
+import { useToast } from '@/hooks/useToast';
+import { useEffect, useState } from 'react';
+import { useAlertStore } from '@/modules/alerts/stores/alertStore';
+import { Alert } from '@/modules/alerts/types';
+import AlertHeader from '@/modules/alerts/components/AlertHeader';
+import AlertList from '@/modules/alerts/components/AlertList';
+import { LoadingIndicator } from '@/components';
 
 export default function AlertsScreen() {
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
+  const toast = useToast();
+  const [selectedTab, setSelectedTab] = useState<'all' | 'unread'>('all');
+  
+  // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어만 사용
+  const { 
+    alerts, 
+    loadAlerts, 
+    loadMoreAlerts,
+    refreshAlerts,
+    markAsRead, 
+    markAllAsRead,
+    isLoading,
+    isLoadingMore,
+    error 
+  } = useAlertStore();
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical':
-        return colors.critical;
-      case 'high':
-        return colors.warning;
-      case 'warning':
-        return colors.warning;
-      default:
-        return colors.tint2;
+  // 화면 진입 시 알림 목록 로드
+  useEffect(() => {
+    loadAlerts();
+  }, [loadAlerts]);
+
+  // 에러 처리
+  useEffect(() => {
+    if (error) {
+      toast.error('알림 오류', error);
+    }
+  }, [error, toast]);
+
+  // API 데이터를 UI 컴포넌트에서 사용할 수 있는 형태로 변환
+  const transformedAlerts: Alert[] = alerts.map(alert => ({
+    id: alert.id,
+    alertStatusId: alert.alertStatusId,
+    title: alert.title,
+    message: alert.message,
+    timestamp: alert.timestamp,
+    kind: alert.kind,
+    isRead: alert.isRead,
+    actionRequired: !alert.isRead, // 읽지 않은 알림은 액션이 필요한 것으로 간주
+  }));
+
+  // 탭에 따라 필터된 알림 목록
+  const filteredAlerts = selectedTab === 'unread' 
+    ? transformedAlerts.filter(alert => !alert.isRead)
+    : transformedAlerts;
+
+  // 알림 클릭 시 읽음 처리
+  const handleAlertPress = async (alertStatusId: number) => {
+    const alert = alerts.find(a => a.alertStatusId === alertStatusId);
+    console.log('🔍 Alert 클릭:', {
+      alertStatusId,
+      alert: alert ? {
+        id: alert.id,
+        alertId: alert.alertId,
+        alertStatusId: alert.alertStatusId,
+        isRead: alert.isRead,
+        title: alert.title
+      } : 'Not found'
+    });
+    
+    if (alert && !alert.isRead) {
+      try {
+        await markAsRead(alert.alertStatusId);
+      } catch (error) {
+        if (__DEV__) console.error('읽음 처리 실패:', error);
+        toast.error('읽음 처리 실패', '알림을 읽음으로 처리하는데 실패했습니다.');
+      }
     }
   };
 
-  const renderAlertItem = ({ item }: { item: typeof mockAlerts[0] }) => (
-    <TouchableOpacity
-      style={[
-        styles.alertCard,
-        { 
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-          opacity: item.isRead ? 0.7 : 1,
-        },
-      ]}
-    >
-      <View style={styles.alertHeader}>
-        <Text style={[styles.alertTitle, { color: colors.text }]}>
-          {item.title}
-        </Text>
-        <View style={styles.badges}>
-          {!item.isRead && (
-            <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
-              <Text style={styles.unreadText}>NEW</Text>
-            </View>
-          )}
-          <View
-            style={[
-              styles.severityBadge,
-              { backgroundColor: getSeverityColor(item.severity) },
-            ]}
-          >
-            <Text style={styles.severityText}>{item.severity}</Text>
-          </View>
-        </View>
-      </View>
-      <Text style={[styles.alertDescription, { color: colors.textSecondary }]}>
-        {item.description}
-      </Text>
-      <View style={styles.alertFooter}>
-        {item.actionRequired && (
-          <View style={[styles.actionBadge, { backgroundColor: colors.critical }]}>
-            <Text style={styles.actionText}>ACTION REQUIRED</Text>
-          </View>
-        )}
-        <Text style={[styles.timestamp, { color: colors.textMuted }]}>
-          {new Date(item.timestamp).toLocaleString()}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  // 전체 읽음 처리
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsRead();
+      toast.success('전체 읽음 완료', '모든 알림이 읽음 처리되었습니다.');
+    } catch (error) {
+      if (__DEV__) console.error('전체 읽음 처리 실패:', error);
+      toast.error('전체 읽음 실패', '모든 알림을 읽음으로 처리하는데 실패했습니다.');
+    }
+  };
+
+  // 무한스크롤 - 더 많은 알림 로드
+  const handleLoadMore = async () => {
+    try {
+      await loadMoreAlerts();
+    } catch (error) {
+      if (__DEV__) console.error('추가 알림 로드 실패:', error);
+      toast.error('로드 실패', '추가 알림을 불러오는데 실패했습니다.');
+    }
+  };
+
+  // Pull to Refresh
+  const handleRefresh = async () => {
+    try {
+      await refreshAlerts();
+    } catch (error) {
+      if (__DEV__) console.error('알림 새로고침 실패:', error);
+      toast.error('새로고침 실패', '알림을 새로고침하는데 실패했습니다.');
+    }
+  };
+
+  // 읽지 않은 알림이 있는지 확인
+  const hasUnreadAlerts = alerts.some(alert => !alert.isRead);
+
+  // 로딩 중일 때 표시할 컴포넌트
+  if (isLoading && alerts.length === 0) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <AlertHeader 
+          onMarkAllAsRead={handleMarkAllAsRead}
+          hasUnreadAlerts={hasUnreadAlerts}
+          selectedTab={selectedTab}
+          onTabChange={setSelectedTab}
+        />
+        <LoadingIndicator 
+          fullScreen 
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Alerts
-        </Text>
-      </View>
-      <FlatList
-        data={mockAlerts}
-        renderItem={renderAlertItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
+      <AlertHeader 
+        onMarkAllAsRead={handleMarkAllAsRead}
+        hasUnreadAlerts={hasUnreadAlerts}
+        selectedTab={selectedTab}
+        onTabChange={setSelectedTab}
+      />
+      <AlertList 
+        alerts={filteredAlerts} 
+        onAlertPress={handleAlertPress}
+        onEndReached={handleLoadMore}
+        onRefresh={handleRefresh}
+        isRefreshing={isLoading}
+        isLoadingMore={isLoadingMore}
       />
     </SafeAreaView>
   );
@@ -119,83 +158,5 @@ export default function AlertsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  listContainer: {
-    padding: 16,
-  },
-  alertCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-  },
-  alertHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  alertTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-    marginRight: 8,
-  },
-  badges: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  unreadBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  unreadText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  severityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  severityText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  alertDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  alertFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  actionBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  actionText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  timestamp: {
-    fontSize: 12,
   },
 }); 

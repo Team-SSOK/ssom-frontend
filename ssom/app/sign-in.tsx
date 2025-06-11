@@ -1,190 +1,94 @@
 import { router } from 'expo-router';
 import {
-  Text,
   View,
   StyleSheet,
-  Pressable,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Pressable,
+  Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
-import Button from '@/components/Button';
-import { useAlert } from '@/hooks/useAlert';
+import { useToast } from '@/hooks/useToast';
+import { useFCMStore } from '@/modules/notifications';
+import AppLogo from '@/modules/auth/components/SignIn/AppLogo';
+import LoginForm from '@/modules/auth/components/SignIn/LoginForm';
+import LoginNotice from '@/modules/auth/components/SignIn/LoginNotice';
+import AppVersionInfo from '@/modules/auth/components/SignIn/AppVersionInfo';
 
 export default function SignIn() {
-  const { login, signUp, isLoading, error, clearError } = useAuthStore();
-  const { isDark } = useTheme();
-  const { showSuccessAlert, showErrorAlert } = useAlert();
+  const { login, isLoading } = useAuthStore();
+  const { colors } = useTheme();
+  const toast = useToast();
+  const { resetPermissionRequest } = useFCMStore();
 
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-    name: '',
-  });
-
-  // 에러가 변경되면 Alert로 표시
-  useEffect(() => {
-    if (error) {
-      showErrorAlert(error, clearError);
-    }
-  }, [error, clearError, showErrorAlert]);
-
-  const handleAuth = async () => {
-    if (!form.email.trim() || !form.password.trim()) {
-      showErrorAlert('이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-
-    if (isSignUp && !form.name.trim()) {
-      showErrorAlert('이름을 입력해주세요.');
+  const handleLogin = async (employeeId: string, password: string) => {
+    if (!employeeId.trim() || !password.trim()) {
+      toast.error('입력 오류', '직원 ID와 비밀번호를 입력해주세요.');
       return;
     }
 
     try {
-      if (isSignUp) {
-        await signUp({
-          email: form.email.trim(),
-          password: form.password.trim(),
-          name: form.name.trim(),
-        });
-        showSuccessAlert('회원가입이 완료되었습니다!', () => router.dismiss());
-      } else {
-        await login({
-          email: form.email.trim(),
-          password: form.password.trim(),
-        });
-        router.replace('/(app)');
-      }
+      await login({
+        employeeId: employeeId.trim(),
+        password: password.trim(),
+      });
+
+      console.log('로그인 완료 - 앱으로 이동...');
+      toast.success('로그인 성공', '환영합니다!');
+      
+      router.replace('/(app)/(tabs)');
     } catch (error) {
-      console.error('인증 오류:', error);
-      showErrorAlert('인증 중 오류가 발생했습니다.');
+      console.warn('로그인 실패:', error);
+      toast.error('로그인 오류', "로그인에 실패했습니다");
     }
   };
 
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp);
-    setForm({
-      email: '',
-      password: '',
-      name: '',
-    });
-    clearError(); // 모드 변경 시 에러 클리어
+  // 개발용: 첫 로그인 상태 리셋
+  const resetFirstLoginStatus = async () => {
+    try {
+      const { clearAuth } = useAuthStore.getState();
+      await clearAuth();
+      
+      // FCM 권한 요청 상태도 함께 리셋
+      resetPermissionRequest();
+      
+      toast.success('개발자 도구', '모든 인증 데이터가 리셋되었습니다.');
+    } catch (error) {
+      toast.error('개발자 도구', '리셋 중 오류가 발생했습니다.');
+    }
   };
 
-  const isFormValid =
-    form.email.trim() &&
-    form.password.trim() &&
-    (!isSignUp || form.name.trim());
-
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}
-    >
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.content}>
-            <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>
-              {isSignUp ? '회원가입' : '로그인'} 👋
-            </Text>
-            <Text
-              style={[styles.subtitle, { color: isDark ? '#ccc' : '#666' }]}
-            >
-              {isSignUp ? '새 계정을 만들어주세요' : '계정에 로그인하세요'}
-            </Text>
-
-            <View style={styles.formContainer}>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
-                    color: isDark ? '#fff' : '#000',
-                    borderColor: isDark ? '#333' : '#ddd',
-                  },
-                ]}
-                placeholder="이메일"
-                placeholderTextColor={isDark ? '#888' : '#999'}
-                value={form.email}
-                onChangeText={(text) => setForm({ ...form, email: text })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-              />
-
-              {isSignUp && (
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
-                      color: isDark ? '#fff' : '#000',
-                      borderColor: isDark ? '#333' : '#ddd',
-                    },
-                  ]}
-                  placeholder="이름"
-                  placeholderTextColor={isDark ? '#888' : '#999'}
-                  value={form.name}
-                  onChangeText={(text) => setForm({ ...form, name: text })}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  editable={!isLoading}
-                />
-              )}
-
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
-                    color: isDark ? '#fff' : '#000',
-                    borderColor: isDark ? '#333' : '#ddd',
-                  },
-                ]}
-                placeholder="비밀번호"
-                placeholderTextColor={isDark ? '#888' : '#999'}
-                value={form.password}
-                onChangeText={(text) => setForm({ ...form, password: text })}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-              />
-
-              <Button
-                title={
-                  isLoading ? '처리 중...' : isSignUp ? '회원가입' : '로그인'
-                }
-                onPress={handleAuth}
-                disabled={!isFormValid || isLoading}
-              />
-
-              <Pressable
-                style={styles.toggleButton}
-                onPress={toggleMode}
-                disabled={isLoading}
+            <AppLogo />
+            <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
+            <LoginNotice />
+            
+            {/* 개발용 리셋 버튼 */}
+            {__DEV__ && (
+              <Pressable 
+                style={[styles.devButton, { borderColor: colors.textMuted }]}
+                onPress={resetFirstLoginStatus}
               >
-                <Text style={[styles.toggleText, { color: '#007AFF' }]}>
-                  {isSignUp
-                    ? '이미 계정이 있으신가요? 로그인'
-                    : '계정이 없으신가요? 회원가입'}
+                <Text style={[styles.devButtonText, { color: colors.textMuted }]}>
+                  [DEV] 모든 인증 데이터 리셋
                 </Text>
               </Pressable>
-            </View>
-
-            <Text style={[styles.note, { color: isDark ? '#888' : '#999' }]}>
-              이것은 데모 인증입니다. 실제 앱에서는 적절한 보안 인증을
-              구현하세요.
-            </Text>
+            )}
+            
+            <AppVersionInfo />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -205,42 +109,20 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 40,
-    paddingVertical: 20,
+    paddingHorizontal: 32,
+    paddingVertical: 40,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 48,
-  },
-  formContainer: {
-    marginBottom: 32,
-  },
-  input: {
-    height: 50,
-    borderRadius: 12,
-    paddingHorizontal: 16,
+  devButton: {
+    marginTop: 16,
     marginBottom: 16,
-    borderWidth: 1,
-    fontSize: 16,
-  },
-  toggleButton: {
-    alignItems: 'center',
     paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: 'center',
   },
-  toggleText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  note: {
+  devButtonText: {
     fontSize: 12,
     textAlign: 'center',
-    lineHeight: 16,
   },
 });

@@ -12,18 +12,23 @@ export default function TabLayout() {
 
   const fabActions = [
     {
-      icon: 'alpha-i',
+      icon: 'bug-outline',
       onPress: () => router.push('/(app)/(tabs)'),
       style:  styles.fabActions ,
     },
     {
-      icon: 'alert',
-      onPress: () => router.push('/(app)/(tabs)/alerts'),
+      icon: 'monitor-dashboard',
+      onPress: () => router.push('/(app)/(tabs)/grafana'),
       style: styles.fabActions,
     },
     {
-      icon: 'math-log',
-      onPress: () => router.push('/(app)/(tabs)/logs'),
+      icon: 'console-line',
+      onPress: () => router.push('/(app)/(tabs)/loggings'),
+      style: styles.fabActions,
+    },
+    {
+      icon: 'account',
+      onPress: () => router.push('/(app)/(tabs)/profile'),
       style: styles.fabActions,
     },
   ];
@@ -36,9 +41,10 @@ export default function TabLayout() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="issues/index" />
-        <Stack.Screen name="logs/index" />
-        <Stack.Screen name="alerts/index" />
+        <Stack.Screen name="issues" options={{ headerShown: false }} />
+        <Stack.Screen name="loggings" options={{ headerShown: false }} />
+        <Stack.Screen name="alerts" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
       </Stack>
       
       <Portal>

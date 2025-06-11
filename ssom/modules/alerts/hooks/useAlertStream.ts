@@ -1,0 +1,244 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'expo-router';
+import { alertSSEApi } from '../apis/alertSSEApi';
+import { useAlertStore } from '../stores/alertStore';
+import { AlertEntry, AlertEventListener, AlertConnectionEventListener } from '../types';
+import Toast from 'react-native-toast-message';
+
+interface UseAlertStreamResult {
+  alerts: AlertEntry[];
+  connectionStatus: 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error' | 'cooldown';
+  connectionMessage: string;
+  connect: () => void;
+  disconnect: () => void;
+  forceReconnect: () => void;
+  loadAlerts: () => Promise<void>;
+  markAsRead: (alertStatusId: number) => Promise<void>;
+  deleteAlert: (alertStatusId: number) => Promise<void>;
+  isConnected: boolean;
+  reconnectAttempts: number;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export function useAlertStream(): UseAlertStreamResult {
+  const router = useRouter();
+  
+  // Zustand 스토어에서 상태와 액션 가져오기
+  const {
+    alerts,
+    isLoading,
+    error,
+    addAlert,
+    markAsRead,
+    deleteAlert,
+    loadAlerts,
+  } = useAlertStore();
+
+  // SSE 연결 관련 상태 (로컬 상태로 유지)
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error' | 'cooldown'>('disconnected');
+  const [connectionMessage, setConnectionMessage] = useState<string>('연결되지 않음');
+  const [reconnectAttempts, setReconnectAttempts] = useState<number>(0);
+  const isConnecting = useRef(false);
+  const connectionStatusRef = useRef<'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error' | 'cooldown'>('disconnected');
+
+  // connectionStatus 변경 시 ref 업데이트
+  useEffect(() => {
+    connectionStatusRef.current = connectionStatus;
+  }, [connectionStatus]);
+
+  // 컴포넌트 마운트 시 현재 SSE 연결 상태와 동기화
+  useEffect(() => {
+    const statusInfo = alertSSEApi.getConnectionStatus();
+    setReconnectAttempts(statusInfo.attempts);
+    
+    if (statusInfo.connected && statusInfo.state === 'connected') {
+      setConnectionStatus('connected');
+      setConnectionMessage('연결됨');
+      console.log('🔄 기존 Alert SSE 연결 상태와 동기화됨');
+    } else {
+      setConnectionStatus(statusInfo.state);
+      switch (statusInfo.state) {
+        case 'connecting':
+          setConnectionMessage('연결 중...');
+          break;
+        case 'reconnecting':
+          setConnectionMessage('재연결 중...');
+          break;
+        case 'error':
+          setConnectionMessage('연결 오류');
+          break;
+        case 'cooldown':
+          setConnectionMessage('서버 문제로 대기 중...');
+          break;
+        default:
+          setConnectionMessage('연결되지 않음');
+      }
+    }
+  }, []);
+
+  // 새 알림 수신 처리 - 스토어의 addAlert 사용 + 토스트 표시
+  const handleAlertReceived: AlertEventListener = useCallback((alert: AlertEntry) => {
+    console.log('📨 새 알림 수신:', alert);
+    
+    // 스토어에 알림 추가
+    addAlert(alert);
+    
+    // 알림 종류에 따른 토스트 타입 결정
+    let toastType: 'success' | 'error' | 'info' | 'warning' = 'info';
+    let toastIcon = '📱';
+    
+    switch (alert.kind?.toUpperCase()) {
+      case 'OPENSEARCH':
+      case 'ERROR':
+        toastType = 'error';
+        toastIcon = '🚨';
+        break;
+      case 'WARNING':
+      case 'WARN':
+        toastType = 'warning';
+        toastIcon = '⚠️';
+        break;
+      case 'SUCCESS':
+        toastType = 'success';
+        toastIcon = '✅';
+        break;
+      default:
+        toastType = 'info';
+        toastIcon = '📱';
+    }
+    
+    // 새 알림 토스트 표시
+    Toast.show({
+      type: toastType,
+      text1: `${toastIcon} ${alert.title || '새로운 알림'}`,
+      text2: alert.message || '새로운 알림이 도착했습니다.',
+      visibilityTime: 6000,
+      position: 'top',
+      topOffset: 60,
+      onPress: () => {
+        Toast.hide();
+        // 알림 탭으로 이동
+        router.push('/(app)/(tabs)/alerts');
+      }
+    });
+  }, [addAlert, router]);
+
+  // 연결 상태 변경 처리
+  const handleConnectionEvent: AlertConnectionEventListener = useCallback((event) => {
+    console.log('🔗 Alert 연결 이벤트:', event);
+    
+    // 재연결 시도 횟수 업데이트
+    const statusInfo = alertSSEApi.getConnectionStatus();
+    setReconnectAttempts(statusInfo.attempts);
+    
+    switch (event.type) {
+      case 'connected':
+        setConnectionStatus('connected');
+        setConnectionMessage('연결됨');
+        break;
+      case 'disconnected':
+        setConnectionStatus('disconnected');
+        setConnectionMessage('연결 해제됨');
+        break;
+      case 'connecting':
+        setConnectionStatus('connecting');
+        setConnectionMessage('연결 중...');
+        break;
+      case 'reconnecting':
+        setConnectionStatus('reconnecting');
+        setConnectionMessage(event.message || '재연결 중...');
+        break;
+      case 'error':
+        // 서버 문제인지 클라이언트 문제인지 구분
+        if (event.message?.includes('500') || event.message?.includes('서버')) {
+          setConnectionStatus('cooldown');
+        } else {
+          setConnectionStatus('error');
+        }
+        setConnectionMessage(event.message || '연결 오류');
+        break;
+    }
+  }, []);
+
+  // SSE 연결 시작
+  const connect = useCallback(() => {
+    if (isConnecting.current || connectionStatusRef.current === 'connected') {
+      console.log('이미 연결 중이거나 연결됨');
+      return;
+    }
+
+    isConnecting.current = true;
+    setConnectionStatus('connecting');
+    setConnectionMessage('연결 중...');
+
+    alertSSEApi.connect(handleAlertReceived, handleConnectionEvent)
+      .then(() => {
+        console.log('Alert SSE 연결 시도 완료');
+      })
+      .catch((error) => {
+        if (__DEV__) console.error('Alert SSE 연결 실패:', error);
+        
+        Toast.show({
+          type: 'error',
+          text1: '알림 연결 실패',
+          text2: '실시간 알림 연결에 실패했습니다.',
+          visibilityTime: 4000,
+        });
+        
+        setConnectionStatus('error');
+        setConnectionMessage('연결 실패');
+      })
+      .finally(() => {
+        isConnecting.current = false;
+      });
+  }, [handleAlertReceived, handleConnectionEvent]);
+
+  // SSE 연결 해제
+  const disconnect = useCallback(() => {
+    console.log('🔴 Alert SSE 연결 해제 요청:', {
+      connectionStatus: connectionStatusRef.current,
+      isConnecting: isConnecting.current,
+      timestamp: new Date().toISOString()
+    });
+    
+    alertSSEApi.disconnect();
+    setConnectionStatus('disconnected');
+    setConnectionMessage('연결 해제됨');
+    setReconnectAttempts(0);
+    isConnecting.current = false;
+  }, []);
+
+  // 수동 재연결 (사용자가 버튼 클릭 시)
+  const forceReconnect = useCallback(() => {
+    console.log('🔄 Alert 수동 재연결 시도');
+    setConnectionStatus('connecting');
+    setConnectionMessage('재연결 중...');
+    isConnecting.current = false;
+    
+    alertSSEApi.forceReconnect(handleAlertReceived, handleConnectionEvent);
+  }, [handleAlertReceived, handleConnectionEvent]);
+
+  // 컴포넌트 언마운트 시 연결 해제
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [disconnect]);
+
+  return {
+    alerts,
+    connectionStatus,
+    connectionMessage,
+    connect,
+    disconnect,
+    forceReconnect,
+    loadAlerts,
+    markAsRead,
+    deleteAlert,
+    isConnected: connectionStatus === 'connected',
+    reconnectAttempts,
+    isLoading,
+    error,
+  };
+} 

@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   authApi,
   type SignInRequest,
-  type SignUpRequest,
-} from '../api/authApi';
+  type PasswordChangeRequest,
+} from '@/modules/auth/apis/authApi';
 import {
   saveTokens,
   clearTokens,
@@ -14,23 +15,35 @@ import {
   removeItem,
 } from '@/services/tokenService';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
+export interface User {
+  username: string;
+  department: string;
+  expiresIn: number;
+  biometricEnabled: boolean;
+  lastLoginAt: string;
 }
 
-interface AuthState {
+export interface UserProfile {
+  employeeId: string;
+  username: string;
+  phoneNumber: string;
+  department: string;
+  departmentCode: number;
+  githubId: string;
+}
+
+export interface AuthState {
   user: User | null;
+  profile: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
+  isPasswordChanged: boolean;
   login: (credentials: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
-  signUp: (userData: SignUpRequest) => Promise<void>;
+  changePassword: (data: PasswordChangeRequest) => Promise<void>;
+  getProfile: () => Promise<void>;
   initialize: () => Promise<void>;
-  clearError: () => void;
-  resetAuth: () => Promise<void>;
+  clearAuth: () => Promise<void>;
 }
 
 const persistStorage = {
@@ -43,12 +56,13 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      profile: null,
       isAuthenticated: false,
       isLoading: false,
-      error: null,
+      isPasswordChanged: false,
 
       login: async (credentials: SignInRequest) => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true });
 
         try {
           const response = await authApi.signIn(credentials);
@@ -59,106 +73,127 @@ export const useAuthStore = create<AuthState>()(
             throw new Error('토큰 저장에 실패했습니다.');
           }
 
+          const authUser: User = {
+            username: user.username,
+            department: user.department,
+            expiresIn: user.expiresIn,
+            biometricEnabled: user.biometricEnabled,
+            lastLoginAt: user.lastLoginAt,
+          };
+
           set({
-            user: user as User,
+            user: authUser,
             isAuthenticated: true,
-            error: null,
           });
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : '로그인에 실패했습니다.';
+          // API 에러 또는 토큰 저장 실패 시 상태 초기화
           set({
             user: null,
             isAuthenticated: false,
-            error: errorMessage,
           });
-          throw error;
+          
+          // 에러 메시지 가공 후 다시 throw
+          if (error instanceof Error) {
+            if(__DEV__) console.error('로그인 실패:', error);
+            throw error;
+          } else {
+            throw new Error('로그인에 실패했습니다.');
+          }
         } finally {
           set({ isLoading: false });
         }
       },
 
       logout: async () => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true });
 
         try {
+          // 서버에 로그아웃 요청
+          await authApi.logout();
+        } catch (error) {
+          // 서버 API 실패 시에도 로컬 상태는 정리합니다
+          if(__DEV__) console.error('로그아웃 API 호출 실패, 로컬 상태만 정리합니다.');
+          // 서버 API 실패는 치명적이지 않으므로 에러를 throw하지 않습니다
+        } finally {
           await clearTokens();
           set({
             user: null,
             isAuthenticated: false,
-            error: null,
+            isLoading: false,
           });
-        } catch (error) {
-          set({
-            user: null,
-            isAuthenticated: false,
-            error: null,
-          });
-        } finally {
-          set({ isLoading: false });
         }
       },
 
-      signUp: async (userData: SignUpRequest) => {
-        set({ isLoading: true, error: null });
+      changePassword: async (data: PasswordChangeRequest) => {
+        set({ isLoading: true });
 
         try {
-          const response = await authApi.signUp(userData);
-
-          if (!response.isSuccess) {
-            throw new Error(response.message || '회원가입에 실패했습니다.');
-          }
-
-          await get().login({
-            email: userData.email,
-            password: userData.password,
-          });
+          await authApi.changePassword(data);
+          
+          // 비밀번호 변경 성공 시 상태 업데이트 (Zustand persist가 자동으로 저장)
+          set({ isPasswordChanged: true });
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : '회원가입에 실패했습니다.';
-          set({ error: errorMessage });
+          if(__DEV__) console.error('비밀번호 변경 실패:', error);
           throw error;
         } finally {
           set({ isLoading: false });
         }
       },
 
-      initialize: async () => {
+      getProfile: async () => {
         try {
-          const { accessToken } = await getTokens();
-          const persistedUser = get().user;
+          const profile = await authApi.getProfile();
+          set({ profile: profile });
 
-          if (accessToken && persistedUser) {
-            set({
-              isAuthenticated: true,
-              error: null,
-            });
-          } else {
-            await get().resetAuth();
-          }
         } catch (error) {
-          console.error('Auth 초기화 오류:', error);
-          await get().resetAuth();
+          if(__DEV__) console.error('프로필 조회 실패:', error);
+          throw error;
         }
       },
 
-      clearError: () => {
-        set({ error: null });
+      initialize: async () => {
+        try {
+          const { accessToken, refreshToken } = await getTokens();
+          const persistedUser = get().user;
+
+          // 토큰과 사용자 정보가 모두 있는 경우에만 인증 상태 유지
+          if (accessToken && refreshToken && persistedUser) {
+            // 토큰 유효성 간단 검증 (형식 체크)
+            const isValidToken = accessToken.split('.').length === 3; // JWT 형식 확인
+            
+            if (isValidToken) {
+              set({
+                isAuthenticated: true,
+              });
+            } else {
+              // 유효하지 않은 토큰 형식이면 리셋
+              console.warn('[AuthStore] 유효하지 않은 토큰 형식, 인증 상태 리셋');
+              await get().clearAuth();
+            }
+          } else {
+            // 토큰이나 사용자 정보가 불완전하면 리셋
+            await get().clearAuth();
+          }
+        } catch (error) {
+          // Auth 초기화 실패 시 자동으로 리셋
+          console.warn('[AuthStore] 초기화 실패, 인증 상태 리셋:', error);
+          await get().clearAuth();
+        }
       },
 
-      resetAuth: async () => {
+      clearAuth: async () => {
         await clearTokens();
         set({
           user: null,
           isAuthenticated: false,
-          error: null,
+          isPasswordChanged: false,
         });
       },
     }),
     {
       name: 'authStorage',
       storage: createJSONStorage(() => persistStorage),
-      partialize: ({ user }) => ({ user }),
+      partialize: ({ user, isPasswordChanged }) => ({ user, isPasswordChanged }),
       onRehydrateStorage: () => (state) => {
         if (__DEV__) console.log('[AuthStore] persist 복원 완료');
       },
