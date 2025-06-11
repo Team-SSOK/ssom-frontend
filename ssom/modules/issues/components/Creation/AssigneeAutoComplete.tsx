@@ -48,7 +48,9 @@ export default function AssigneeAutoComplete({
         const userList = await authApi.getUserList();
         setUsers(userList);
       } catch (error) {
-        console.error('Failed to fetch users:', error);
+        if (__DEV__) console.error('[AssigneeAutoComplete] Failed to fetch users:', error);
+        // 사용자 목록 로드 실패 시 빈 배열로 설정하여 UI 동작 유지
+        setUsers([]);
       } finally {
         setIsLoading(false);
       }

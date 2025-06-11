@@ -54,7 +54,7 @@ export function useMultiSelectLogs() {
         params: params as any,
       });
     } catch (error) {
-      console.error('이슈 생성 파라미터 구성 실패:', error);
+      if (__DEV__) console.error('[useMultiSelectLogs] 이슈 생성 파라미터 구성 실패:', error);
     }
   }, [selectedLogIds]);
 
@@ -68,7 +68,7 @@ export function useMultiSelectLogs() {
         params: params as any,
       });
     } catch (error) {
-      console.error('단일 로그 이슈 생성 실패:', error);
+      if (__DEV__) console.error('[useMultiSelectLogs] 단일 로그 이슈 생성 실패:', error);
     }
   }, []);
 

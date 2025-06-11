@@ -78,7 +78,7 @@ export const useFCMStore = create<FCMState>()(
                     console.log('✅ FCM 초기화 완료');
                     resolve();
                   } catch (error) {
-                    console.error('📱 FCM 초기화 실패:', error);
+                    if (__DEV__) console.error('[FCMStore] FCM 초기화 실패:', error);
                     set({ 
                       registrationStatus: 'failed',
                       lastError: error instanceof Error ? error.message : '알 수 없는 오류'
@@ -117,7 +117,7 @@ export const useFCMStore = create<FCMState>()(
             lastError: errorMessage
           });
           
-          console.error('❌ FCM 초기화 실패:', error);
+          if (__DEV__) console.error('[FCMStore] FCM 초기화 실패:', error);
           throw error;
         }
       },

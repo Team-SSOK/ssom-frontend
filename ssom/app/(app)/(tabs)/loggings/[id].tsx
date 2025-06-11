@@ -56,7 +56,9 @@ export default function LogDetailScreen() {
       await createAnalysis(currentLog);
       toast.success('분석 완료', 'AI 분석이 완료되었습니다.');
     } catch (error) {
-      toast.error('분석 실패', 'AI 분석 요청에 실패했습니다.');
+      const { getFeatureSpecificErrorMessage } = require('@/utils/errorHandlers');
+      const errorMessage = getFeatureSpecificErrorMessage('analysis', error);
+      toast.error('분석 실패', errorMessage);
     }
   };
 

@@ -6,6 +6,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
 import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useFCMStore } from '@/modules/notifications';
+import { getFeatureSpecificErrorMessage } from '@/utils/errorHandlers';
 import PwChangeHeader from '@/modules/auth/components/PwChange/PwChangeHeader';
 import PwChangeForm, { PwChangeFormRef, PasswordChangeRequest } from '@/modules/auth/components/PwChange/PwChangeForm';
 import PwChangeButton from '@/modules/auth/components/PwChange/PwChangeButton';
@@ -71,8 +72,8 @@ export default function PasswordChange() {
         }
       });
     } catch (error) {
-      console.warn('비밀번호 변경 실패:', error);
-      toast.error('비밀번호 변경 오류', '비밀번호 변경에 실패했습니다');
+      const errorMessage = getFeatureSpecificErrorMessage('password', error);
+      toast.error('비밀번호 변경 실패', errorMessage);
     }
   };
 

@@ -94,9 +94,10 @@ export const useAuthStore = create<AuthState>()(
           
           // 에러 메시지 가공 후 다시 throw
           if (error instanceof Error) {
-            if(__DEV__) console.error('로그인 실패:', error);
+            if(__DEV__) console.error('[AuthStore] 로그인 실패:', error);
             throw error;
           } else {
+            if(__DEV__) console.error('[AuthStore] 로그인 실패 - 알 수 없는 에러:', error);
             throw new Error('로그인에 실패했습니다.');
           }
         } finally {
@@ -112,7 +113,7 @@ export const useAuthStore = create<AuthState>()(
           await authApi.logout();
         } catch (error) {
           // 서버 API 실패 시에도 로컬 상태는 정리합니다
-          if(__DEV__) console.error('로그아웃 API 호출 실패, 로컬 상태만 정리합니다.');
+          if(__DEV__) console.error('[AuthStore] 로그아웃 API 호출 실패, 로컬 상태만 정리합니다:', error);
           // 서버 API 실패는 치명적이지 않으므로 에러를 throw하지 않습니다
         } finally {
           await clearTokens();
@@ -133,7 +134,7 @@ export const useAuthStore = create<AuthState>()(
           // 비밀번호 변경 성공 시 상태 업데이트 (Zustand persist가 자동으로 저장)
           set({ isPasswordChanged: true });
         } catch (error) {
-          if(__DEV__) console.error('비밀번호 변경 실패:', error);
+          if(__DEV__) console.error('[AuthStore] 비밀번호 변경 실패:', error);
           throw error;
         } finally {
           set({ isLoading: false });
@@ -146,7 +147,7 @@ export const useAuthStore = create<AuthState>()(
           set({ profile: profile });
 
         } catch (error) {
-          if(__DEV__) console.error('프로필 조회 실패:', error);
+          if(__DEV__) console.error('[AuthStore] 프로필 조회 실패:', error);
           throw error;
         }
       },

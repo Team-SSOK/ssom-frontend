@@ -13,6 +13,7 @@ import { useAuthStore } from '@/modules/auth/stores/authStore';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
 import { useFCMStore } from '@/modules/notifications';
+import { getFeatureSpecificErrorMessage } from '@/utils/errorHandlers';
 import AppLogo from '@/modules/auth/components/SignIn/AppLogo';
 import LoginForm from '@/modules/auth/components/SignIn/LoginForm';
 import LoginNotice from '@/modules/auth/components/SignIn/LoginNotice';
@@ -41,8 +42,8 @@ export default function SignIn() {
       
       router.replace('/(app)/(tabs)');
     } catch (error) {
-      console.warn('로그인 실패:', error);
-      toast.error('로그인 오류', "로그인에 실패했습니다");
+      const errorMessage = getFeatureSpecificErrorMessage('login', error);
+      toast.error('로그인 실패', errorMessage);
     }
   };
 

@@ -62,7 +62,7 @@ export class NotificationService {
       console.log('🔔 Notification Service 초기화 완료');
     } catch (error) {
       this.status.lastError = error as Error;
-      console.error('Notification Service 초기화 실패:', error);
+      if (__DEV__) console.error('[NotificationService] 초기화 실패:', error);
       throw error;
     }
   }
@@ -177,7 +177,7 @@ export class NotificationService {
         const statusCode = (error as any)?.response?.status;
         console.warn(`⚠️ FCM 등록 클라이언트 오류 (${statusCode}). 서버 측 확인 필요`);
       } else {
-        console.error('토큰 등록 실패:', error);
+        if (__DEV__) console.error('[NotificationService] 토큰 등록 실패:', error);
       }
       
       throw error;
@@ -227,7 +227,7 @@ export class NotificationService {
       console.log('📅 로컬 알림 스케줄링 완료:', identifier);
       return identifier;
     } catch (error) {
-      console.error('로컬 알림 스케줄링 실패:', error);
+      if (__DEV__) console.error('[NotificationService] 로컬 알림 스케줄링 실패:', error);
       throw error;
     }
   }

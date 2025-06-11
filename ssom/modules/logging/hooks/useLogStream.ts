@@ -127,7 +127,7 @@ export function useLogStream(): UseLogStreamResult {
         console.log('SSE 연결 시도 완료');
       })
       .catch((error) => {
-        if (__DEV__) console.error('SSE 연결 실패:', error);
+        if (__DEV__) console.error('[LogStream] SSE 연결 실패:', error);
         
         Toast.show({
           type: 'error',

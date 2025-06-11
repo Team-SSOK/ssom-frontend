@@ -69,7 +69,7 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '이슈 초안 생성 중 오류가 발생했습니다.';
-      if (__DEV__) console.error('Issue draft creation error:', error);
+      if (__DEV__) console.error('[IssueStore] Issue draft creation error:', error);
       
       set({ 
         isDraftCreating: false,
@@ -91,7 +91,7 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'GitHub 이슈 생성 중 오류가 발생했습니다.';
-      if (__DEV__) console.error('GitHub issue creation error:', error);
+      if (__DEV__) console.error('[IssueStore] GitHub issue creation error:', error);
       
       set({ 
         isIssueCreating: false,
@@ -113,7 +113,7 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '이슈 목록을 불러오는 중 오류가 발생했습니다.';
-      if (__DEV__) console.error('Get all issues error:', error);
+      if (__DEV__) console.error('[IssueStore] Get all issues error:', error);
       
       set({ 
         isLoadingIssues: false,
@@ -135,7 +135,7 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '나의 이슈 목록을 불러오는 중 오류가 발생했습니다.';
-      if (__DEV__) console.error('Get my issues error:', error);
+      if (__DEV__) console.error('[IssueStore] Get my issues error:', error);
       
       set({ 
         isLoadingMyIssues: false,
@@ -157,7 +157,7 @@ export const useIssueStore = create<IssueState>((set, get) => ({
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '이슈 상세 정보를 불러오는 중 오류가 발생했습니다.';
-      if (__DEV__) console.error('Get issue by ID error:', error);
+      if (__DEV__) console.error('[IssueStore] Get issue by ID error:', error);
       
       set({ 
         isLoadingCurrentIssue: false,

@@ -97,8 +97,8 @@ export const useAlertStore = create<AlertState>((set, get) => ({
       // 로컬 상태 업데이트
       get().updateAlert(alertStatusId, { isRead: true });
     } catch (error: any) {
-      console.log('알림 읽음 처리 실패:', error);
-      set({ error: '알림 읽음 처리에 실패했습니다.' });
+      if (__DEV__) console.error('[AlertStore] 알림 읽음 처리 실패:', error);
+      // UI에서 처리할 수 있도록 에러를 다시 throw
       throw error;
     }
   },
@@ -110,8 +110,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
       // 서버에서 받은 업데이트된 알림 목록으로 전체 상태 업데이트
       get().setAlerts(updatedAlerts);
     } catch (error: any) {
-      console.log('전체 알림 읽음 처리 실패:', error);
-      set({ error: '전체 알림 읽음 처리에 실패했습니다.' });
+      if (__DEV__) console.error('[AlertStore] 전체 알림 읽음 처리 실패:', error);
       throw error;
     }
   },
@@ -123,8 +122,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
       // 로컬 상태에서 제거
       get().removeAlert(alertStatusId);
     } catch (error: any) {
-      console.log('알림 삭제 실패:', error);
-      set({ error: '알림 삭제에 실패했습니다.' });
+      if (__DEV__) console.error('[AlertStore] 알림 삭제 실패:', error);
       throw error;
     }
   },
@@ -140,10 +138,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
         hasNextPage: !response.last
       });
     } catch (error: any) {
-      const errorMessage = error.message || '알림 목록을 불러오는데 실패했습니다.';
-      if (__DEV__) console.error('알림 목록 로드 실패:', error);
-      
-      set({ error: errorMessage });
+      if (__DEV__) console.error('[AlertStore] 알림 목록 로드 실패:', error);
       throw error;
     } finally {
       set({ isLoading: false });
@@ -173,10 +168,8 @@ export const useAlertStore = create<AlertState>((set, get) => ({
         hasNextPage: !response.last
       });
     } catch (error: any) {
-      const errorMessage = error.message || '추가 알림을 불러오는데 실패했습니다.';
-      if (__DEV__) console.error('추가 알림 로드 실패:', error);
-      
-      set({ error: errorMessage });
+      if (__DEV__) console.error('[AlertStore] 추가 알림 로드 실패:', error);
+      throw error;
     } finally {
       set({ isLoadingMore: false });
     }
@@ -187,7 +180,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
       set({ page: 0, hasNextPage: true });
       await get().loadAlerts();
     } catch (error: any) {
-      if (__DEV__) console.error('알림 새로고침 실패:', error);
+      if (__DEV__) console.error('[AlertStore] 알림 새로고침 실패:', error);
       throw error;
     }
   },

@@ -73,10 +73,9 @@ export default function AlertsScreen() {
     if (alert && !alert.isRead) {
       try {
         await markAsRead(alert.alertStatusId);
-      } catch (error) {
-        if (__DEV__) console.error('읽음 처리 실패:', error);
-        toast.error('읽음 처리 실패', '알림을 읽음으로 처리하는데 실패했습니다.');
-      }
+          } catch (error) {
+      toast.error('읽음 처리 실패', '알림을 읽음으로 처리하는데 실패했습니다.');
+    }
     }
   };
 
@@ -86,7 +85,6 @@ export default function AlertsScreen() {
       await markAllAsRead();
       toast.success('전체 읽음 완료', '모든 알림이 읽음 처리되었습니다.');
     } catch (error) {
-      if (__DEV__) console.error('전체 읽음 처리 실패:', error);
       toast.error('전체 읽음 실패', '모든 알림을 읽음으로 처리하는데 실패했습니다.');
     }
   };
@@ -96,7 +94,6 @@ export default function AlertsScreen() {
     try {
       await loadMoreAlerts();
     } catch (error) {
-      if (__DEV__) console.error('추가 알림 로드 실패:', error);
       toast.error('로드 실패', '추가 알림을 불러오는데 실패했습니다.');
     }
   };
@@ -106,7 +103,6 @@ export default function AlertsScreen() {
     try {
       await refreshAlerts();
     } catch (error) {
-      if (__DEV__) console.error('알림 새로고침 실패:', error);
       toast.error('새로고침 실패', '알림을 새로고침하는데 실패했습니다.');
     }
   };

@@ -91,7 +91,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     } catch (err) {
       const error = err as Error;
       setError(error);
-      console.error('알림 초기화 실패:', error);
+      if (__DEV__) console.error('[useNotifications] 알림 초기화 실패:', error);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +110,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     } catch (err) {
       const error = err as Error;
       setError(error);
-      console.error('알림 새로고침 실패:', error);
+      if (__DEV__) console.error('[useNotifications] 알림 새로고침 실패:', error);
     } finally {
       setIsLoading(false);
     }
@@ -166,7 +166,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       
       return granted;
     } catch (err) {
-      console.error('권한 요청 실패:', err);
+      if (__DEV__) console.error('[useNotifications] 권한 요청 실패:', err);
       return false;
     }
   }, [updateStatus]);
@@ -186,7 +186,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         // Expo Router로 네비게이션
         router.push(url as any);
       } catch (error) {
-        console.error('딥링크 처리 실패:', error);
+        if (__DEV__) console.error('[useNotifications] 딥링크 처리 실패:', error);
       }
     }
   }, [enableDeepLinking, onDeepLink]);
@@ -234,7 +234,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         handleDeepLink(response.notification);
       }
     } catch (error) {
-      console.error('초기 알림 응답 처리 실패:', error);
+      if (__DEV__) console.error('[useNotifications] 초기 알림 응답 처리 실패:', error);
     }
   }, [handleDeepLink]);
 
