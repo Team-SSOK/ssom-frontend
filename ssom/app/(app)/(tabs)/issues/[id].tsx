@@ -11,6 +11,7 @@ import IssueDetailDescription from '@/modules/issues/components/Detail/IssueDeta
 import IssueDetailMetadata from '@/modules/issues/components/Detail/IssueDetailMetadata';
 import IssueDetailTags from '@/modules/issues/components/Detail/IssueDetailTags';
 import IssueDetailLoadingState from '@/modules/issues/components/Detail/IssueDetailLoadingState';
+import { LoadingIndicator } from '@/components';
 
 export default function IssueDetailScreen() {
   const { colors } = useTheme();
@@ -41,13 +42,7 @@ export default function IssueDetailScreen() {
   }, [clearCurrentIssue]);
 
   if (isLoadingCurrentIssue) {
-    return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background }]}
-      >
-        <IssueDetailLoadingState />
-      </SafeAreaView>
-    );
+    return <LoadingIndicator />
   }
 
   if (!currentIssue) {

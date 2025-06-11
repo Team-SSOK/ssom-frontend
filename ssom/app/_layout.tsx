@@ -94,7 +94,7 @@ function RootNavigator() {
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
       </Stack.Protected>
 
-      <Stack.Protected guard={isAuthenticated && !!user && isPasswordChanged === false}>
+      <Stack.Protected guard={isAuthenticated && !!user}>
         <Stack.Screen 
           name="pw-change" 
           options={{ 
