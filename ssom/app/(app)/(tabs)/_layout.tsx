@@ -1,105 +1,218 @@
-import React, { useState } from 'react';
-import { Stack } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Drawer } from 'expo-router/drawer';
 import { useTheme } from '@/hooks/useTheme';
-import { FAB, Portal } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-import { StyleSheet } from 'react-native';
-import { Octicons, MaterialIcons } from '@expo/vector-icons';
-import { FabProvider, useFab } from '@/contexts/FabContext';
+import { FabProvider } from '@/contexts/FabContext';
+import { Ionicons, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
+import { StyleSheet, View, Text } from 'react-native';
+import {
+  DrawerContentScrollView,
+  DrawerItemList,
+} from '@react-navigation/drawer';
+import DrawerProfile from '../../../modules/auth/components/Profile/DrawerProfile';
+import { useAuthStore } from '@/modules/auth/stores/authStore';
 
-function TabLayoutInner() {
-  const { isDark, colors } = useTheme();
-  const { fabVisible } = useFab();
-  const router = useRouter();
-  const [fabOpen, setFabOpen] = useState(false);
-
-  const fabActions = [
-    {
-      icon: ({ size, color }: { size: number; color: string }) => (
-        <MaterialIcons name="space-dashboard" size={24} color="black" />
-      ),
-      onPress: () => router.push('/(app)/(tabs)'),
-      style: styles.fabActions,
-    },
-    {
-      icon: 'monitor-dashboard',
-      onPress: () => router.push('/(app)/(tabs)/grafana'),
-      style: styles.fabActions,
-    },
-    {
-      icon: ({ size, color }: { size: number; color: string }) => (
-        <Octicons name="issue-opened" size={size} color={color} />
-      ),
-      onPress: () => router.push('/(app)/(tabs)/issues/'),
-      style: styles.fabActions,
-    },
-    {
-      icon: ({ size, color }: { size: number; color: string }) => (
-        <Octicons name="log" size={size} color={color} />
-      ),
-      onPress: () => router.push('/(app)/(tabs)/loggings'),
-      style: styles.fabActions,
-    },
-    {
-      icon: 'account',
-      onPress: () => router.push('/(app)/(tabs)/profile'),
-      style: styles.fabActions,
-    },
-  ];
+function CustomDrawerContent(props: any) {
+  const { colors } = useTheme();
 
   return (
-    <>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
+    <View style={[styles.drawerContainer, { backgroundColor: colors.card }]}>
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="issues" options={{ headerShown: false }} />
-        <Stack.Screen name="loggings" options={{ headerShown: false }} />
-        <Stack.Screen name="alerts" options={{ headerShown: false }} />
-        <Stack.Screen name="profile" options={{ headerShown: false }} />
-      </Stack>
-      
-      <Portal>
-        <FAB.Group
-          open={fabOpen}
-          visible={fabVisible}
-          icon={fabOpen ? 'close' : 'menu'}
-          actions={fabActions}
-          onStateChange={() => { setFabOpen(!fabOpen) }}
-          style={styles.fab}
-          fabStyle={[styles.fabButton, { backgroundColor: colors.primary }]}
-          color='white'
-          backdropColor='transparent'
-        />
-      </Portal>
-    </>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>SSOM</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+            System Monitor
+          </Text>
+        </View>
+
+        {/* Profile Section */}
+        <View style={styles.profileWrapper}>
+          <DrawerProfile />
+        </View>
+
+        {/* Menu Section */}
+        <View style={styles.menuSection}>
+          <Text style={[styles.menuTitle, { color: colors.textSecondary }]}>
+            NAVIGATION
+          </Text>
+          <View style={styles.menuItems}>
+            <DrawerItemList {...props} />
+          </View>
+        </View>
+      </DrawerContentScrollView>
+    </View>
+  );
+}
+
+function CustomDrawerLayout() {
+  const { colors } = useTheme();
+  const { getProfile } = useAuthStore();
+
+  useEffect(() => {
+    getProfile();
+  }, [getProfile]);
+
+  return (
+    <Drawer
+      drawerContent={props => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerPosition: 'right',
+        drawerStyle: {
+          backgroundColor: 'transparent',
+          width: 320,
+          shadowColor: '#000',
+          shadowOffset: { width: -2, height: 0 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 5,
+        },
+        drawerLabelStyle: {
+          fontSize: 16,
+          fontWeight: '500',
+          marginLeft: -8,
+        },
+        drawerActiveBackgroundColor: `${colors.primary}15`,
+        drawerActiveTintColor: colors.primary,
+        drawerInactiveTintColor: colors.textSecondary,
+        drawerItemStyle: {
+          marginHorizontal: 0,
+          marginVertical: 2,
+          borderRadius: 12,
+        },
+      }}
+    >
+      <Drawer.Screen
+        name="index"
+        options={{
+          drawerLabel: '대시보드',
+          drawerIcon: ({ size, color }) => (
+            <MaterialCommunityIcons
+              name="view-dashboard-outline"
+              size={22}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="issues"
+        options={{
+          drawerLabel: '이슈 관리',
+          drawerIcon: ({ size, color }) => (
+            <Octicons name="issue-opened" size={22} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="loggings"
+        options={{
+          drawerLabel: '로그 조회',
+          drawerIcon: ({ size, color }) => (
+            <Octicons name="log" size={22} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="alerts"
+        options={{
+          drawerLabel: '알림',
+          drawerIcon: ({ size, color }) => (
+            <Ionicons name="notifications-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="grafana"
+        options={{
+          drawerLabel: 'Grafana',
+          drawerIcon: ({ size, color }) => (
+            <MaterialCommunityIcons name="chart-line" size={22} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen name="profile" options={{ drawerItemStyle: { display: 'none' } }} />
+    </Drawer>
   );
 }
 
 export default function TabLayout() {
   return (
     <FabProvider>
-      <TabLayoutInner />
+      <CustomDrawerLayout />
     </FabProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  fab: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
+  drawerContainer: {
+    flex: 1,
   },
-  fabActions: {
-    padding: 3,
-    backgroundColor: 'white',
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
-  fabButton: {
-    elevation: 5,
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+  header: {
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+  },
+  logoContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-});
+  logoText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  profileWrapper: {
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'gray',
+  },
+  menuSection: {
+    paddingHorizontal: 16,
+  },
+  menuTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    marginBottom: 16,
+    marginLeft: 16,
+  },
+  menuItems: {
+    gap: 4,
+  },
+}); 
