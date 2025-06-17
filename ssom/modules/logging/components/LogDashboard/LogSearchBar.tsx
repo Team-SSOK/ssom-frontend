@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: Platform.select({
-      android: 4,
       ios: 12,
     }),
     borderRadius: 8,

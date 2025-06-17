@@ -10,10 +10,12 @@ import LogDetailBasicInfo from '@/modules/logging/components/LogDetail/LogDetail
 import LogDetailMetadata from '@/modules/logging/components/LogDetail/LogDetailMetadata';
 import LogAnalysisResultComponent from '@/modules/logging/components/LogDetail/LogAnalysisResult';
 import { useLogStore } from '@/modules/logging/stores/logStore';
+import { useFab } from '@/contexts/FabContext';
 
 export default function LogDetailScreen() {
   const { colors } = useTheme();
   const toast = useToast();
+  const { handleScroll } = useFab();
   
   const { 
     analysisResult, 
@@ -79,7 +81,12 @@ export default function LogDetailScreen() {
         }}
       />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         <LogDetailBasicInfo
           level={currentLog.level}
           timestamp={currentLog.timestamp}
