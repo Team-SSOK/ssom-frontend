@@ -12,199 +12,114 @@ import {
 import { useTheme } from '@/hooks/useTheme';
 import { authApi, User } from '@/modules/auth/apis/authApi';
 import { LoadingIndicator } from '@/components';
+import { Ionicons } from '@expo/vector-icons';
 
 interface AssigneeAutoCompleteProps {
-  value: string;
-  onChangeText: (text: string) => void;
+  label: string;
+  selectedAssignees: string[];
+  onAddAssignee: (assignee: string) => void;
+  onRemoveAssignee: (assignee: string) => void;
   placeholder?: string;
   error?: string;
   disabled?: boolean;
-  label?: string;
-  required?: boolean;
 }
 
 export default function AssigneeAutoComplete({
-  value,
-  onChangeText,
+  label,
+  selectedAssignees,
+  onAddAssignee,
+  onRemoveAssignee,
   placeholder,
   error,
   disabled = false,
-  label,
-  required = false,
 }: AssigneeAutoCompleteProps) {
   const { colors } = useTheme();
-  const [users, setUsers] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [inputFocused, setInputFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
-  // 사용자 목록 로드
   useEffect(() => {
     const fetchUsers = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const userList = await authApi.getUserList();
-        setUsers(userList);
-      } catch (error) {
-        if (__DEV__) console.error('[AssigneeAutoComplete] Failed to fetch users:', error);
-        // 사용자 목록 로드 실패 시 빈 배열로 설정하여 UI 동작 유지
-        setUsers([]);
+        setAllUsers(userList);
+      } catch (e) {
+        if (__DEV__) console.error('Failed to fetch users:', e);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
-  // 입력값에 따라 사용자 필터링
   useEffect(() => {
-    if (!value.trim()) {
+    if (searchQuery.trim() === '') {
       setFilteredUsers([]);
-      setShowDropdown(false);
       return;
     }
-
-    const searchTerm = value.toLowerCase();
-    const filtered = users.filter((user) => {
-      const username = user.username.toLowerCase();
-      const id = user.id.toLowerCase();
-      const department = user.department.toLowerCase();
-      
-      return (
-        username.includes(searchTerm) ||
-        id.includes(searchTerm) ||
-        department.includes(searchTerm) ||
-        // 한글 초성 검색 지원
-        getInitialConsonants(user.username).includes(searchTerm)
-      );
-    });
-
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const availableUsers = allUsers.filter(
+      (user) => !selectedAssignees.includes(user.username)
+    );
+    const filtered = availableUsers.filter(
+      (user) =>
+        user.username.toLowerCase().includes(lowerCaseQuery) ||
+        user.id.toLowerCase().includes(lowerCaseQuery)
+    );
     setFilteredUsers(filtered);
-    setShowDropdown(filtered.length > 0 && inputFocused);
-  }, [value, users, inputFocused]);
+  }, [searchQuery, allUsers, selectedAssignees]);
 
-  // 한글 초성 추출 함수
-  const getInitialConsonants = (text: string): string => {
-    const consonants = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
-    return text
-      .split('')
-      .map((char) => {
-        const code = char.charCodeAt(0) - 44032;
-        if (code >= 0 && code <= 11171) {
-          return consonants[Math.floor(code / 588)];
-        }
-        return char;
-      })
-      .join('');
-  };
-
-  const handleUserSelect = (user: User) => {
-    onChangeText(user.username);
-    setShowDropdown(false);
+  const handleSelectUser = (user: User) => {
+    onAddAssignee(user.username);
+    setSearchQuery('');
+    setFilteredUsers([]);
     inputRef.current?.blur();
   };
 
-  const handleFocus = () => {
-    setInputFocused(true);
-    if (value.trim() && filteredUsers.length > 0) {
-      setShowDropdown(true);
-    }
-  };
-
-  const handleBlur = () => {
-    setInputFocused(false);
-    // 약간의 지연을 두어 사용자가 드롭다운 아이템을 클릭할 수 있게 함
-    setTimeout(() => setShowDropdown(false), 200);
-  };
-
-  const renderUserItem = (item: User, index: number) => (
-    <TouchableOpacity
-      key={item.id}
-      style={[
-        styles.userItem, 
-        { borderBottomColor: colors.border },
-        index === filteredUsers.length - 1 && { borderBottomWidth: 0 }
-      ]}
-      onPress={() => handleUserSelect(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.userInfo}>
-        <Text style={[styles.username, { color: colors.text }]}>
-          {item.username}
-        </Text>
-        <Text style={[styles.userDetails, { color: colors.textSecondary }]}>
-          {item.id} • {item.department}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={styles.container}>
-      {label && (
-        <View style={styles.labelContainer}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            {label}
-            {required && <Text style={[styles.required, { color: colors.critical }]}> *</Text>}
-          </Text>
+      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+      <View style={[styles.inputContainer, { borderColor: error ? colors.critical : colors.border }]}>
+        <View style={styles.chipsContainer}>
+          {selectedAssignees.map((assignee) => (
+            <View key={assignee} style={[styles.chip, { backgroundColor: colors.primary }]}>
+              <Text style={styles.chipText}>{assignee}</Text>
+              <Pressable onPress={() => onRemoveAssignee(assignee)} style={styles.chipRemove}>
+                <Ionicons name="close" size={14} color="white" />
+              </Pressable>
+            </View>
+          ))}
         </View>
-      )}
-      
-      <View style={styles.inputContainer}>
         <TextInput
           ref={inputRef}
-          style={[
-            styles.input,
-            {
-              backgroundColor: colors.card,
-              borderColor: error ? colors.critical : colors.border,
-              color: colors.text,
-            },
-            disabled && { opacity: 0.5 },
-          ]}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor={colors.textMuted}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+          style={[styles.input, { color: colors.text }]}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder={selectedAssignees.length === 0 ? placeholder : '추가 담당자 검색...'}
+          placeholderTextColor={colors.textSecondary}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           editable={!disabled}
         />
-        
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <LoadingIndicator size="small" fullScreen={false} />
-          </View>
-        )}
       </View>
 
-      {error && (
-        <Text style={[styles.errorText, { color: colors.critical }]}>
-          {error}
-        </Text>
-      )}
-
-      {showDropdown && (
-        <View
-          style={[
-            styles.dropdown,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-              shadowColor: colors.text,
-            },
-          ]}
-        >
-          <ScrollView
-            style={styles.userList}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            nestedScrollEnabled={true}
-          >
-            {filteredUsers.map((item, index) => renderUserItem(item, index))}
+      {error && <Text style={[styles.errorText, { color: colors.critical }]}>{error}</Text>}
+      
+      {isFocused && filteredUsers.length > 0 && (
+        <View style={[styles.dropdown, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {filteredUsers.map((user) => (
+              <Pressable key={user.id} style={styles.userItem} onPress={() => handleSelectUser(user)}>
+                <Text style={{ color: colors.text }}>{user.username}</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
+                  {user.id} • {user.department}
+                </Text>
+              </Pressable>
+            ))}
           </ScrollView>
         </View>
       )}
@@ -213,77 +128,15 @@ export default function AssigneeAutoComplete({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-    zIndex: 1000,
-  },
-  labelContainer: {
-    marginBottom: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  required: {
-    fontSize: 16,
-  },
-  inputContainer: {
-    position: 'relative',
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    minHeight: 48,
-  },
-  loadingContainer: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-  },
-  dropdown: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginTop: 4,
-    maxHeight: 200,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    zIndex: 1000,
-  },
-  userList: {
-    maxHeight: 200,
-  },
-  userItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  username: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  userDetails: {
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  errorText: {
-    fontSize: 12,
-    marginTop: 4,
-    lineHeight: 16,
-  },
+  container: { marginBottom: 20 },
+  label: { fontSize: 16, marginBottom: 8 },
+  inputContainer: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 12 },
+  chipsContainer: { flexDirection: 'row', flexWrap: 'wrap', paddingTop: 8, gap: 8 },
+  chip: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16 },
+  chipText: { color: 'white', fontWeight: '500' },
+  chipRemove: { marginLeft: 6, padding: 2 },
+  input: { height: 48, fontSize: 16 },
+  errorText: { color: 'red', marginTop: 4 },
+  dropdown: { maxHeight: 150, borderWidth: 1, borderRadius: 8, marginTop: 4 },
+  userItem: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
 }); 

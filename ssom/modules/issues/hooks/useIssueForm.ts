@@ -7,7 +7,9 @@ import { LogParams, parseLogParams } from '../utils/parseLogParams';
 
 // Form Action Types
 type FormAction =
-  | { type: 'SET_FIELD'; field: keyof IssueFormData; value: string }
+  | { type: 'SET_FIELD'; field: keyof Omit<IssueFormData, 'assignees'>; value: string }
+  | { type: 'ADD_ASSIGNEE'; assignee: string }
+  | { type: 'REMOVE_ASSIGNEE'; assignee: string }
   | { type: 'SET_FORM'; form: IssueFormData }
   | { type: 'RESET_FORM' }
   | { type: 'SET_ERRORS'; errors: ValidationErrors }
@@ -22,7 +24,7 @@ interface FormState {
 const initialForm: IssueFormData = {
   title: '',
   description: '',
-  assignee: '',
+  assignees: [],
   tags: '',
   location: '',
   cause: '',
@@ -44,6 +46,20 @@ function formReducer(state: FormState, action: FormAction): FormState {
         ...state,
         form: { ...state.form, [action.field]: action.value },
         errors: { ...state.errors, [action.field]: undefined },
+      };
+    case 'ADD_ASSIGNEE':
+      if (state.form.assignees.includes(action.assignee)) return state;
+      return {
+        ...state,
+        form: { ...state.form, assignees: [...state.form.assignees, action.assignee] },
+      };
+    case 'REMOVE_ASSIGNEE':
+      return {
+        ...state,
+        form: {
+          ...state.form,
+          assignees: state.form.assignees.filter(a => a !== action.assignee),
+        },
       };
     case 'SET_FORM':
       return {
@@ -107,7 +123,7 @@ export function useIssueForm(params: LogParams) {
         form: {
           title: analysisData.title,
           description: analysisData.description,
-          assignee: '',
+          assignees: [],
           tags: logData.tagsFromLogs,
           location: `${analysisData.location.file} - ${analysisData.location.function}`,
           cause: analysisData.cause,
@@ -144,8 +160,16 @@ export function useIssueForm(params: LogParams) {
   }, [clearDraft, clearIssue]);
 
   // Field 업데이트 함수
-  const updateField = useCallback((field: keyof IssueFormData) => (value: string) => {
+  const updateField = useCallback((field: keyof Omit<IssueFormData, 'assignees'>) => (value: string) => {
     dispatch({ type: 'SET_FIELD', field, value });
+  }, []);
+
+  const addAssignee = useCallback((assignee: string) => {
+    dispatch({ type: 'ADD_ASSIGNEE', assignee });
+  }, []);
+
+  const removeAssignee = useCallback((assignee: string) => {
+    dispatch({ type: 'REMOVE_ASSIGNEE', assignee });
   }, []);
 
   // 폼 리셋
@@ -172,9 +196,7 @@ export function useIssueForm(params: LogParams) {
     }
 
     // 담당자 목록 준비
-    const assigneeUsernames = state.form.assignee.trim() 
-      ? state.form.assignee.split(',').map(name => name.trim()).filter(name => name)
-      : [];
+    const assigneeUsernames = state.form.assignees.map(name => name.trim()).filter(name => name);
 
     // 재현 단계 배열로 변환
     const reproductionSteps = state.form.reproductionSteps.trim()
@@ -225,6 +247,8 @@ export function useIssueForm(params: LogParams) {
     
     // Actions
     updateField,
+    addAssignee,
+    removeAssignee,
     resetForm,
     handleSubmit,
   };

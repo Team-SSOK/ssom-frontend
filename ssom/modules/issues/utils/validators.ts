@@ -1,7 +1,7 @@
 export interface IssueFormData {
   title: string;
   description: string;
-  assignee: string;
+  assignees: string[];
   tags: string;
   location: string;
   cause: string;
@@ -26,6 +26,8 @@ export interface ValidationSchema {
   [key: string]: ValidationRule;
 }
 
+type FieldName = keyof Omit<IssueFormData, 'assignees'>;
+
 const issueFormSchema: ValidationSchema = {
   title: {
     required: true,
@@ -36,7 +38,7 @@ const issueFormSchema: ValidationSchema = {
     required: true,
     minLength: 1,
   },
-  assignee: {
+  assignees: {
     required: false,
   },
   tags: {
@@ -59,61 +61,62 @@ const issueFormSchema: ValidationSchema = {
   },
 };
 
-export function validateField(
-  fieldName: string, 
-  value: string, 
-  schema: ValidationSchema = issueFormSchema
-): string | undefined {
-  const rule = schema[fieldName];
-  if (!rule) return undefined;
+export function validateField(field: keyof Omit<IssueFormData, 'assignees'>, value: string): string | undefined {
+  const rules = issueFormSchema[field];
+  if (!rules) return undefined;
 
   const trimmedValue = value.trim();
 
   // Required 체크
-  if (rule.required && !trimmedValue) {
-    return `${getFieldDisplayName(fieldName)}을(를) 입력해주세요`;
+  if (rules.required && !trimmedValue) {
+    return `${getFieldDisplayName(field)}을(를) 입력해주세요`;
   }
 
   // 값이 없고 required가 아니면 검증 통과
-  if (!trimmedValue && !rule.required) {
+  if (!trimmedValue && !rules.required) {
     return undefined;
   }
 
   // 최소 길이 체크
-  if (rule.minLength && trimmedValue.length < rule.minLength) {
-    return `${getFieldDisplayName(fieldName)}은(는) 최소 ${rule.minLength}자 이상이어야 합니다`;
+  if (rules.minLength && trimmedValue.length < rules.minLength) {
+    return `${getFieldDisplayName(field)}은(는) 최소 ${rules.minLength}자 이상이어야 합니다`;
   }
 
   // 최대 길이 체크
-  if (rule.maxLength && trimmedValue.length > rule.maxLength) {
-    return `${getFieldDisplayName(fieldName)}은(는) ${rule.maxLength}자 이내로 입력해주세요`;
+  if (rules.maxLength && trimmedValue.length > rules.maxLength) {
+    return `${getFieldDisplayName(field)}은(는) ${rules.maxLength}자 이내로 입력해주세요`;
   }
 
   // 패턴 체크
-  if (rule.pattern && !rule.pattern.test(trimmedValue)) {
-    return `${getFieldDisplayName(fieldName)}의 형식이 올바르지 않습니다`;
+  if (rules.pattern && !rules.pattern.test(trimmedValue)) {
+    return `${getFieldDisplayName(field)}의 형식이 올바르지 않습니다`;
   }
 
   // 커스텀 검증
-  if (rule.custom) {
-    return rule.custom(trimmedValue);
+  if (rules.custom) {
+    return rules.custom(trimmedValue);
   }
 
   return undefined;
 }
 
-export function validateForm(
-  formData: IssueFormData, 
-  schema: ValidationSchema = issueFormSchema
-): ValidationErrors {
+export function validateForm(formData: IssueFormData): ValidationErrors {
   const errors: ValidationErrors = {};
+  const schema = issueFormSchema;
 
-  Object.keys(schema).forEach(fieldName => {
-    const error = validateField(fieldName, formData[fieldName as keyof IssueFormData], schema);
+  Object.keys(schema).forEach(key => {
+    const fieldName = key as keyof IssueFormData;
+    if (fieldName === 'assignees') return; // assignees는 별도 처리
+
+    const error = validateField(fieldName, formData[fieldName] as string);
     if (error) {
       errors[fieldName] = error;
     }
   });
+
+  if (formData.assignees.length > 5) {
+    errors.assignees = '담당자는 최대 5명까지 지정할 수 있습니다.';
+  }
 
   return errors;
 }
@@ -122,7 +125,7 @@ function getFieldDisplayName(fieldName: string): string {
   const displayNames: { [key: string]: string } = {
     title: '제목',
     description: '설명',
-    assignee: '담당자',
+    assignees: '담당자',
     tags: '태그',
     location: '발생 위치',
     cause: '원인',
