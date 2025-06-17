@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, RefreshControl, View, Pressable } from 'react-native';
-import { Text } from '@/components';
+import { StyleSheet, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';

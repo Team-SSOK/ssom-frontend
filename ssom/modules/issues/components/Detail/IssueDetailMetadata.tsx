@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
+import { Ionicons } from '@expo/vector-icons';
 
 interface IssueDetailMetadataProps {
   assigneeGithubIds: string[];
@@ -11,89 +12,101 @@ interface IssueDetailMetadataProps {
   updatedAt: string;
 }
 
-export default function IssueDetailMetadata({ 
-  assigneeGithubIds, 
-  createdByEmployeeId, 
-  githubIssueNumber, 
-  createdAt, 
-  updatedAt 
+const DetailRow = ({ icon, label, value, color }: { icon: any; label: string; value: string; color: string }) => (
+  <View style={styles.detailRow}>
+    <Ionicons name={icon} size={20} color={color} style={styles.icon} />
+    <Text style={[styles.detailLabel, { color: color }]}>{label}</Text>
+    <Text style={[styles.detailValue, { color: color }]} numberOfLines={1}>{value}</Text>
+  </View>
+);
+
+export default function IssueDetailMetadata({
+  assigneeGithubIds,
+  createdByEmployeeId,
+  githubIssueNumber,
+  createdAt,
+  updatedAt
 }: IssueDetailMetadataProps) {
   const { colors } = useTheme();
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ko-KR', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+  };
+
   return (
-    <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>
-        Details
-      </Text>
-      <View style={styles.detailsContainer}>
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-            담당자:
-          </Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>
-            {assigneeGithubIds.join(', ') || '미지정'}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-            생성자:
-          </Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>
-            {createdByEmployeeId}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-            GitHub 이슈 번호:
-          </Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>
-            {githubIssueNumber || '미연동'}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-            생성일:
-          </Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>
-            {new Date(createdAt).toLocaleString()}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>
-            수정일:
-          </Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>
-            {new Date(updatedAt).toLocaleString()}
-          </Text>
-        </View>
+    <View style={styles.container}>
+      <View style={[styles.card, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+        <DetailRow 
+          icon="person-outline"
+          label="담당자"
+          value={assigneeGithubIds.join(', ') || '미지정'}
+          color={colors.textSecondary}
+        />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        <DetailRow
+          icon="create-outline"
+          label="생성자"
+          value={createdByEmployeeId}
+          color={colors.textSecondary}
+        />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        <DetailRow
+          icon="logo-github"
+          label="GitHub 이슈"
+          value={githubIssueNumber ? `#${githubIssueNumber}` : '미연동'}
+          color={colors.textSecondary}
+        />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        <DetailRow
+          icon="calendar-outline"
+          label="생성일"
+          value={formatDate(createdAt)}
+          color={colors.textSecondary}
+        />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        <DetailRow
+          icon="time-outline"
+          label="마지막 업데이트"
+          value={formatDate(updatedAt)}
+          color={colors.textSecondary}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  section: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  container: {
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  detailsContainer: {
-    gap: 8,
+  card: {
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 16,
   },
   detailRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  icon: {
+    marginRight: 12,
   },
   detailLabel: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
+    width: '35%',
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: '500',
+    flex: 1,
+    textAlign: 'right',
+  },
+  divider: {
+    height: 1,
   },
 }); 

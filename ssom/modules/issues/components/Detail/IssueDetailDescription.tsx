@@ -11,30 +11,29 @@ export default function IssueDetailDescription({ description }: IssueDetailDescr
   const { colors } = useTheme();
 
   return (
-    <View style={styles.section}>
+    <View style={styles.container}>
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
         Description
       </Text>
       <Text style={[styles.description, { color: colors.textSecondary }]}>
-        {description}
+        {description || 'No description provided.'}
       </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  section: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   description: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 24,
   },
 }); 

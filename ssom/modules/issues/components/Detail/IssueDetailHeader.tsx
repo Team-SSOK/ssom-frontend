@@ -13,15 +13,11 @@ export default function IssueDetailHeader({ issueId }: IssueDetailHeaderProps) {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.header}>
-      <Pressable onPress={() => router.back()} style={styles.backButton}>
-        <Ionicons 
-          name="arrow-back" 
-          size={24} 
-          color={colors.text} 
-        />
+    <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <Pressable onPress={() => router.back()} style={styles.button}>
+        <Ionicons name="chevron-back" size={24} color={colors.text} />
       </Pressable>
-      <Text style={[styles.headerTitle, { color: colors.text }]}>
+      <Text style={[styles.title, { color: colors.text }]}>
         Issue #{issueId}
       </Text>
       <View style={styles.placeholder} />
@@ -33,17 +29,19 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    height: 60,
   },
-  backButton: {
-    padding: 8,
+  button: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  headerTitle: {
+  title: {
     fontSize: 18,
     fontWeight: '600',
-    flex: 1,
-    textAlign: 'center',
   },
   placeholder: {
     width: 40,

@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Text } from '@/components';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
-import StatusBadge from '@/modules/issues/components/Dashboard/Common/StatusBadge';
+import { getStatusStyle } from '@/modules/issues/utils/statusStyles';
 
 interface Issue {
   id: string;
@@ -19,34 +19,39 @@ interface IssueItemProps {
 
 function IssueItem({ item }: IssueItemProps) {
   const { colors } = useTheme();
+  const statusStyle = getStatusStyle(item.status, colors);
 
   const handlePress = () => {
     router.push(`/issues/${item.id}`);
   };
 
+  const formattedDate = new Date(item.createdAt).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
   return (
     <Pressable
-      style={[
-        styles.issueCard,
-        { 
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-        },
+      style={({ pressed }) => [
+        styles.container,
+        { backgroundColor: colors.card, borderColor: colors.border },
+        pressed && { backgroundColor: colors.surface }
       ]}
       onPress={handlePress}
     >
-      <View style={styles.issueHeader}>
-        <Text style={[styles.issueTitle, { color: colors.text }]}>
-          Issue #{item.id} : {item.title}
-        </Text>
-      </View>
-      <Text ellipsizeMode='tail' numberOfLines={2} style={[styles.issueDescription, { color: colors.textSecondary }]}>
-        {item.description}
-      </Text>
-      <View style={styles.issueFooter}>
-        <StatusBadge status={item.status} />
-        <Text style={[styles.createdAt, { color: colors.textMuted }]}>
-          {new Date(item.createdAt).toLocaleDateString()}
+      <View style={[styles.statusIndicator, { backgroundColor: statusStyle.color }]} />
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+            {item.title}
+          </Text>
+          <Text style={[styles.date, { color: colors.textSecondary }]}>
+            {formattedDate}
+          </Text>
+        </View>
+        <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>
+          {item.description}
         </Text>
       </View>
     </Pressable>
@@ -57,34 +62,38 @@ function IssueItem({ item }: IssueItemProps) {
 export default memo(IssueItem);
 
 const styles = StyleSheet.create({
-  issueCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  issueHeader: {
+  container: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  issueTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-    marginRight: 8,
-  },
-  issueDescription: {
-    fontSize: 14,
-    lineHeight: 20,
+    borderRadius: 14,
     marginBottom: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
-  issueFooter: {
+  statusIndicator: {
+    width: 6,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  createdAt: {
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+    flexShrink: 1,
+    marginRight: 12,
+  },
+  date: {
     fontSize: 12,
+    fontWeight: '400',
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 20,
   },
 }); 

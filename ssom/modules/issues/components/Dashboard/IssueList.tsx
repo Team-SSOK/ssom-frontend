@@ -52,6 +52,7 @@ export default memo(IssueList);
 
 const styles = StyleSheet.create({
   listContainer: {
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
   },
 }); 

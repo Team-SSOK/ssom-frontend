@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
+import { Octicons } from '@expo/vector-icons';
 
 interface Issue {
   status: string;
@@ -14,25 +15,25 @@ interface IssueStatusSummaryProps {
 export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) {
   const { colors } = useTheme();
 
-  const openCount = issues.filter(issue => issue.status === 'OPEN').length;
-  const closeCount = issues.filter(issue => issue.status === 'CLOSED').length;
+  const openCount = issues.filter(issue =>
+    ['OPEN'].includes(issue.status.toUpperCase())
+  ).length;
+  const closeCount = issues.filter(issue =>
+    ['CLOSED'].includes(issue.status.toUpperCase())
+  ).length;
 
   return (
-    <View style={styles.statsContainer}>
-      <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-        <Text variant="h4" weight="bold" style={[styles.statNumber, { color: colors.critical }]}>
-          {openCount}
-        </Text>
-        <Text variant="caption" weight="medium" style={[styles.statLabel, { color: colors.textSecondary }]}>
-          OPEN
+    <View style={[styles.container, { borderBottomColor: colors.border }]}>
+      <View style={[styles.statItem, { borderRightColor: colors.border, borderRightWidth: 0.5 }]}>
+        <Octicons name="issue-opened" size={14} color={colors.textSecondary} />
+        <Text style={[styles.statText, { color: colors.text }]}>
+          <Text weight="bold">{openCount}</Text> Open
         </Text>
       </View>
-      <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-        <Text variant="h4" weight="bold" style={[styles.statNumber, { color: colors.success || colors.primary }]}>
-          {closeCount}
-        </Text>
-        <Text variant="caption" weight="medium" style={[styles.statLabel, { color: colors.textSecondary }]}>
-          CLOSE
+      <View style={styles.statItem}>
+        <Octicons name="issue-closed" size={14} color={colors.textSecondary} />
+        <Text style={[styles.statText, { color: colors.text }]}>
+          <Text weight="bold">{closeCount}</Text> Closed
         </Text>
       </View>
     </View>
@@ -40,22 +41,19 @@ export default function IssueStatusSummary({ issues }: IssueStatusSummaryProps) 
 }
 
 const styles = StyleSheet.create({
-  statsContainer: {
+  container: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 12,
   },
-  statCard: {
+  statItem: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
   },
-  statNumber: {
-    marginBottom: 4,
-  },
-  statLabel: {
-    textTransform: 'uppercase',
+  statText: {
+    fontSize: 14,
   },
 }); 
