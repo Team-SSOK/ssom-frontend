@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
@@ -21,6 +21,7 @@ interface AlertItemProps {
 
 export default function AlertItem({ item, onPress }: AlertItemProps) {
   const { colors } = useTheme();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Extract level from title format: "[ERROR] ssok-bank"
   const extractLevel = (title: string) => {
@@ -31,7 +32,7 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
   // Extract app name from title
   const extractAppName = (title: string) => {
     const match = title.match(/\]\s*(.+)/);
-    return match ? match[1] : '';
+    return match ? match[1].trim() : title;
   };
 
   const level = extractLevel(item.title);
@@ -40,17 +41,17 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
   const getIconAndColor = (level: string) => {
     switch (level.toUpperCase()) {
       case 'ERROR':
-        return { icon: 'alert-circle', color: '#FF3B30', bgColor: '#FFE5E5' };
+        return { icon: 'alert-circle', color: colors.danger };
       case 'WARN':
-        return { icon: 'warning', color: '#FF9500', bgColor: '#FFF4E5' };
+        return { icon: 'warning', color: colors.warning };
       case 'INFO':
-        return { icon: 'information-circle', color: '#007AFF', bgColor: '#E5F4FF' };
+        return { icon: 'information-circle', color: colors.info };
       default:
-        return { icon: 'notifications', color: '#8E8E93', bgColor: '#F2F2F7' };
+        return { icon: 'notifications', color: colors.textSecondary };
     }
   };
 
-  const { icon, color, bgColor } = getIconAndColor(level);
+  const { icon, color } = getIconAndColor(level);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -59,109 +60,95 @@ export default function AlertItem({ item, onPress }: AlertItemProps) {
     
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-      return `${diffInMinutes}m`;
+      if (diffInMinutes < 1) return '방금 전';
+      return `${diffInMinutes}분 전`;
     } else if (diffInHours < 24) {
-      return `${diffInHours}h`;
+      return `${diffInHours}시간 전`;
     } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return date.toLocaleDateString('ko-KR', { 
+        year: 'numeric',
+        month: '2-digit', 
+        day: '2-digit' 
+      });
     }
   };
 
   const handlePress = () => {
+    setIsExpanded(!isExpanded);
     onPress?.();
   };
 
-  return (
-    <Pressable
-      style={[
-        styles.alertItem,
-        { backgroundColor: colors.background }
-      ]}
-      onPress={handlePress}
-    >
-      <View style={styles.alertContent}>
-        {/* Icon */}
-        <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>
-          <Ionicons name={icon as any} size={20} color={color} />
-        </View>
+  const itemBackgroundColor = item.isRead ? colors.background : colors.card;
 
-        {/* Content */}
+  return (
+    <View style={[styles.card, { backgroundColor: itemBackgroundColor, borderColor: colors.border }]}>
+      <Pressable
+        style={styles.pressable}
+        onPress={handlePress}
+        android_ripple={{ color: colors.border }}
+      >
         <View style={styles.contentContainer}>
-          <View style={styles.headerRow}>
-            <Text style={[styles.alertTitle, { color: colors.text }]} numberOfLines={1}>
-              {appName || level}
-            </Text>
-            <View style={styles.rightSection}>
-              <Text style={[styles.timeText, { color: colors.textSecondary }]}>
+          <Ionicons name={icon as any} size={22} color={color} style={styles.icon} />
+          <View style={styles.textContainer}>
+            <View style={styles.headerRow}>
+              <Text style={[styles.alertTitle, { color: colors.textSecondary }]} numberOfLines={1}>
+                {appName}
+              </Text>
+              <Text style={[styles.timeText, { color: colors.text }]}>
                 {formatTime(item.timestamp)}
               </Text>
-              {!item.isRead && (
-                <View style={[styles.unreadDot, { backgroundColor: '#007AFF' }]} />
-              )}
             </View>
+            <Text 
+              style={[styles.alertMessage, { color: colors.text }]} 
+              numberOfLines={isExpanded ? undefined : 2}
+            >
+              {item.message}
+            </Text>
           </View>
-          
-          <Text 
-            style={[styles.alertMessage, { color: colors.textSecondary }]} 
-            numberOfLines={2}
-          >
-            {item.message}
-          </Text>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  alertItem: {
+  card: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    overflow: 'hidden',
   },
-  alertContent: {
+  pressable: {
+    padding: 16,
+  },
+  contentContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+  icon: {
     marginRight: 12,
+    marginTop: 2,
   },
-  contentContainer: {
+  textContainer: {
     flex: 1,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   alertTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    flex: 1,
+    flexShrink: 1,
     marginRight: 8,
-  },
-  rightSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
   timeText: {
     fontSize: 12,
-    fontWeight: '400',
-  },
-  unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    color: '#8E8E93',
   },
   alertMessage: {
-    fontSize: 14,
-    lineHeight: 18,
-    marginTop: 2,
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 20,
   },
 }); 

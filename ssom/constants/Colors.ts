@@ -30,7 +30,7 @@ export const Colors = {
     
     // Status Colors
     critical: '#E5483E',       // Critical
-    warning: '#DB8520',        // Warning
+    warning: '#FF9500',        // Warning
     resolved: '#5BA169',       // Resolved/Success
     error: '#E5483E',          // Same as critical
     success: '#5BA169',        // Same as resolved
@@ -42,6 +42,8 @@ export const Colors = {
     tabIconSelected: '#1C2F5E',
     card: '#F5F7FA',
     secondary: '#4A508A',
+    danger: '#FF3B30',
+    info: '#007AFF',
   },
   dark: {
     // Neutral Colors (Dark Mode)
@@ -69,7 +71,7 @@ export const Colors = {
     
     // Status Colors (Adjusted for dark mode)
     critical: '#FF6B6B',       // Softer red for dark mode
-    warning: '#FFB347',        // Softer orange for dark mode
+    warning: '#FF9F0A',        // Softer orange for dark mode
     resolved: '#7BC97B',       // Softer green for dark mode
     error: '#FF6B6B',          // Same as critical
     success: '#7BC97B',        // Same as resolved
@@ -79,7 +81,9 @@ export const Colors = {
     icon: '#B0B3B8',
     tabIconDefault: '#8A8D93',
     tabIconSelected: '#4A6FA5',
-    card: '#2A2C2E',
+    card: '#1C1E1F',
     secondary: '#6A70AA',
+    danger: '#FF453A',
+    info: '#0A84FF',
   },
 }; 

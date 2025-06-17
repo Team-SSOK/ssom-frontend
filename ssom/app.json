@@ -18,7 +18,16 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.jaehongpark.ssom",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -56,6 +65,9 @@
       "eas": {
         "projectId": "335fd377-dd39-4fc8-968f-eaaaf7a287b6"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/335fd377-dd39-4fc8-968f-eaaaf7a287b6"
     }
   }
 }

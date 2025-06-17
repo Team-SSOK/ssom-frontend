@@ -32,7 +32,10 @@ export default function AlertHeader({
   };
 
   return (
-    <View style={[styles.header, { borderBottomColor: colors.border }]}>
+    <View style={[
+      styles.header, 
+      { backgroundColor: colors.background, borderBottomColor: colors.border }
+    ]}>
       <View style={styles.headerContent}>
         <Pressable 
           style={styles.iconButton} 
@@ -96,57 +99,53 @@ export default function AlertHeader({
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingBottom: 0, 
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 48,
+    height: 56,
+    paddingHorizontal: 8,
   },
   iconButton: {
     width: 80,
     height: 40,
     justifyContent: 'center',
-    alignItems: 'flex-start',
-    borderRadius: 20,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 20,
-    fontFamily: FontFamily.bold,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     flex: 1,
     textAlign: 'center',
   },
   markAllButton: {
     width: 80,
-    height: 40,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'flex-end',
-    paddingHorizontal: 8,
   },
   markAllText: {
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '500',
+    paddingHorizontal: 8,
   },
   tabContainer: {
     flexDirection: 'row',
-    marginTop: 16,
-    paddingHorizontal: 16,
+    height: 44,
+    marginTop: 8,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 2,
     borderBottomColor: 'transparent',
   },
   activeTab: {
     borderBottomWidth: 2,
   },
   tabText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
   },
 }); 

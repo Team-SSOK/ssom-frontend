@@ -1,7 +1,7 @@
 // Grafana 설정 (Anonymous 접근 활성화됨)
 export const GRAFANA_CONFIG = {
   BASE_URL: 'https://metric.ssok.kr',
-  DASHBOARD_ID: '1accdfb0-3b5b-4687-8c99-5e59a548a6cc',
+  DASHBOARD_ID: '0076637f-afed-4889-8c23-8d130d500d39',
   ORG_ID: 1,
   ANONYMOUS_ENABLED: true,
 } as const;
@@ -25,8 +25,8 @@ export const createDashboardUrl = (options: {
     to = 'now',
     timezone = 'browser',
     variables = {
-      'var-application': 'ssok-account-service',
-      'var-instance': '172.16.0.232:8080',
+      'var-application': 'ssok-bluetooth-service',
+      'var-instance': '172.16.0.94:8080',
       'var-jvm_memory_pool_heap': '$__all',
       'var-jvm_memory_pool_nonheap': '$__all',
       'var-jvm_buffer_pool': '$__all',

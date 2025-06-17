@@ -57,6 +57,7 @@ export default function StatsSection({
           iconType="octicons"
           color="gray"
           isLoading={isLoadingIssues}
+          onPress={() => router.push('/(app)/(tabs)/issues')}
         />
         <StatsCard
           title="활성 서비스"
