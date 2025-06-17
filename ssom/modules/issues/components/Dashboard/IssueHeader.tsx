@@ -1,30 +1,11 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { Text } from '@/components';
 import { useTheme } from '@/hooks/useTheme';
-import { useAlertStore } from '@/modules/alerts/stores/alertStore';
-import LottieView from 'lottie-react-native';
-import { useRouter } from 'expo-router';
 
 export default function DashboardHeader() {
   const { colors } = useTheme();
-  const animationRef = useRef<LottieView>(null);
   
-  // SSE 연결은 _layout.tsx에서 관리하므로, 여기서는 스토어만 사용
-  const { alerts } = useAlertStore();
-  
-  // 읽지 않은 모든 알림 개수 카운트
-  const unreadAlerts = alerts.filter(alert => !alert.isRead);
-  const notificationCount = unreadAlerts.length;
-  const hasNotifications = notificationCount > 0;
-
-  const router = useRouter();
-
-  const handleAlertPress = () => {
-    animationRef.current?.play();
-    router.push('/(app)/(tabs)/alerts');
-  };
-
   return (
     <View style={[styles.header, { borderBottomColor: colors.border }]}>
       <View style={styles.content}>
@@ -32,27 +13,7 @@ export default function DashboardHeader() {
         <Text style={[styles.title, { color: colors.text }]}>
           이슈 관리
         </Text>
-        <Pressable 
-          style={styles.rightSection}
-          onPress={handleAlertPress}
-        >
-          <LottieView
-            ref={animationRef}
-            source={require('@/assets/lottie/alert.json')}
-            style={styles.alertAnimation}
-            loop={false}            
-          />
-          {hasNotifications && (
-            <View style={[styles.notificationBadge, { backgroundColor: colors.warning }]}>
-              {notificationCount > 0 && notificationCount < 10 && (
-                <Text style={styles.badgeText}>{notificationCount}</Text>
-              )}
-              {notificationCount >= 10 && (
-                <Text style={styles.badgeText}>9+</Text>
-              )}
-            </View>
-          )}
-        </Pressable>
+        <View style={styles.leftSpacer} />
       </View>
     </View>
   );
